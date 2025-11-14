@@ -1,0 +1,555 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+    xmlns="http://ontologyoflaw.org/structural#"
+    xml:base="http://ontologyoflaw.org/structural"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+    xmlns:law="http://ontologyoflaw.org/structural#"
+    xmlns:bfo="http://purl.obolibrary.org/obo/BFO_">
+
+    <!-- Ontology header -->
+    <owl:Ontology rdf:about="http://ontologyoflaw.org/structural">
+        <owl:imports rdf:resource="http://purl.obolibrary.org/obo/bfo.owl"/>
+    </owl:Ontology>
+
+    <!-- #############################
+         UPPER STRUCTURAL CLASSES
+         ############################# -->
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#Agent">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/BFO_Continuant"/>
+        <rdfs:comment>Individual or collective bearer of roles and obligations in the legal system.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#Institution">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/BFO_Continuant"/>
+        <rdfs:comment>Aggregated continuant composed of interrelated roles, norms, and recognition relations.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#LegalSystem">
+        <rdfs:subClassOf rdf:resource="http://ontologyoflaw.org/structural#Institution"/>
+        <rdfs:comment>Global institutional configuration of roles, procedures, and norms that constitute law within a political community.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#PoliticalCommunity">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/BFO_Continuant"/>
+        <rdfs:comment>Community of agents whose mutual recognition sustains a legal and political order (citizens, subjects, etc.).</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#Role">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/BFO_RealizableEntity"/>
+        <rdfs:comment>Specifically dependent continuant inhering in an agent and depending on an institution for its existence.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#Obligation">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/BFO_DependentContinuant"/>
+        <rdfs:comment>Dependent continuant that constrains an agent’s possible actions by virtue of a role.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#Right">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/BFO_DependentContinuant"/>
+        <rdfs:comment>Role- or agent-centered legal advantage correlated with an obligation on some other role.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#Permission">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/BFO_DependentContinuant"/>
+        <rdfs:comment>Dependent continuant reflecting institutional non-prohibition of certain actions for a given role.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#Power">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/BFO_DependentContinuant"/>
+        <rdfs:comment>Dependent continuant that enables a role bearer to effect normative changes (e.g. issuing binding decisions).</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#Immunity">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/BFO_DependentContinuant"/>
+        <rdfs:comment>Dependent continuant specifying that an agent or role is protected from certain normative changes.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#Recognition">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/BFO_RelationalQuality"/>
+        <rdfs:comment>Relational quality that links agents, roles, institutions, and continuants in fields of acknowledgment.</rdfs:comment>
+    </owl:Class>
+
+    <!-- #############################
+         PROCESSES AND EVENTS
+         ############################# -->
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#Process">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/BFO_Process"/>
+        <rdfs:comment>Generic occurrent in which roles and obligations are realized.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#LegalProcess">
+        <rdfs:subClassOf rdf:resource="http://ontologyoflaw.org/structural#Process"/>
+        <rdfs:comment>Procedurally constrained process inside a legal institution (trial, hearing, legislation, enforcement).</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#Trial">
+        <rdfs:subClassOf rdf:resource="http://ontologyoflaw.org/structural#LegalProcess"/>
+        <rdfs:comment>Adjudicative process in which evidence is evaluated and verdicts are produced.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#Hearing">
+        <rdfs:subClassOf rdf:resource="http://ontologyoflaw.org/structural#LegalProcess"/>
+        <rdfs:comment>Legal process focused on specific issues (motions, bail, etc.).</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#Inquest">
+        <rdfs:subClassOf rdf:resource="http://ontologyoflaw.org/structural#LegalProcess"/>
+        <rdfs:comment>Legal process for fact-finding outside ordinary trials.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#LegislationProcess">
+        <rdfs:subClassOf rdf:resource="http://ontologyoflaw.org/structural#LegalProcess"/>
+        <rdfs:comment>Process in which legislative roles create or modify legal norms.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#AdjudicationProcess">
+        <rdfs:subClassOf rdf:resource="http://ontologyoflaw.org/structural#LegalProcess"/>
+        <rdfs:comment>Process in which judicial roles classify facts and apply legal norms.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#EnforcementProcess">
+        <rdfs:subClassOf rdf:resource="http://ontologyoflaw.org/structural#LegalProcess"/>
+        <rdfs:comment>Process through which police or enforcement roles implement judgments or rules.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#RepairProcess">
+        <rdfs:subClassOf rdf:resource="http://ontologyoflaw.org/structural#LegalProcess"/>
+        <rdfs:comment>Process that responds to contradiction and restores coherence in recognition and obligations.</rdfs:comment>
+    </owl:Class>
+
+    <!-- #############################
+         FACTS AND FACT-MAKING
+         ############################# -->
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#BruteFact">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/BFO_Continuant"/>
+        <rdfs:comment>Continuant or occurrence not yet incorporated into institutional recognition as a legal fact.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#LegalFact">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/BFO_Continuant"/>
+        <rdfs:comment>Fact that exists as a dependent continuant sustained by institutional recognition (e.g. conviction, judgment).</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#FactMakingProcess">
+        <rdfs:subClassOf rdf:resource="http://ontologyoflaw.org/structural#LegalProcess"/>
+        <rdfs:comment>Process transforming brute facts, via recognition, into institutional legal facts.</rdfs:comment>
+    </owl:Class>
+
+    <!-- #############################
+         INSTITUTIONS
+         ############################# -->
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#Court">
+        <rdfs:subClassOf rdf:resource="http://ontologyoflaw.org/structural#Institution"/>
+        <rdfs:comment>Institutional role network including judges, clerks, bailiffs, litigants, and triers of fact.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#Legislature">
+        <rdfs:subClassOf rdf:resource="http://ontologyoflaw.org/structural#Institution"/>
+        <rdfs:comment>Institutional role network of representatives and officers responsible for legislation.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#PoliceDepartment">
+        <rdfs:subClassOf rdf:resource="http://ontologyoflaw.org/structural#Institution"/>
+        <rdfs:comment>Institution coordinating police roles, jurisdictions, and mandates.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#RegulatoryAgency">
+        <rdfs:subClassOf rdf:resource="http://ontologyoflaw.org/structural#Institution"/>
+        <rdfs:comment>Institution charged with rule-making and enforcement in specialized domains (markets, environment, etc.).</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#Association">
+        <rdfs:subClassOf rdf:resource="http://ontologyoflaw.org/structural#Institution"/>
+        <rdfs:comment>Institutional entity representing collective agents (e.g. condominium association).</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#PropertyRegistry">
+        <rdfs:subClassOf rdf:resource="http://ontologyoflaw.org/structural#Institution"/>
+        <rdfs:comment>Institution responsible for maintaining recognized property records and registration systems.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#RegistrationSystem">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/BFO_Continuant"/>
+        <rdfs:comment>Informational and procedural infrastructure for recording recognized statuses (ownership, rights, verdicts).</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#AI_LegalSystemComponent">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/BFO_Continuant"/>
+        <rdfs:comment>Artificial system participating in legal roles or decision support within human institutions.</rdfs:comment>
+    </owl:Class>
+
+    <!-- #############################
+         ROLE SUBCLASSES
+         ############################# -->
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#LegalRole">
+        <rdfs:subClassOf rdf:resource="http://ontologyoflaw.org/structural#Role"/>
+        <rdfs:comment>Role realized in legal processes and sustained by legal institutions.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#JudgeRole">
+        <rdfs:subClassOf rdf:resource="http://ontologyoflaw.org/structural#LegalRole"/>
+        <rdfs:comment>Role bearing authority to manage trials, issue rulings, and sometimes serve as trier of fact.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#PlaintiffRole">
+        <rdfs:subClassOf rdf:resource="http://ontologyoflaw.org/structural#LegalRole"/>
+        <rdfs:comment>Role of initiating party in a civil action.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#DefendantRole">
+        <rdfs:subClassOf rdf:resource="http://ontologyoflaw.org/structural#LegalRole"/>
+        <rdfs:comment>Role of party against whom a claim or charge is brought; may become OffenderRole upon conviction.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#OffenderRole">
+        <rdfs:subClassOf rdf:resource="http://ontologyoflaw.org/structural#LegalRole"/>
+        <rdfs:comment>Role inhering in an agent upon conviction for an offense.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#ProsecutorRole">
+        <rdfs:subClassOf rdf:resource="http://ontologyoflaw.org/structural#LegalRole"/>
+        <rdfs:comment>Role bearing the obligation to present the case against a defendant in criminal proceedings.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#PoliceOfficerRole">
+        <rdfs:subClassOf rdf:resource="http://ontologyoflaw.org/structural#LegalRole"/>
+        <rdfs:comment>Enforcement role within a police institution.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#CitizenRole">
+        <rdfs:subClassOf rdf:resource="http://ontologyoflaw.org/structural#LegalRole"/>
+        <rdfs:comment>Role linking agents to a political community, bearing obligations such as obedience to law.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#SubjectRole">
+        <rdfs:subClassOf rdf:resource="http://ontologyoflaw.org/structural#LegalRole"/>
+        <rdfs:comment>Role of ruled individuals in non-republican or hierarchical legal orders.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#BuyerRole">
+        <rdfs:subClassOf rdf:resource="http://ontologyoflaw.org/structural#LegalRole"/>
+        <rdfs:comment>Market role dependent on institutions of exchange, bearing obligations of payment.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#SellerRole">
+        <rdfs:subClassOf rdf:resource="http://ontologyoflaw.org/structural#LegalRole"/>
+        <rdfs:comment>Market role correlated with BuyerRole, bearing obligations of transfer.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#WitnessRole">
+        <rdfs:subClassOf rdf:resource="http://ontologyoflaw.org/structural#LegalRole"/>
+        <rdfs:comment>Role of providing testimony as input to fact-finding.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#JurorRole">
+        <rdfs:subClassOf rdf:resource="http://ontologyoflaw.org/structural#LegalRole"/>
+        <rdfs:comment>Role of participant in collective trier of fact.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#TrierOfFactRole">
+        <rdfs:subClassOf rdf:resource="http://ontologyoflaw.org/structural#LegalRole"/>
+        <rdfs:comment>Role responsible for producing factual determinations based on evidence within a trial.</rdfs:comment>
+    </owl:Class>
+
+    <!-- #############################
+         PROPERTY, VALUE, MARKETS
+         ############################# -->
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#Property">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/BFO_Continuant"/>
+        <rdfs:comment>Relational continuant linking agents, institutions, and objects via recognized ownership.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#Ownership">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/BFO_DependentContinuant"/>
+        <rdfs:comment>Dependent continuant specifying who holds property rights over some object.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#Value">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/BFO_DependentContinuant"/>
+        <rdfs:comment>Relational disposition realized through exchange, dependent on recognized property relations.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#Market">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/BFO_Continuant"/>
+        <rdfs:comment>Configuration of institutions, rules, and practices in which exchange processes realize value.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#Exchange">
+        <rdfs:subClassOf rdf:resource="http://ontologyoflaw.org/structural#Process"/>
+        <rdfs:comment>Realization process in which property relations are reconfigured through mutual recognition.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#Price">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/BFO_InformationContentEntity"/>
+        <rdfs:comment>Information artifact quantifying recognition of value in a given configuration.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#CompanyShare">
+        <rdfs:subClassOf rdf:resource="http://ontologyoflaw.org/structural#Property"/>
+        <rdfs:comment>Property unit whose value fluctuates with patterns of recognition and institutional guarantees.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#DigitalAsset">
+        <rdfs:subClassOf rdf:resource="http://ontologyoflaw.org/structural#Property"/>
+        <rdfs:comment>Property whose bearers and objects are informational entities (tokens, blockchain entries, virtual goods).</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#Trademark">
+        <rdfs:subClassOf rdf:resource="http://ontologyoflaw.org/structural#Property"/>
+        <rdfs:comment>Recognized exclusive right over signs associated with goods or services.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#DataSet">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/BFO_InformationContentEntity"/>
+        <rdfs:comment>Structured collection of data, potentially bearing property and value.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#SocialMediaInfluence">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/BFO_DependentContinuant"/>
+        <rdfs:comment>Relational dependent continuant sustained by recognition patterns on social platforms and legal structures around them.</rdfs:comment>
+    </owl:Class>
+
+    <!-- #############################
+         EVIDENCE, PROOF, VERDICT
+         ############################# -->
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#Data">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/BFO_InformationContentEntity"/>
+        <rdfs:comment>Information content entity existing independently of juridical status.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#Testimony">
+        <rdfs:subClassOf rdf:resource="http://ontologyoflaw.org/structural#Process"/>
+        <rdfs:comment>Speech-act process in which an agent conveys information with the intention of recognition.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#Evidence">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/BFO_DependentContinuant"/>
+        <rdfs:comment>Recognized information artifact bearing evidential force within a legal process.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#Proof">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/BFO_DependentContinuant"/>
+        <rdfs:comment>Configuration of evidential relations achieving institutional coherence sufficient for legal truth.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#Verdict">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/BFO_DependentContinuant"/>
+        <rdfs:comment>Relational continuant linking a trier of fact, evidential record, and institutional context as binding legal truth.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#VerdictDocument">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/BFO_InformationContentEntity"/>
+        <rdfs:comment>Information artifact that records the verdict and supports its persistence in registries and precedent.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#TrierOfFact">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/BFO_DependentContinuant"/>
+        <rdfs:comment>Epistemic structure realized in judge or jury roles that generates determinations of fact.</rdfs:comment>
+    </owl:Class>
+
+    <!-- #############################
+         METRICS: CONTRADICTION, RESILIENCE
+         ############################# -->
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#ContradictionDebt">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/BFO_DependentContinuant"/>
+        <rdfs:comment>Accumulated unresolved obligation conflicts in an institutional field.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#RecognitionDensity">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/BFO_DependentContinuant"/>
+        <rdfs:comment>Measure-like dependent continuant capturing density of recognition relations in a region of the system.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#RepairEfficiency">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/BFO_DependentContinuant"/>
+        <rdfs:comment>Dependent continuant representing the effectiveness of repair processes in resolving contradictions.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#InstitutionalResilienceIndex">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/BFO_DependentContinuant"/>
+        <rdfs:comment>Composite dependent continuant over RD, CD, RE, etc., indicating overall resilience.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#Justice">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/BFO_DependentContinuant"/>
+        <rdfs:comment>High-level dependent continuant reflecting the coherence and repairability of obligations and recognition across a legal system.</rdfs:comment>
+    </owl:Class>
+
+    <owl:Class rdf:about="http://ontologyoflaw.org/structural#Pluralism">
+        <rdfs:subClassOf rdf:resource="http://purl.obolibrary.org/obo/BFO_DependentContinuant"/>
+        <rdfs:comment>Structural condition of distributed, overlapping recognition fields that support stability between rigidity and anomy.</rdfs:comment>
+    </owl:Class>
+
+    <!-- #############################
+         CORE OBJECT PROPERTIES
+         ############################# -->
+
+    <owl:ObjectProperty rdf:about="http://ontologyoflaw.org/structural#bearsRole">
+        <rdfs:domain rdf:resource="http://ontologyoflaw.org/structural#Agent"/>
+        <rdfs:range rdf:resource="http://ontologyoflaw.org/structural#Role"/>
+        <rdfs:comment>Relates an agent to a role it bears.</rdfs:comment>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://ontologyoflaw.org/structural#roleInheresIn">
+        <rdfs:domain rdf:resource="http://ontologyoflaw.org/structural#Role"/>
+        <rdfs:range rdf:resource="http://ontologyoflaw.org/structural#Agent"/>
+        <owl:inverseOf rdf:resource="http://ontologyoflaw.org/structural#bearsRole"/>
+        <rdfs:comment>Inverse of bearsRole.</rdfs:comment>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://ontologyoflaw.org/structural#roleDependsOnInstitution">
+        <rdfs:domain rdf:resource="http://ontologyoflaw.org/structural#Role"/>
+        <rdfs:range rdf:resource="http://ontologyoflaw.org/structural#Institution"/>
+        <rdfs:comment>Specifies the institution that sustains a given role.</rdfs:comment>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://ontologyoflaw.org/structural#imposesObligationOnRole">
+        <rdfs:domain rdf:resource="http://ontologyoflaw.org/structural#Obligation"/>
+        <rdfs:range rdf:resource="http://ontologyoflaw.org/structural#Role"/>
+        <rdfs:comment>Relates an obligation to the role that bears it.</rdfs:comment>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://ontologyoflaw.org/structural#realizesObligation">
+        <rdfs:domain rdf:resource="http://ontologyoflaw.org/structural#Process"/>
+        <rdfs:range rdf:resource="http://ontologyoflaw.org/structural#Obligation"/>
+        <rdfs:comment>Relates processes to obligations they realize.</rdfs:comment>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://ontologyoflaw.org/structural#recognizes">
+        <rdfs:domain rdf:resource="http://ontologyoflaw.org/structural#Agent"/>
+        <rdfs:range rdf:resource="http://purl.obolibrary.org/obo/BFO_Continuant"/>
+        <rdfs:comment>Agent-level recognition relation toward another continuant.</rdfs:comment>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://ontologyoflaw.org/structural#institutionallyRecognizes">
+        <rdfs:domain rdf:resource="http://ontologyoflaw.org/structural#Institution"/>
+        <rdfs:range rdf:resource="http://purl.obolibrary.org/obo/BFO_Continuant"/>
+        <rdfs:comment>Institutional recognition that confers legal status (e.g. evidence, property, verdicts).</rdfs:comment>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://ontologyoflaw.org/structural#hasParticipant">
+        <rdfs:domain rdf:resource="http://ontologyoflaw.org/structural#Process"/>
+        <rdfs:range rdf:resource="http://purl.obolibrary.org/obo/BFO_Continuant"/>
+        <rdfs:comment>Relates processes to participating continuants (agents, institutions, roles, evidence).</rdfs:comment>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://ontologyoflaw.org/structural#occursInInstitution">
+        <rdfs:domain rdf:resource="http://ontologyoflaw.org/structural#LegalProcess"/>
+        <rdfs:range rdf:resource="http://ontologyoflaw.org/structural#Institution"/>
+        <rdfs:comment>Relates legal processes to the institutions within which they occur.</rdfs:comment>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://ontologyoflaw.org/structural#outputsFact">
+        <rdfs:domain rdf:resource="http://ontologyoflaw.org/structural#FactMakingProcess"/>
+        <rdfs:range rdf:resource="http://ontologyoflaw.org/structural#LegalFact"/>
+        <rdfs:comment>Relates fact-making processes to the legal facts they produce.</rdfs:comment>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://ontologyoflaw.org/structural#hasEvidence">
+        <rdfs:domain rdf:resource="http://ontologyoflaw.org/structural#Trial"/>
+        <rdfs:range rdf:resource="http://ontologyoflaw.org/structural#Evidence"/>
+        <rdfs:comment>Relates trials to evidential items considered in fact-finding.</rdfs:comment>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://ontologyoflaw.org/structural#evidenceDerivedFromData">
+        <rdfs:domain rdf:resource="http://ontologyoflaw.org/structural#Evidence"/>
+        <rdfs:range rdf:resource="http://ontologyoflaw.org/structural#Data"/>
+        <rdfs:comment>Relates evidence to underlying data from which it is formed.</rdfs:comment>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://ontologyoflaw.org/structural#evidenceDerivedFromTestimony">
+        <rdfs:domain rdf:resource="http://ontologyoflaw.org/structural#Evidence"/>
+        <rdfs:range rdf:resource="http://ontologyoflaw.org/structural#Testimony"/>
+        <rdfs:comment>Relates evidence to testimony that serves as its source.</rdfs:comment>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://ontologyoflaw.org/structural#hasVerdict">
+        <rdfs:domain rdf:resource="http://ontologyoflaw.org/structural#Trial"/>
+        <rdfs:range rdf:resource="http://ontologyoflaw.org/structural#Verdict"/>
+        <rdfs:comment>Relates a trial process to the verdict it yields.</rdfs:comment>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://ontologyoflaw.org/structural#verdictIssuedBy">
+        <rdfs:domain rdf:resource="http://ontologyoflaw.org/structural#Verdict"/>
+        <rdfs:range rdf:resource="http://ontologyoflaw.org/structural#TrierOfFact"/>
+        <rdfs:comment>Relates verdicts to the trier of fact that issues them.</rdfs:comment>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://ontologyoflaw.org/structural#verdictRecordedIn">
+        <rdfs:domain rdf:resource="http://ontologyoflaw.org/structural#Verdict"/>
+        <rdfs:range rdf:resource="http://ontologyoflaw.org/structural#VerdictDocument"/>
+        <rdfs:comment>Relates verdicts to information artifacts recording them.</rdfs:comment>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://ontologyoflaw.org/structural#hasPropertyBearer">
+        <rdfs:domain rdf:resource="http://ontologyoflaw.org/structural#Property"/>
+        <rdfs:range rdf:resource="http://purl.obolibrary.org/obo/BFO_Continuant"/>
+        <rdfs:comment>Relates property relations to the objects over which they range.</rdfs:comment>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://ontologyoflaw.org/structural#hasOwner">
+        <rdfs:domain rdf:resource="http://ontologyoflaw.org/structural#Property"/>
+        <rdfs:range rdf:resource="http://ontologyoflaw.org/structural#Agent"/>
+        <rdfs:comment>Relates property relations to their owning agents or associations.</rdfs:comment>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://ontologyoflaw.org/structural#hasMarketValue">
+        <rdfs:domain rdf:resource="http://ontologyoflaw.org/structural#Property"/>
+        <rdfs:range rdf:resource="http://ontologyoflaw.org/structural#Value"/>
+        <rdfs:comment>Relates property to value that is realized through exchange.</rdfs:comment>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://ontologyoflaw.org/structural#valueRealizedInExchange">
+        <rdfs:domain rdf:resource="http://ontologyoflaw.org/structural#Value"/>
+        <rdfs:range rdf:resource="http://ontologyoflaw.org/structural#Exchange"/>
+        <rdfs:comment>Relates value to the exchange processes in which it is realized.</rdfs:comment>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://ontologyoflaw.org/structural#exchangeOccursOnMarket">
+        <rdfs:domain rdf:resource="http://ontologyoflaw.org/structural#Exchange"/>
+        <rdfs:range rdf:resource="http://ontologyoflaw.org/structural#Market"/>
+        <rdfs:comment>Relates exchanges to the markets that structure them.</rdfs:comment>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://ontologyoflaw.org/structural#exchangeHasPrice">
+        <rdfs:domain rdf:resource="http://ontologyoflaw.org/structural#Exchange"/>
+        <rdfs:range rdf:resource="http://ontologyoflaw.org/structural#Price"/>
+        <rdfs:comment>Relates an individual exchange to a price artifact expressing recognition equilibrium.</rdfs:comment>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://ontologyoflaw.org/structural#hasContradictionDebt">
+        <rdfs:domain rdf:resource="http://ontologyoflaw.org/structural#Institution"/>
+        <rdfs:range rdf:resource="http://ontologyoflaw.org/structural#ContradictionDebt"/>
+        <rdfs:comment>Relates institutions to their accumulated contradiction debt.</rdfs:comment>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://ontologyoflaw.org/structural#hasRecognitionDensity">
+        <rdfs:domain rdf:resource="http://ontologyoflaw.org/structural#Institution"/>
+        <rdfs:range rdf:resource="http://ontologyoflaw.org/structural#RecognitionDensity"/>
+        <rdfs:comment>Relates institutional regions to recognition density values.</rdfs:comment>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://ontologyoflaw.org/structural#hasRepairEfficiency">
+        <rdfs:domain rdf:resource="http://ontologyoflaw.org/structural#Institution"/>
+        <rdfs:range rdf:resource="http://ontologyoflaw.org/structural#RepairEfficiency"/>
+        <rdfs:comment>Relates institutions to measures of how efficiently they repair contradictions.</rdfs:comment>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="http://ontologyoflaw.org/structural#hasInstitutionalResilienceIndex">
+        <rdfs:domain rdf:resource="http://ontologyoflaw.org/structural#Institution"/>
+        <rdfs:range rdf:resource="http://ontologyoflaw.org/structural#InstitutionalResilienceIndex"/>
+        <rdfs:comment>Relates institutions or legal systems to composite resilience metrics.</rdfs:comment>
+    </owl:ObjectProperty>
+
+</rdf:RDF>
