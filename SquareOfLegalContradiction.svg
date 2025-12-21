@@ -1,0 +1,196 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1500" width="1200" height="1500" role="img" aria-label="SOoL contradiction square with embedded minimum legal chain (1 to 8)">
+  <title>SOoL Contradiction Square with Embedded Minimum Legal Chain (1–8)</title>
+
+  <defs>
+    <!-- SOoL Color Grammar: tweak these in one place -->
+    <style>
+      :root{
+        --sool-ink:#1c2430;
+        --sool-muted:#556173;
+        --sool-paper:#ffffff;
+
+        /* Quadrant fills (SOoL color grammar) */
+        --sool-authority-fill:#e8f1ff;
+        --sool-authority-stroke:#2b6df3;
+
+        --sool-effect-fill:#fff1e6;
+        --sool-effect-stroke:#f07a2b;
+
+        --sool-recognition-fill:#e9fbf2;
+        --sool-recognition-stroke:#1f9d55;
+
+        --sool-repair-fill:#f3ecff;
+        --sool-repair-stroke:#7c3aed;
+
+        /* Structural vs chain styling */
+        --sool-structural-stroke:#2a3342;
+        --sool-chain-stroke:#5a667a;
+
+        /* UI-friendly */
+        --sool-card-radius:18px;
+        --sool-card-stroke:3px;
+        --sool-shadow: 0px 12px 28px rgba(28,36,48,0.14);
+        --sool-shadow-soft: 0px 8px 18px rgba(28,36,48,0.10);
+        --sool-font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      }
+
+      .bg { fill: var(--sool-paper); }
+      .title { font: 700 28px var(--sool-font); fill: var(--sool-ink); }
+      .subtitle { font: 500 14px var(--sool-font); fill: var(--sool-muted); }
+
+      .card {
+        rx: var(--sool-card-radius);
+        ry: var(--sool-card-radius);
+        stroke-width: var(--sool-card-stroke);
+        filter: drop-shadow(var(--sool-shadow));
+      }
+
+      .cardHead { font: 800 18px var(--sool-font); letter-spacing: 0.5px; }
+      .cardText { font: 500 14px var(--sool-font); fill: var(--sool-ink); }
+      .cardMuted { font: 600 13px var(--sool-font); fill: var(--sool-muted); }
+
+      .structEdge { stroke: var(--sool-structural-stroke); stroke-width: 4; fill: none; opacity: 0.9; }
+      .chainEdge { stroke: var(--sool-chain-stroke); stroke-width: 3; fill: none; stroke-dasharray: 10 10; opacity: 0.95; }
+
+      .edgeLabel { font: 700 13px var(--sool-font); fill: var(--sool-muted); paint-order: stroke; stroke: rgba(255,255,255,0.9); stroke-width: 6px; }
+      .note {
+        fill: #fbfcff;
+        stroke: #cbd5e1;
+        stroke-width: 2;
+        rx: 14; ry: 14;
+        filter: drop-shadow(var(--sool-shadow-soft));
+      }
+      .noteText { font: 600 13px var(--sool-font); fill: var(--sool-ink); }
+      .noteMuted { font: 600 12px var(--sool-font); fill: var(--sool-muted); }
+
+      .bullet { font: 500 14px var(--sool-font); fill: var(--sool-ink); }
+
+      /* Make text crisp in browsers */
+      text { text-rendering: geometricPrecision; }
+      shape-rendering { geometricPrecision: auto; }
+    </style>
+
+    <!-- Arrowhead for chain arrows -->
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="var(--sool-chain-stroke)"></path>
+    </marker>
+
+    <!-- Small dot marker (for structure, no arrowheads) -->
+    <marker id="dot" markerWidth="10" markerHeight="10" refX="5" refY="5">
+      <circle cx="5" cy="5" r="3.2" fill="var(--sool-structural-stroke)" opacity="0.55"></circle>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect class="bg" x="0" y="0" width="1200" height="1500"></rect>
+
+  <!-- Title -->
+  <text class="title" x="600" y="64" text-anchor="middle">SOoL Contradiction Square with Embedded Minimum Legal Chain (1–8)</text>
+  <text class="subtitle" x="600" y="92" text-anchor="middle">Solid square = structural conditions. Dashed arrows = chain order. Numbers = required chain positions.</text>
+
+  <!-- Layout anchors -->
+  <!-- Square corners (centers of cards) are around:
+       AUTHORITY (300, 360)  EFFECT (900, 360)
+       RECOGNITION (300, 1020) REPAIR (900, 1020)
+  -->
+
+  <!-- Structural square edges (no arrows) -->
+  <path class="structEdge" d="M 480 360 L 720 360" marker-start="url(#dot)" marker-end="url(#dot)"></path>
+  <path class="structEdge" d="M 900 540 L 900 840" marker-start="url(#dot)" marker-end="url(#dot)"></path>
+  <path class="structEdge" d="M 720 1020 L 480 1020" marker-start="url(#dot)" marker-end="url(#dot)"></path>
+  <path class="structEdge" d="M 300 840 L 300 540" marker-start="url(#dot)" marker-end="url(#dot)"></path>
+
+  <!-- Chain edges (dashed, with arrowheads) -->
+  <!-- AUTHORITY -> EFFECT -->
+  <path class="chainEdge" d="M 480 430 C 600 520, 600 520, 720 430" marker-end="url(#arrow)"></path>
+  <text class="edgeLabel" x="600" y="520" text-anchor="middle">1→2→3→4</text>
+
+  <!-- EFFECT -> RECOGNITION -->
+  <path class="chainEdge" d="M 820 540 C 700 700, 500 700, 380 840" marker-end="url(#arrow)"></path>
+  <text class="edgeLabel" x="600" y="720" text-anchor="middle">4→5→6→7</text>
+
+  <!-- RECOGNITION -> REPAIR -->
+  <path class="chainEdge" d="M 480 1090 C 600 1180, 600 1180, 720 1090" marker-end="url(#arrow)"></path>
+  <text class="edgeLabel" x="600" y="1180" text-anchor="middle">7→8</text>
+
+  <!-- Quadrant cards -->
+  <!-- AUTHORITY card -->
+  <rect class="card" x="120" y="180" width="360" height="360" fill="var(--sool-authority-fill)" stroke="var(--sool-authority-stroke)"></rect>
+  <text class="cardHead" x="300" y="224" text-anchor="middle" fill="var(--sool-authority-stroke)">AUTHORITY</text>
+
+  <text class="cardText" x="155" y="266">
+    <tspan x="155" dy="0">(1) Source of authority</tspan>
+    <tspan x="155" dy="22">(2) Norm</tspan>
+    <tspan x="155" dy="22">(3) Actor in role</tspan>
+
+    <tspan x="155" dy="34" class="cardMuted">Primary failures</tspan>
+    <tspan x="155" dy="22">• Conferral failure (1→3)</tspan>
+    <tspan x="155" dy="22">• Jurisdictional contradiction (2↔6)</tspan>
+    <tspan x="155" dy="22">• Role contradiction (3)</tspan>
+  </text>
+
+  <!-- EFFECT card -->
+  <rect class="card" x="720" y="180" width="360" height="360" fill="var(--sool-effect-fill)" stroke="var(--sool-effect-stroke)"></rect>
+  <text class="cardHead" x="900" y="224" text-anchor="middle" fill="var(--sool-effect-stroke)">EFFECT</text>
+
+  <text class="cardText" x="755" y="266">
+    <tspan x="755" dy="0">(4) Triggering facts</tspan>
+    <tspan x="755" dy="22">(5) Legal action / omission</tspan>
+
+    <tspan x="755" dy="34" class="cardMuted">Primary failures</tspan>
+    <tspan x="755" dy="22">• Procedural contradiction (2→5)</tspan>
+    <tspan x="755" dy="22">• Temporal contradiction (2↔4)</tspan>
+  </text>
+
+  <!-- RECOGNITION card -->
+  <rect class="card" x="120" y="840" width="360" height="360" fill="var(--sool-recognition-fill)" stroke="var(--sool-recognition-stroke)"></rect>
+  <text class="cardHead" x="300" y="884" text-anchor="middle" fill="var(--sool-recognition-stroke)">RECOGNITION</text>
+
+  <text class="cardText" x="155" y="926">
+    <tspan x="155" dy="0">(6) Target</tspan>
+    <tspan x="155" dy="22">(7) Legal effect</tspan>
+
+    <tspan x="155" dy="34" class="cardMuted">Primary failures</tspan>
+    <tspan x="155" dy="22">• Recognition failure (6/7)</tspan>
+    <tspan x="155" dy="22">• Role contradiction (7)</tspan>
+    <tspan x="155" dy="22">• Correlativity contradiction (7)</tspan>
+  </text>
+
+  <!-- REPAIR card -->
+  <rect class="card" x="720" y="840" width="360" height="360" fill="var(--sool-repair-fill)" stroke="var(--sool-repair-stroke)"></rect>
+  <text class="cardHead" x="900" y="884" text-anchor="middle" fill="var(--sool-repair-stroke)">REPAIR</text>
+
+  <text class="cardText" x="755" y="926">
+    <tspan x="755" dy="0">(8) Remedy</tspan>
+
+    <tspan x="755" dy="34" class="cardMuted">Primary failures</tspan>
+    <tspan x="755" dy="22">• Repair failure (8)</tspan>
+    <tspan x="755" dy="22">• Remedy unavailable or blocked</tspan>
+  </text>
+
+  <!-- Top callout: Minimum legal chain -->
+  <rect class="note" x="360" y="118" width="480" height="92"></rect>
+  <text class="noteText" x="600" y="150" text-anchor="middle">Minimum Legal Chain (1–8)</text>
+  <text class="noteMuted" x="600" y="178" text-anchor="middle">A legal effect is valid only if each numbered position is satisfied in order.</text>
+
+  <!-- Right callout: Legend -->
+  <rect class="note" x="740" y="620" width="420" height="124"></rect>
+  <text class="noteText" x="950" y="654" text-anchor="middle">Legend</text>
+  <text class="noteMuted" x="770" y="684">
+    <tspan x="770" dy="0">Solid square = structural conditions</tspan>
+    <tspan x="770" dy="22">Dashed arrows = chain order</tspan>
+    <tspan x="770" dy="22">Numbers = required chain positions</tspan>
+  </text>
+
+  <!-- Bottom-right callout: Indexing contradictions -->
+  <rect class="note" x="720" y="1240" width="440" height="104"></rect>
+  <text class="noteMuted" x="740" y="1274">
+    <tspan x="740" dy="0">Contradictions are indexed</tspan>
+    <tspan x="740" dy="22">to specific chain links,</tspan>
+    <tspan x="740" dy="22">not merely to doctrines.</tspan>
+  </text>
+
+  <!-- Optional: subtle center guide (kept invisible by default)
+  <circle cx="600" cy="750" r="6" fill="#000" opacity="0.08"/>
+  -->
+</svg>
