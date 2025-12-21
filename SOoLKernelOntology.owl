@@ -1,0 +1,522 @@
+@prefix : <http://seal.tamu.edu/legal-kernel#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+#################################################################
+# Ontology header
+#################################################################
+
+<http://seal.tamu.edu/legal-kernel> a owl:Ontology ;
+    rdfs:label "SEAL Legal Structural Kernel Ontology" ;
+    rdfs:comment "Kernel for structural modeling of legal events, violation classes, and offenses." .
+
+#################################################################
+# Core classes
+#################################################################
+
+:LegalSystem a owl:Class ;
+    rdfs:label "Legal system" ;
+    rdfs:comment "A historically and socially situated system of norms and practices." .
+
+:Norm a owl:Class ;
+    rdfs:label "Norm" ;
+    rdfs:comment "A rule or standard within a legal system, such as a statute, regulation, or constitutional provision." .
+
+:Role a owl:Class ;
+    rdfs:label "Role" ;
+    rdfs:comment "A position or function within a legal system, such as judge, police officer, landlord, tenant, citizen." .
+
+:Agent a owl:Class ;
+    rdfs:label "Agent" ;
+    rdfs:comment "An entity that can bear roles and perform acts (person, organization, state actor)." .
+
+:LegalEvent a owl:Class ;
+    rdfs:label "Legal event" ;
+    rdfs:comment "A temporally extended occurrence involving agents, norms, roles, procedures, and facts." .
+
+:NormativeEvent a owl:Class ;
+    rdfs:subClassOf :LegalEvent ;
+    rdfs:label "Normative event" ;
+    rdfs:comment "A legal event concerning creation, modification, or application of norms." .
+
+:OffenseEvent a owl:Class ;
+    rdfs:subClassOf :LegalEvent ;
+    rdfs:label "Offense event" ;
+    rdfs:comment "A legal event that instantiates a wrongful pattern described by an offense type." .
+
+:FactSituation a owl:Class ;
+    rdfs:label "Fact situation" ;
+    rdfs:comment "A concrete factual configuration relevant to legal assessment." .
+
+:Remedy a owl:Class ;
+    rdfs:label "Remedy" ;
+    rdfs:comment "A structured legal response intended to repair, compensate, punish, or restore." .
+
+#################################################################
+# Structural layer: Chain elements and violation classes
+#################################################################
+
+:ChainElement a owl:Class ;
+    rdfs:label "Chain element" ;
+    rdfs:comment "A position in the canonical chain of legality (authority, norm, role, facts, procedure, etc.)." .
+
+:StructuralViolationClass a owl:Class ;
+    rdfs:label "Structural violation class" ;
+    rdfs:comment "A generic type of mismatch or failure in the legal chain." .
+
+:ChainFailurePattern a owl:Class ;
+    rdfs:label "Chain failure pattern" ;
+    rdfs:comment "A pattern describing how one or more chain elements are structurally related in a failure." .
+
+#################################################################
+# Offense layer
+#################################################################
+
+:OffenseType a owl:Class ;
+    rdfs:label "Offense type" ;
+    rdfs:comment "A type-level pattern of wrongful conduct (e.g., Murder, Fraud, Unlawful Search and Seizure)." .
+
+:OffenseCategory a owl:Class ;
+    rdfs:label "Offense category" ;
+    rdfs:comment "A category such as Crime, Tort, or Constitutional violation." .
+
+#################################################################
+# Enumerated offense categories
+#################################################################
+
+:Crime a owl:NamedIndividual , :OffenseCategory ;
+    rdfs:label "Crime" .
+
+:Tort a owl:NamedIndividual , :OffenseCategory ;
+    rdfs:label "Tort" .
+
+:ConstitutionalViolation a owl:NamedIndividual , :OffenseCategory ;
+    rdfs:label "Constitutional violation" .
+
+#################################################################
+# Object properties
+#################################################################
+
+:hasOffenseCategory a owl:ObjectProperty ;
+    rdfs:label "has offense category" ;
+    rdfs:domain :OffenseType ;
+    rdfs:range :OffenseCategory ;
+    rdfs:comment "Links an offense type to its category (Crime, Tort, Constitutional violation)." .
+
+:hasStructuralViolationClass a owl:ObjectProperty ;
+    rdfs:label "has structural violation class" ;
+    rdfs:domain :OffenseType ;
+    rdfs:range :StructuralViolationClass ;
+    rdfs:comment "Links an offense type to the structural violation classes it instantiates." .
+
+:hasChainFailurePattern a owl:ObjectProperty ;
+    rdfs:label "has chain failure pattern" ;
+    rdfs:domain [ a owl:Class ;
+                  owl:unionOf ( :OffenseType :StructuralViolationClass ) ] ;
+    rdfs:range :ChainFailurePattern ;
+    rdfs:comment "Links either an offense type or a structural violation class to its chain failure pattern(s)." .
+
+:focusesOnElement a owl:ObjectProperty ;
+    rdfs:label "focuses on element" ;
+    rdfs:domain :ChainFailurePattern ;
+    rdfs:range :ChainElement ;
+    rdfs:comment "Identifies the primary chain element involved in a failure pattern." .
+
+:relatesToSecondaryElement a owl:ObjectProperty ;
+    rdfs:label "relates to secondary element" ;
+    rdfs:domain :ChainFailurePattern ;
+    rdfs:range :ChainElement ;
+    rdfs:comment "Identifies an additional chain element related to the failure pattern." .
+
+:involvesFactSituation a owl:ObjectProperty ;
+    rdfs:label "involves fact situation" ;
+    rdfs:domain :LegalEvent ;
+    rdfs:range :FactSituation ;
+    rdfs:comment "Links a legal event to the fact situation it involves." .
+
+:involvesAgent a owl:ObjectProperty ;
+    rdfs:label "involves agent" ;
+    rdfs:domain :LegalEvent ;
+    rdfs:range :Agent ;
+    rdfs:comment "Links a legal event to participating agents." .
+
+:appliesNorm a owl:ObjectProperty ;
+    rdfs:label "applies norm" ;
+    rdfs:domain :LegalEvent ;
+    rdfs:range :Norm ;
+    rdfs:comment "Links a legal event to norms applied within it." .
+
+:confersRole a owl:ObjectProperty ;
+    rdfs:label "confers role" ;
+    rdfs:domain :NormativeEvent ;
+    rdfs:range :Role ;
+    rdfs:comment "Relates a normative event to the roles it confers." .
+
+:hasRemedy a owl:ObjectProperty ;
+    rdfs:label "has remedy" ;
+    rdfs:domain :LegalEvent ;
+    rdfs:range :Remedy ;
+    rdfs:comment "Links a legal event to the remedies triggered or sought." .
+
+:instantiatesOffenseType a owl:ObjectProperty ;
+    rdfs:label "instantiates offense type" ;
+    rdfs:domain :OffenseEvent ;
+    rdfs:range :OffenseType ;
+    rdfs:comment "Indicates that an offense event instantiates a particular offense type." .
+
+#################################################################
+# Data properties
+#################################################################
+
+:hasName a owl:DatatypeProperty ;
+    rdfs:label "has name" ;
+    rdfs:range xsd:string .
+
+:hasDescription a owl:DatatypeProperty ;
+    rdfs:label "has description" ;
+    rdfs:range xsd:string .
+
+:hasRelationType a owl:DatatypeProperty ;
+    rdfs:label "has relation type" ;
+    rdfs:domain :ChainFailurePattern ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Encodes relation between chain elements, e.g. 'FOCUS', 'FORWARD', 'BIDIRECTIONAL'." .
+
+:hasCode a owl:DatatypeProperty ;
+    rdfs:label "has code" ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Optional code or identifier for offenses or structural classes (e.g., statue citations, internal IDs)." .
+
+#################################################################
+# Canonical chain elements (1–8)
+#################################################################
+
+:AuthoritySource a owl:NamedIndividual , :ChainElement ;
+    rdfs:label "Authority source" ;
+    :hasDescription "Source of authority to create or enforce norms (e.g., constitution, legislature, court)." .
+
+:NormSpecification a owl:NamedIndividual , :ChainElement ;
+    rdfs:label "Norm specification" ;
+    :hasDescription "The content of a norm specifying conditions, prohibitions, powers, or permissions." .
+
+:RoleConferral a owl:NamedIndividual , :ChainElement ;
+    rdfs:label "Role conferral" ;
+    :hasDescription "The conferral of roles or legal capacities upon agents." .
+
+:FactualTrigger a owl:NamedIndividual , :ChainElement ;
+    rdfs:label "Factual trigger" ;
+    :hasDescription "The factual conditions whose occurrence triggers the application of norms." .
+
+:ProcedureElement a owl:NamedIndividual , :ChainElement ;
+    rdfs:label "Procedure" ;
+    :hasDescription "Procedures and processes by which norms are applied or enforced." .
+
+:JurisdictionScope a owl:NamedIndividual , :ChainElement ;
+    rdfs:label "Jurisdiction and scope" ;
+    :hasDescription "The jurisdictional and target scope of norms and authorities." .
+
+:CorrelativePosition a owl:NamedIndividual , :ChainElement ;
+    rdfs:label "Correlative position" ;
+    :hasDescription "Positions in correlativity relations, such as rights and corresponding duties." .
+
+:RemedyStage a owl:NamedIndividual , :ChainElement ;
+    rdfs:label "Remedy stage" ;
+    :hasDescription "The stage at which remedies are determined and applied." .
+
+#################################################################
+# Structural violation classes (as classes)
+#################################################################
+
+:SourceOfAuthorityFailure a owl:Class ;
+    rdfs:subClassOf :StructuralViolationClass ;
+    rdfs:label "Source of authority failure" ;
+    rdfs:comment "No valid source of authority to create or enforce a norm; authority is not legitimate or recognized." .
+
+:NormativeContradiction a owl:Class ;
+    rdfs:subClassOf :StructuralViolationClass ;
+    rdfs:label "Normative contradiction" ;
+    rdfs:comment "A norm conflicts with higher-level law or constitutional provisions, making it invalid or defective." .
+
+:ConferralFailure a owl:Class ;
+    rdfs:subClassOf :StructuralViolationClass ;
+    rdfs:label "Conferral failure" ;
+    rdfs:comment "Authority fails to confer a role properly; the actor lacks legal power to perform the act." .
+
+:RoleContradictionAuthority a owl:Class ;
+    rdfs:subClassOf :StructuralViolationClass ;
+    rdfs:label "Role contradiction (authority)" ;
+    rdfs:comment "An actor does not occupy the appropriate role or acts outside their assigned role." .
+
+:ProceduralContradiction a owl:Class ;
+    rdfs:subClassOf :StructuralViolationClass ;
+    rdfs:label "Procedural contradiction" ;
+    rdfs:comment "Procedural requirements are not followed; there is a mismatch between the norm and the legal action." .
+
+:TemporalContradiction a owl:Class ;
+    rdfs:subClassOf :StructuralViolationClass ;
+    rdfs:label "Temporal contradiction" ;
+    rdfs:comment "Timing mismatch between the norm and triggering facts; norms applied retroactively or prematurely." .
+
+:FactualMisalignment a owl:Class ;
+    rdfs:subClassOf :StructuralViolationClass ;
+    rdfs:label "Factual misalignment" ;
+    rdfs:comment "Triggering facts do not meet normative conditions; the factual predicate for legal action is absent or wrong." .
+
+:JurisdictionalContradiction a owl:Class ;
+    rdfs:subClassOf :StructuralViolationClass ;
+    rdfs:label "Jurisdictional contradiction" ;
+    rdfs:comment "A norm or authority is applied to a target outside its jurisdiction or scope." .
+
+:RecognitionFailure a owl:Class ;
+    rdfs:subClassOf :StructuralViolationClass ;
+    rdfs:label "Recognition failure" ;
+    rdfs:comment "The target or legal effect is not recognized by the relevant actors or institutions." .
+
+:CorrelativityContradiction a owl:Class ;
+    rdfs:subClassOf :StructuralViolationClass ;
+    rdfs:label "Correlativity contradiction" ;
+    rdfs:comment "Rights and duties are not properly correlated; e.g., a right is asserted without a corresponding duty." .
+
+:EffectContradiction a owl:Class ;
+    rdfs:subClassOf :StructuralViolationClass ;
+    rdfs:label "Effect contradiction" ;
+    rdfs:comment "The legal effect contradicts itself or conflicts with existing legal effects." .
+
+:RepairFailure a owl:Class ;
+    rdfs:subClassOf :StructuralViolationClass ;
+    rdfs:label "Repair failure" ;
+    rdfs:comment "The system fails to repair itself; remedies are not applied or are ineffective." .
+
+:RemedyUnavailableOrBlocked a owl:Class ;
+    rdfs:subClassOf :StructuralViolationClass ;
+    rdfs:label "Remedy unavailable or blocked" ;
+    rdfs:comment "A remedy is legally barred or practically inaccessible, leaving the harm unaddressed." .
+
+#################################################################
+# Canonical chain failure patterns for structural classes
+#################################################################
+
+# Factual misalignment: focus on factual trigger (4)
+:FactualMisalignment_Pattern a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Factual misalignment pattern" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+
+:FactualMisalignment rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty :hasChainFailurePattern ;
+    owl:hasValue :FactualMisalignment_Pattern
+] .
+
+# Normative contradiction: norm conflicts with higher-level norm (2↔)
+:NormativeContradiction_Pattern a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Normative contradiction pattern" ;
+    :focusesOnElement :NormSpecification ;
+    :hasRelationType "BIDIRECTIONAL" .
+
+:NormativeContradiction rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty :hasChainFailurePattern ;
+    owl:hasValue :NormativeContradiction_Pattern
+] .
+
+# Source of authority failure: focus on authority source (1)
+:SourceOfAuthorityFailure_Pattern a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Source of authority failure pattern" ;
+    :focusesOnElement :AuthoritySource ;
+    :hasRelationType "FOCUS" .
+
+:SourceOfAuthorityFailure rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty :hasChainFailurePattern ;
+    owl:hasValue :SourceOfAuthorityFailure_Pattern
+] .
+
+# Conferral failure: authority source -> role conferral (1→3)
+:ConferralFailure_Pattern a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Conferral failure pattern" ;
+    :focusesOnElement :AuthoritySource ;
+    :relatesToSecondaryElement :RoleConferral ;
+    :hasRelationType "FORWARD" .
+
+:ConferralFailure rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty :hasChainFailurePattern ;
+    owl:hasValue :ConferralFailure_Pattern
+] .
+
+# Role contradiction (authority): focus on role conferral/use (3)
+:RoleContradictionAuthority_Pattern a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Role contradiction (authority) pattern" ;
+    :focusesOnElement :RoleConferral ;
+    :hasRelationType "FOCUS" .
+
+:RoleContradictionAuthority rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty :hasChainFailurePattern ;
+    owl:hasValue :RoleContradictionAuthority_Pattern
+] .
+
+# Procedural contradiction: norm <-> procedure (2→5 / 2↔5)
+:ProceduralContradiction_Pattern a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Procedural contradiction pattern" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :ProcedureElement ;
+    :hasRelationType "BIDIRECTIONAL" .
+
+:ProceduralContradiction rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty :hasChainFailurePattern ;
+    owl:hasValue :ProceduralContradiction_Pattern
+] .
+
+# Temporal contradiction: norm <-> factual trigger (2↔4)
+:TemporalContradiction_Pattern a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Temporal contradiction pattern" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :FactualTrigger ;
+    :hasRelationType "BIDIRECTIONAL" .
+
+:TemporalContradiction rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty :hasChainFailurePattern ;
+    owl:hasValue :TemporalContradiction_Pattern
+] .
+
+# Jurisdictional contradiction: norm <-> jurisdiction/scope (2↔6)
+:JurisdictionalContradiction_Pattern a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Jurisdictional contradiction pattern" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :JurisdictionScope ;
+    :hasRelationType "BIDIRECTIONAL" .
+
+:JurisdictionalContradiction rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty :hasChainFailurePattern ;
+    owl:hasValue :JurisdictionalContradiction_Pattern
+] .
+
+# Recognition failure: focus on jurisdiction/scope and/or correlative position (6/7)
+:RecognitionFailure_Pattern a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Recognition failure pattern" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+
+:RecognitionFailure rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty :hasChainFailurePattern ;
+    owl:hasValue :RecognitionFailure_Pattern
+] .
+
+# Correlativity contradiction: focus on correlative position (7)
+:CorrelativityContradiction_Pattern a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Correlativity contradiction pattern" ;
+    :focusesOnElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+
+:CorrelativityContradiction rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty :hasChainFailurePattern ;
+    owl:hasValue :CorrelativityContradiction_Pattern
+] .
+
+# Effect contradiction: focus on remedy/effects (7)
+:EffectContradiction_Pattern a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Effect contradiction pattern" ;
+    :focusesOnElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+
+:EffectContradiction rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty :hasChainFailurePattern ;
+    owl:hasValue :EffectContradiction_Pattern
+] .
+
+# Repair failure: focus on remedy stage (8)
+:RepairFailure_Pattern a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Repair failure pattern" ;
+    :focusesOnElement :RemedyStage ;
+    :hasRelationType "FOCUS" .
+
+:RepairFailure rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty :hasChainFailurePattern ;
+    owl:hasValue :RepairFailure_Pattern
+] .
+
+# Remedy unavailable or blocked: remedy stage + norm/procedure (8)
+:RemedyUnavailableOrBlocked_Pattern a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Remedy unavailable or blocked pattern" ;
+    :focusesOnElement :RemedyStage ;
+    :relatesToSecondaryElement :NormSpecification ;
+    :hasRelationType "BIDIRECTIONAL" .
+
+:RemedyUnavailableOrBlocked rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty :hasChainFailurePattern ;
+    owl:hasValue :RemedyUnavailableOrBlocked_Pattern
+] .
+
+#################################################################
+# Example offense types
+#################################################################
+
+# Murder (Crime) – Factual misalignment; Normative contradiction
+:Murder a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Murder" ;
+    :hasOffenseCategory :Crime ;
+    :hasStructuralViolationClass :FactualMisalignment , :NormativeContradiction ;
+    :hasDescription "Unlawful killing violates the norm against homicide and depends on the factual predicate of causing death." ;
+    :hasChainFailurePattern :Murder_Factual_Pattern , :Murder_Normative_Pattern .
+
+:Murder_Factual_Pattern a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Murder factual misalignment pattern" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+
+:Murder_Normative_Pattern a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Murder normative contradiction pattern" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :FactualTrigger ;
+    :hasRelationType "BIDIRECTIONAL" .
+
+# False Imprisonment (Tort) – Authority failure; Recognition failure
+:FalseImprisonment a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "False imprisonment" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :SourceOfAuthorityFailure , :RecognitionFailure ;
+    :hasDescription "Unlawful restraint of another’s freedom lacks valid authority and misrecognizes their liberty." ;
+    :hasChainFailurePattern :FalseImprisonment_Authority_Pattern , :FalseImprisonment_Recognition_Pattern .
+
+:FalseImprisonment_Authority_Pattern a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "False imprisonment authority pattern" ;
+    :focusesOnElement :AuthoritySource ;
+    :hasRelationType "FOCUS" .
+
+:FalseImprisonment_Recognition_Pattern a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "False imprisonment recognition pattern" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+
+# Unlawful Search and Seizure (Constitutional) – Authority failure; Procedural contradiction
+:UnlawfulSearchAndSeizure a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Unlawful search and seizure" ;
+    :hasOffenseCategory :ConstitutionalViolation ;
+    :hasStructuralViolationClass :SourceOfAuthorityFailure , :ProceduralContradiction ;
+    :hasDescription "Government search without warrant or probable cause lacks authority and violates procedural safeguards." ;
+    :hasChainFailurePattern :UnlawfulSearch_Authority_Pattern , :UnlawfulSearch_Procedural_Pattern .
+
+:UnlawfulSearch_Authority_Pattern a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Unlawful search authority pattern" ;
+    :focusesOnElement :AuthoritySource ;
+    :hasRelationType "FOCUS" .
+
+:UnlawfulSearch_Procedural_Pattern a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Unlawful search procedural pattern" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :ProcedureElement ;
+    :hasRelationType "BIDIRECTIONAL" .
