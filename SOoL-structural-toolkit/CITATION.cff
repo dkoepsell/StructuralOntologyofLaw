@@ -1,0 +1,53 @@
+cff-version: 1.2.0
+message: >
+  If you use the SOoL Structural Toolkit in your research, teaching,
+  software, or publications, please cite it as below.
+
+title: "The SOoL Structural Toolkit: A Structural Ontology of Law for Legal Reasoning and Computable Law"
+
+type: software
+
+authors:
+  - family-names: Koepsell
+    given-names: David R.
+    orcid: https://orcid.org/0000-0002-XXXX-XXXX
+
+abstract: >
+  The SOoL Structural Toolkit is a modular framework for structural legal
+  reasoning grounded in Basic Formal Ontology (BFO). It provides a Minimum
+  Legal Chain, a formal contradiction typology, IRACplus integration,
+  validation tools, offense mappings, teaching materials, and case libraries
+  to support legal ontology research, legal AI, and legal education.
+
+keywords:
+  - legal ontology
+  - structural ontology of law
+  - Basic Formal Ontology
+  - Minimum Legal Chain
+  - legal contradictions
+  - computable law
+  - legal AI
+  - jurisprudence
+
+license: CC-BY-4.0
+
+preferred-citation:
+  type: book
+  authors:
+    - family-names: Koepsell
+      given-names: David R.
+      orcid: https://orcid.org/0000-0002-XXXX-XXXX
+  title: "The SOoL Structural Toolkit: Structural Legal Reasoning, Ontology, and Computable Law"
+  year: 2025
+  publisher: "SOoL Project"
+  version: "1.0.0"
+
+repository-code: https://github.com/sool-project/sool-structural-toolkit
+
+license-url: https://creativecommons.org/licenses/by/4.0/
+
+notes: >
+  Documentation, diagrams, teaching materials, and explanatory texts are
+  licensed under Creative Commons Attribution 4.0 International (CC BY 4.0).
+  Ontology files, schemas, validation rules, and code artifacts are licensed
+  under the Apache License, Version 2.0.
