@@ -1,0 +1,36 @@
+{
+  "authority": {
+    "id": "AgencyRuleAuthority",
+    "valid": false,
+    "details": "No statute authorises the agency to promulgate the rule"
+  },
+  "jurisdiction": {
+    "domain": "Nationwide",
+    "withinScope": true
+  },
+  "role": {
+    "actor": "AgencyOfficial",
+    "roleName": "Administrator",
+    "valid": true
+  },
+  "norm": {
+    "reference": "ProposedRule",
+    "inForce": false
+  },
+  "process": {
+    "procedure": "Notice and comment rulemaking",
+    "complied": true
+  },
+  "event": {
+    "description": "Agency promulgates rule without statutory authority",
+    "time": "2022-04-01T00:00:00Z"
+  },
+  "recognition": {
+    "institution": "FederalRegister",
+    "recognised": true
+  },
+  "remedy": {
+    "available": true,
+    "description": "Courts may invalidate the rule through judicial review"
+  }
+}

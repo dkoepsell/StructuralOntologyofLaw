@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "IRACplus Document",
+  "description": "Schema for representing a legal analysis document structured according to the IRACplus method.",
+  "type": "object",
+  "properties": {
+    "issue": {
+      "type": "string",
+      "description": "The legal issue framed in structural terms."
+    },
+    "rule": {
+      "type": "string",
+      "description": "The applicable rule(s), including statutory authority and normative content."
+    },
+    "analysis": {
+      "type": "string",
+      "description": "The analysis applying the rule to the facts, checking each MLC link and discussing contradictions."
+    },
+    "conclusion": {
+      "type": "string",
+      "description": "The conclusion on whether the legal effect exists and what structural failures, if any, prevent it."
+    },
+    "structuralDiagnosis": {
+      "type": "array",
+      "description": "List of detected contradiction types.",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": ["issue", "rule", "analysis", "conclusion"]
+}

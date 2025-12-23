@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="600" viewBox="0 0 700 600" role="img" aria-label="SOoL Toolkit Map">
+  <style>
+    .bg{fill:#0b0e14;}
+    .box{fill:#111827;stroke:#243244;stroke-width:1.5;}
+    .text{fill:#e5e7eb;font-family:sans-serif;font-size:14px;}
+    .title{fill:#60a5fa;font-size:20px;font-weight:bold;}
+    .arrow{stroke:#60a5fa;stroke-width:2;fill:none;marker-end:url(#arrowHead);}
+  </style>
+  <defs>
+    <marker id="arrowHead" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#60a5fa" />
+    </marker>
+  </defs>
+  <rect class="bg" width="700" height="600"/>
+  <text class="title" x="20" y="30">SOoL Toolkit Structure</text>
+  <!-- Layer boxes -->
+  <g transform="translate(50,60)">
+    <!-- Kernel -->
+    <rect class="box" x="0" y="0" width="500" height="50" />
+    <text class="text" x="10" y="30">Kernel Ontology (Module 1) – structural backbone, BFO alignment</text>
+    <!-- MLC -->
+    <rect class="box" x="0" y="70" width="500" height="50" />
+    <text class="text" x="10" y="100">Minimum Legal Chain (Module 2) – eight structural conditions</text>
+    <!-- Contradictions -->
+    <rect class="box" x="0" y="140" width="500" height="50" />
+    <text class="text" x="10" y="170">Contradiction Typology (Module 3) – structural failures & AERR families</text>
+    <!-- Validation tools -->
+    <rect class="box" x="0" y="210" width="500" height="50" />
+    <text class="text" x="10" y="240">Structural Validation Tools (Module 4) – checkers & reports</text>
+    <!-- Offense mapping -->
+    <rect class="box" x="0" y="280" width="500" height="50" />
+    <text class="text" x="10" y="310">Offense Mapping Dataset (Module 5) – doctrine ↔ structure</text>
+    <!-- IRACplus -->
+    <rect class="box" x="0" y="350" width="500" height="50" />
+    <text class="text" x="10" y="380">IRACplus Integration (Module 6) – structural writing</text>
+    <!-- Teaching -->
+    <rect class="box" x="0" y="420" width="500" height="50" />
+    <text class="text" x="10" y="450">Teaching Materials (Module 7) – modules, handouts, labs</text>
+    <!-- Developer -->
+    <rect class="box" x="0" y="490" width="500" height="50" />
+    <text class="text" x="10" y="520">Developer Resources (Module 8) – APIs, queries, governance</text>
+    <!-- Examples -->
+    <rect class="box" x="0" y="560" width="500" height="50" />
+    <text class="text" x="10" y="590">Examples & Cases (Module 9) – canonical case library</text>
+  </g>
+  <!-- Connectors (arrows) -->
+  <g transform="translate(550,85)">
+    <line class="arrow" x1="0" y1="0" x2="0" y2="45" />
+    <line class="arrow" x1="0" y1="70" x2="0" y2="115" />
+    <line class="arrow" x1="0" y1="140" x2="0" y2="185" />
+    <line class="arrow" x1="0" y1="210" x2="0" y2="255" />
+    <line class="arrow" x1="0" y1="280" x2="0" y2="325" />
+    <line class="arrow" x1="0" y1="350" x2="0" y2="395" />
+    <line class="arrow" x1="0" y1="420" x2="0" y2="465" />
+  </g>
+</svg>

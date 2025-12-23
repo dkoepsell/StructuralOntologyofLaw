@@ -1,0 +1,36 @@
+{
+  "authority": {
+    "id": "JurisdictionCaseAuthority",
+    "valid": true,
+    "details": "City charter grants police authority within City A"
+  },
+  "jurisdiction": {
+    "domain": "City A",
+    "withinScope": false
+  },
+  "role": {
+    "actor": "Officer",
+    "roleName": "Police Officer",
+    "valid": true
+  },
+  "norm": {
+    "reference": "TrafficCode",
+    "inForce": true
+  },
+  "process": {
+    "procedure": "Issue traffic citation",
+    "complied": true
+  },
+  "event": {
+    "description": "Officer issues citation in City B",
+    "time": "2022-05-01T00:00:00Z"
+  },
+  "recognition": {
+    "institution": "CityBCourt",
+    "recognised": false
+  },
+  "remedy": {
+    "available": true,
+    "description": "Defendant may challenge and court can dismiss"
+  }
+}

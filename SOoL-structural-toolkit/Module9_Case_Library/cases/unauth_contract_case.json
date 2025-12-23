@@ -1,0 +1,36 @@
+{
+  "authority": {
+    "id": "ContractCaseAuthority",
+    "valid": true,
+    "details": "Corporate board resolution conferring contract authority"
+  },
+  "jurisdiction": {
+    "domain": "Corporate affairs",
+    "withinScope": true
+  },
+  "role": {
+    "actor": "Intern",
+    "roleName": "Contracting Agent",
+    "valid": false
+  },
+  "norm": {
+    "reference": "CorporateLawNorm",
+    "inForce": true
+  },
+  "process": {
+    "procedure": "Board approval of contracts",
+    "complied": false
+  },
+  "event": {
+    "description": "Intern signs supply contract",
+    "time": "2022-03-01T00:00:00Z"
+  },
+  "recognition": {
+    "institution": "CompanyRegistrar",
+    "recognised": true
+  },
+  "remedy": {
+    "available": true,
+    "description": "Company may ratify or void the contract"
+  }
+}

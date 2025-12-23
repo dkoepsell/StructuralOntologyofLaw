@@ -1,0 +1,66 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sool: <http://example.org/sool#> .
+
+# Battery without consent case (tort law)
+#
+# This file declares the individuals and relations for a tort battery case.  The
+# authority and jurisdiction exist, the doctor holds a valid role, the norm of
+# informed consent applies, but the authorised process (obtaining consent) and
+# recognition (documentation of consent) fail, leading to a structural
+# contradiction.
+
+sool:BatteryCaseAuthority a sool:Authority ;
+  rdfs:label "Tort Law Authority" .
+
+sool:BatteryCaseJurisdiction a sool:Jurisdiction ;
+  rdfs:label "State Jurisdiction" .
+
+sool:BatteryCaseRole a sool:Role ;
+  rdfs:label "Physician Role" .
+
+sool:BatteryCaseNorm a sool:Norm ;
+  rdfs:label "Informed Consent Norm" .
+
+sool:BatteryCaseProcess a sool:AuthorisedProcess ;
+  rdfs:label "Consent Obtaining Process" .
+
+sool:BatteryCaseEvent a sool:LegalEvent ;
+  rdfs:label "Physical Contact Event" .
+
+sool:BatteryCaseRecognition a sool:Recognition ;
+  rdfs:label "Consent Recording" .
+
+sool:BatteryCaseRemedy a sool:Remedy ;
+  rdfs:label "Tort Damages Remedy" .
+
+sool:Legislature a sool:Institution ;
+  rdfs:label "Legislature" .
+
+sool:Hospital a sool:Institution ;
+  rdfs:label "Hospital" .
+
+sool:Court a sool:Institution ;
+  rdfs:label "Court" .
+
+sool:DrSmith a sool:Agent ;
+  rdfs:label "Dr Smith" .
+
+sool:PatientJ a sool:Agent ;
+  rdfs:label "Patient J" .
+
+# Relations
+sool:Legislature sool:confersAuthority sool:BatteryCaseAuthority .
+
+sool:BatteryCaseAuthority sool:hasJurisdiction sool:BatteryCaseJurisdiction .
+
+sool:BatteryCaseAuthority sool:assignsRole sool:BatteryCaseRole .
+
+sool:BatteryCaseRole sool:roleRealises sool:BatteryCaseNorm .
+
+sool:BatteryCaseProcess sool:processRealisesEvent sool:BatteryCaseEvent .
+
+# Recognition fails: the hospital does not recognise the event, so we omit the recognisesEvent assertion.
+# Instead, we still declare the remedy provided by the court.
+
+sool:Court sool:providesRemedy sool:BatteryCaseRemedy .

@@ -1,0 +1,15 @@
+# Sample SWRL rules for contradiction detection in the SOoL framework
+# These assume that boolean properties are available to indicate validity of MLC links
+
+MLCRecord(?x) ^ hasAuthorityValid(?x, false) -> ConferralFailure(?x)
+MLCRecord(?x) ^ hasJurisdictionInScope(?x, false) -> JurisdictionalContradiction(?x)
+MLCRecord(?x) ^ hasRoleValid(?x, false) -> RoleContradiction(?x)
+MLCRecord(?x) ^ hasProcessComplied(?x, false) -> ProceduralContradiction(?x)
+MLCRecord(?x) ^ hasEventInTime(?x, false) -> TemporalContradiction(?x)
+MLCRecord(?x) ^ hasRecognition(?x, false) -> RecognitionFailure(?x)
+MLCRecord(?x) ^ hasCorrelation(?x, false) -> CorrelativityContradiction(?x)
+MLCRecord(?x) ^ hasRemedyAvailable(?x, false) -> RepairFailure(?x)
+
+# Compound contradiction: if more than one failure holds
+ConferralFailure(?x) ^ JurisdictionalContradiction(?x) -> CompoundContradiction(?x)
+

@@ -1,0 +1,36 @@
+{
+  "authority": {
+    "id": "TheftCaseAuthority",
+    "valid": true,
+    "details": "State legislature enacted the theft statute"
+  },
+  "jurisdiction": {
+    "domain": "State",
+    "withinScope": true
+  },
+  "role": {
+    "actor": "Prosecutor",
+    "roleName": "Prosecutor",
+    "valid": true
+  },
+  "norm": {
+    "reference": "TheftStatute",
+    "inForce": true
+  },
+  "process": {
+    "procedure": "Criminal prosecution",
+    "complied": true
+  },
+  "event": {
+    "description": "Alice took Bob's bicycle without consent",
+    "time": "2022-06-01T00:00:00Z"
+  },
+  "recognition": {
+    "institution": "StateCourt",
+    "recognised": true
+  },
+  "remedy": {
+    "available": true,
+    "description": "Sentencing and restitution"
+  }
+}

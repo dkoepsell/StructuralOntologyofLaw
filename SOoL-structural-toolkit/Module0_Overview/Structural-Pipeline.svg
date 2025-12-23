@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="520" viewBox="0 0 1400 520" role="img" aria-label="SOoL Structural Pipeline: Ontology to MLC to Contradiction Diagnosis to IRACplus with repair loop">
+  <defs>
+    <style>
+      :root{
+        --bg:#0b0e14;
+        --panel:#111827;
+        --text:#e5e7eb;
+        --muted:#9ca3af;
+        --border:#243244;
+        --accent:#60a5fa;
+        --ok:#34d399;
+        --warn:#fbbf24;
+        --bad:#fb7185;
+      }
+      .bg{ fill:var(--bg); }
+      .panel{ fill:var(--panel); stroke:var(--border); stroke-width:2; }
+      .title{ fill:var(--text); font:700 22px sans-serif; }
+      .subtitle{ fill:var(--muted); font:500 14px sans-serif; }
+      .h{ fill:var(--text); font:700 18px sans-serif; }
+      .t{ fill:var(--text); font:500 14px sans-serif; }
+      .m{ fill:var(--muted); font:500 13px sans-serif; }
+      .pill{ fill:rgba(96,165,250,0.14); stroke:rgba(96,165,250,0.55); stroke-width:1.5; }
+      .pill2{ fill:rgba(52,211,153,0.12); stroke:rgba(52,211,153,0.55); stroke-width:1.5; }
+      .pillBad{ fill:rgba(251,113,133,0.12); stroke:rgba(251,113,133,0.65); stroke-width:1.5; }
+      .arrow{ stroke:var(--accent); stroke-width:3; fill:none; }
+      .arrow2{ stroke:var(--ok); stroke-width:3; fill:none; }
+      .arrowBad{ stroke:var(--bad); stroke-width:3; fill:none; }
+      .dash{ stroke-dasharray:7 7; }
+      .cap{ stroke-linecap:round; stroke-linejoin:round; }
+      .small{ font-size:12px; }
+    </style>
+
+    <marker id="arrowHead" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#60a5fa"/>
+    </marker>
+    <marker id="arrowHeadOk" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#34d399"/>
+    </marker>
+    <marker id="arrowHeadBad" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#fb7185"/>
+    </marker>
+
+    <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#000000" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect class="bg" x="0" y="0" width="1400" height="520"/>
+
+  <!-- Header -->
+  <text class="title" x="56" y="56">SOoL Structural Pipeline</text>
+  <text class="subtitle" x="56" y="80">Ontology → Minimum Legal Chain → Contradiction Diagnosis → IRACplus</text>
+
+  <!-- Stage boxes -->
+  <!-- 1 Ontology -->
+  <g filter="url(#softShadow)">
+    <rect class="panel" x="56" y="120" rx="18" ry="18" width="300" height="280"/>
+  </g>
+  <text class="h" x="80" y="160">1) Ontology</text>
+  <text class="m" x="80" y="186">Name the relevant structural elements</text>
+
+  <rect class="pill" x="80" y="210" rx="14" ry="14" width="250" height="34"/>
+  <text class="t" x="96" y="233">Agents</text>
+
+  <rect class="pill" x="80" y="254" rx="14" ry="14" width="250" height="34"/>
+  <text class="t" x="96" y="277">Roles</text>
+
+  <rect class="pill" x="80" y="298" rx="14" ry="14" width="250" height="34"/>
+  <text class="t" x="96" y="321">Institutions</text>
+
+  <rect class="pill" x="80" y="342" rx="14" ry="14" width="250" height="34"/>
+  <text class="t" x="96" y="365">Events & relations</text>
+
+  <!-- 2 MLC -->
+  <g filter="url(#softShadow)">
+    <rect class="panel" x="392" y="120" rx="18" ry="18" width="360" height="280"/>
+  </g>
+  <text class="h" x="416" y="160">2) Minimum Legal Chain</text>
+  <text class="m" x="416" y="186">Check structural completeness (MLC 1–8)</text>
+
+  <g>
+    <rect class="pill" x="416" y="210" rx="12" ry="12" width="320" height="28"/>
+    <text class="t small" x="430" y="230">1 source of authority</text>
+
+    <rect class="pill" x="416" y="244" rx="12" ry="12" width="320" height="28"/>
+    <text class="t small" x="430" y="264">2 jurisdictional scope</text>
+
+    <rect class="pill" x="416" y="278" rx="12" ry="12" width="320" height="28"/>
+    <text class="t small" x="430" y="298">3 role conferral</text>
+
+    <rect class="pill" x="416" y="312" rx="12" ry="12" width="320" height="28"/>
+    <text class="t small" x="430" y="332">4 normative content</text>
+
+    <rect class="pill" x="416" y="346" rx="12" ry="12" width="320" height="28"/>
+    <text class="t small" x="430" y="366">5 authorised process</text>
+
+    <rect class="pill" x="416" y="380" rx="12" ry="12" width="320" height="28"/>
+    <text class="t small" x="430" y="400">6 legal event</text>
+
+    <rect class="pill" x="416" y="414" rx="12" ry="12" width="320" height="28"/>
+    <text class="t small" x="430" y="434">7 recognition & recording</text>
+
+    <rect class="pill" x="416" y="448" rx="12" ry="12" width="320" height="28"/>
+    <text class="t small" x="430" y="468">8 remedy & repair</text>
+  </g>
+
+  <!-- 3 Contradiction -->
+  <g filter="url(#softShadow)">
+    <rect class="panel" x="788" y="120" rx="18" ry="18" width="300" height="280"/>
+  </g>
+  <text class="h" x="812" y="160">3) Contradiction Diagnosis</text>
+  <text class="m" x="812" y="186">Classify failure modes structurally</text>
+
+  <rect class="pillBad" x="812" y="210" rx="14" ry="14" width="252" height="34"/>
+  <text class="t" x="828" y="233">Authority failure</text>
+
+  <rect class="pillBad" x="812" y="254" rx="14" ry="14" width="252" height="34"/>
+  <text class="t" x="828" y="277">Jurisdictional contradiction</text>
+
+  <rect class="pillBad" x="812" y="298" rx="14" ry="14" width="252" height="34"/>
+  <text class="t" x="828" y="321">Procedural contradiction</text>
+
+  <rect class="pillBad" x="812" y="342" rx="14" ry="14" width="252" height="34"/>
+  <text class="t" x="828" y="365">Recognition failure</text>
+
+  <rect class="pillBad" x="812" y="386" rx="14" ry="14" width="252" height="34"/>
+  <text class="t" x="828" y="409">Repair failure</text>
+
+  <!-- 4 IRACplus -->
+  <g filter="url(#softShadow)">
+    <rect class="panel" x="1124" y="120" rx="18" ry="18" width="220" height="280"/>
+  </g>
+  <text class="h" x="1148" y="160">4) IRACplus</text>
+  <text class="m" x="1148" y="186">Write with structure first</text>
+
+  <rect class="pill2" x="1148" y="210" rx="14" ry="14" width="172" height="34"/>
+  <text class="t" x="1164" y="233">Issue</text>
+
+  <rect class="pill2" x="1148" y="254" rx="14" ry="14" width="172" height="34"/>
+  <text class="t" x="1164" y="277">Rule</text>
+
+  <rect class="pill2" x="1148" y="298" rx="14" ry="14" width="172" height="34"/>
+  <text class="t" x="1164" y="321">Analysis</text>
+
+  <rect class="pill2" x="1148" y="342" rx="14" ry="14" width="172" height="34"/>
+  <text class="t" x="1164" y="365">Conclusion</text>
+
+</svg>

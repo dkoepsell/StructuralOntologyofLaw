@@ -1,0 +1,71 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix mlc: <http://example.org/mlc#> .
+@prefix ex: <http://example.org/shapes#> .
+
+# Shape to detect conferral failure (Type 1)
+ex:ConferralFailureShape a sh:NodeShape ;
+  sh:targetClass mlc:MLCRecord ;
+  sh:property [
+    sh:path mlc:authority / mlc:valid ;
+    sh:datatype xsd:boolean ;
+    sh:hasValue true ;
+    sh:message "Type 1: Conferral Failure – authority is not valid." ;
+  ] ;
+  sh:severity sh:Violation .
+
+# Shape to detect jurisdictional contradiction (Type 2)
+ex:JurisdictionFailureShape a sh:NodeShape ;
+  sh:targetClass mlc:MLCRecord ;
+  sh:property [
+    sh:path mlc:jurisdiction / mlc:withinScope ;
+    sh:datatype xsd:boolean ;
+    sh:hasValue true ;
+    sh:message "Type 2: Jurisdictional Contradiction – event outside jurisdiction." ;
+  ] ;
+  sh:severity sh:Violation .
+
+# Shape to detect role contradiction (Type 3)
+ex:RoleFailureShape a sh:NodeShape ;
+  sh:targetClass mlc:MLCRecord ;
+  sh:property [
+    sh:path mlc:role / mlc:valid ;
+    sh:datatype xsd:boolean ;
+    sh:hasValue true ;
+    sh:message "Type 3: Role Contradiction – actor does not hold required role." ;
+  ] ;
+  sh:severity sh:Violation .
+
+# Shape to detect procedural contradiction (Type 4)
+ex:ProceduralFailureShape a sh:NodeShape ;
+  sh:targetClass mlc:MLCRecord ;
+  sh:property [
+    sh:path mlc:process / mlc:complied ;
+    sh:datatype xsd:boolean ;
+    sh:hasValue true ;
+    sh:message "Type 4: Procedural Contradiction – process not complied." ;
+  ] ;
+  sh:severity sh:Violation .
+
+# Shape to detect recognition failure (Type 6)
+ex:RecognitionFailureShape a sh:NodeShape ;
+  sh:targetClass mlc:MLCRecord ;
+  sh:property [
+    sh:path mlc:recognition / mlc:recognised ;
+    sh:datatype xsd:boolean ;
+    sh:hasValue true ;
+    sh:message "Type 6: Recognition Failure – event not recognised." ;
+  ] ;
+  sh:severity sh:Violation .
+
+# Shape to detect remedy failure (Type 8)
+ex:RemedyFailureShape a sh:NodeShape ;
+  sh:targetClass mlc:MLCRecord ;
+  sh:property [
+    sh:path mlc:remedy / mlc:available ;
+    sh:datatype xsd:boolean ;
+    sh:hasValue true ;
+    sh:message "Type 8: Repair Failure – no remedy available." ;
+  ] ;
+  sh:severity sh:Violation .
+

@@ -1,0 +1,114 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix bfo: <http://purl.obolibrary.org/obo/BFO_> .
+@prefix lkif: <http://www.estrellaproject.org/lkif-core#> .
+@prefix sool: <http://example.org/sool#> .
+
+# Ontology header
+sool:KernelOntology a owl:Ontology ;
+  rdfs:label "SOoL Kernel Ontology" ;
+  rdfs:comment "A minimal BFO‑aligned ontology capturing the structural primitives of law (authority, norms, roles, processes, events, recognition and remedies)." .
+
+# Classes
+
+## Authority
+sool:Authority a owl:Class ;
+  rdfs:label "Authority" ;
+  rdfs:subClassOf bfo:GenericallyDependentContinuant ;
+  rdfs:subClassOf lkif:Authority ;
+  rdfs:comment "A generically dependent continuant representing the capacity to create binding legal effects; must be conferred by an institution." .
+
+## Jurisdiction
+sool:Jurisdiction a owl:Class ;
+  rdfs:label "Jurisdiction" ;
+  rdfs:subClassOf bfo:RelationalDependentContinuant ;
+  rdfs:comment "A relational dependent continuant specifying spatial, temporal or subject‑matter limits on the exercise of authority." .
+
+## Role
+sool:Role a owl:Class ;
+  rdfs:label "Role" ;
+  rdfs:subClassOf bfo:SpecificallyDependentContinuant ;
+  rdfs:subClassOf lkif:Role ;
+  rdfs:comment "A specifically dependent continuant inhering in an agent that is realised through institutional processes." .
+
+## Norm
+sool:Norm a owl:Class ;
+  rdfs:label "Norm" ;
+  rdfs:subClassOf bfo:RealisableDependentContinuant ;
+  rdfs:subClassOf lkif:Norm ;
+  rdfs:comment "An obligation, permission or power attached to a role; a realisable dependent continuant that prescribes behaviour." .
+
+## AuthorisedProcess
+sool:AuthorisedProcess a owl:Class ;
+  rdfs:label "Authorised Process" ;
+  rdfs:subClassOf bfo:Process ;
+  rdfs:comment "A process carried out by an agent in virtue of its role in order to realise a legal effect." .
+
+## LegalEvent
+sool:LegalEvent a owl:Class ;
+  rdfs:label "Legal Event" ;
+  rdfs:subClassOf bfo:Occurrent ;
+  rdfs:comment "A legally significant occurrence (action or omission) that plays a part in realising a norm." .
+
+## Recognition
+sool:Recognition a owl:Class ;
+  rdfs:label "Recognition" ;
+  rdfs:subClassOf bfo:RealisableDependentContinuant ;
+  rdfs:comment "The institutional acknowledgment that a legal event has occurred and is effective." .
+
+## Remedy
+sool:Remedy a owl:Class ;
+  rdfs:label "Remedy" ;
+  rdfs:subClassOf bfo:Disposition ;
+  rdfs:comment "A disposition or process designed to correct, enforce or reverse legal effects." .
+
+## Agent
+sool:Agent a owl:Class ;
+  rdfs:label "Agent" ;
+  rdfs:subClassOf bfo:MaterialEntity ;
+  rdfs:comment "A person or organisation capable of occupying roles and participating in legal processes." .
+
+## Institution
+sool:Institution a owl:Class ;
+  rdfs:label "Institution" ;
+  rdfs:subClassOf bfo:Object ;
+  rdfs:comment "An organised social structure (court, agency) that confers authority, recognises events and provides remedies." .
+
+# Object properties
+
+sool:confersAuthority a owl:ObjectProperty ;
+  rdfs:domain sool:Institution ;
+  rdfs:range sool:Authority ;
+  rdfs:comment "Relates an institution to the authority it confers." .
+
+sool:hasJurisdiction a owl:ObjectProperty ;
+  rdfs:domain sool:Authority ;
+  rdfs:range sool:Jurisdiction ;
+  rdfs:comment "Relates an authority to its jurisdictional scope." .
+
+sool:assignsRole a owl:ObjectProperty ;
+  rdfs:domain sool:Authority ;
+  rdfs:range sool:Role ;
+  rdfs:comment "Relates an authority to the roles it confers." .
+
+sool:roleRealises a owl:ObjectProperty ;
+  rdfs:domain sool:Role ;
+  rdfs:range sool:Norm ;
+  rdfs:comment "Relates a role to the norms (obligations, powers) it realises." .
+
+sool:processRealisesEvent a owl:ObjectProperty ;
+  rdfs:domain sool:AuthorisedProcess ;
+  rdfs:range sool:LegalEvent ;
+  rdfs:comment "Relates an authorised process to the legal event it produces." .
+
+sool:recognisesEvent a owl:ObjectProperty ;
+  rdfs:domain sool:Institution ;
+  rdfs:range sool:LegalEvent ;
+  rdfs:comment "An institution recognises a legal event, granting it effect." .
+
+sool:providesRemedy a owl:ObjectProperty ;
+  rdfs:domain sool:Institution ;
+  rdfs:range sool:Remedy ;
+  rdfs:comment "Relates an institution to the remedies it provides." .
+

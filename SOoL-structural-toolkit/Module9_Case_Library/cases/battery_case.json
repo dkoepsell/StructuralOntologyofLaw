@@ -1,0 +1,36 @@
+{
+  "authority": {
+    "id": "BatteryCaseAuthority",
+    "valid": true,
+    "details": "Tort law grants authority to protect bodily integrity"
+  },
+  "jurisdiction": {
+    "domain": "State",
+    "withinScope": true
+  },
+  "role": {
+    "actor": "DrSmith",
+    "roleName": "Physician",
+    "valid": true
+  },
+  "norm": {
+    "reference": "InformedConsentNorm",
+    "inForce": true
+  },
+  "process": {
+    "procedure": "Obtain informed consent",
+    "complied": false
+  },
+  "event": {
+    "description": "Dr Smith touched patient J without documented consent",
+    "time": "2022-02-01T00:00:00Z"
+  },
+  "recognition": {
+    "institution": "Hospital",
+    "recognised": false
+  },
+  "remedy": {
+    "available": true,
+    "description": "Damages for battery"
+  }
+}

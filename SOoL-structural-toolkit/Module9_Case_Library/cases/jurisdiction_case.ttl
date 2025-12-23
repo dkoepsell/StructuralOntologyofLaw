@@ -1,0 +1,60 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sool: <http://example.org/sool#> .
+
+# Administrative law case – officer from City A issues fine in City B
+#
+# The officer’s authority is validly conferred, but the event occurs outside
+# the jurisdiction.  Jurisdictional contradiction arises (Type 2).  The ticket
+# may still be recorded, and a remedy (dismissal) is available.
+
+sool:JurisdictionCaseAuthority a sool:Authority ;
+  rdfs:label "City Charter Authority" .
+
+sool:JurisdictionCaseJurisdiction a sool:Jurisdiction ;
+  rdfs:label "City A Jurisdiction" .
+
+sool:JurisdictionCaseRole a sool:Role ;
+  rdfs:label "Police Officer Role" .
+
+sool:JurisdictionCaseNorm a sool:Norm ;
+  rdfs:label "Traffic Code Norm" .
+
+sool:JurisdictionCaseProcess a sool:AuthorisedProcess ;
+  rdfs:label "Citation Issuing Process" .
+
+sool:JurisdictionCaseEvent a sool:LegalEvent ;
+  rdfs:label "Ticket Issuance Event" .
+
+sool:JurisdictionCaseRecognition a sool:Recognition ;
+  rdfs:label "Court Recording" .
+
+sool:JurisdictionCaseRemedy a sool:Remedy ;
+  rdfs:label "Dismissal Remedy" .
+
+sool:CityCouncil a sool:Institution ;
+  rdfs:label "City Council" .
+
+sool:CityCourt a sool:Institution ;
+  rdfs:label "City B Court" .
+
+sool:Officer a sool:Agent ;
+  rdfs:label "Officer" .
+
+sool:Driver a sool:Agent ;
+  rdfs:label "Driver" .
+
+# Relations
+sool:CityCouncil sool:confersAuthority sool:JurisdictionCaseAuthority .
+
+sool:JurisdictionCaseAuthority sool:hasJurisdiction sool:JurisdictionCaseJurisdiction .
+
+sool:JurisdictionCaseAuthority sool:assignsRole sool:JurisdictionCaseRole .
+
+sool:JurisdictionCaseRole sool:roleRealises sool:JurisdictionCaseNorm .
+
+sool:JurisdictionCaseProcess sool:processRealisesEvent sool:JurisdictionCaseEvent .
+
+sool:CityCourt sool:recognisesEvent sool:JurisdictionCaseEvent .
+
+sool:CityCourt sool:providesRemedy sool:JurisdictionCaseRemedy .

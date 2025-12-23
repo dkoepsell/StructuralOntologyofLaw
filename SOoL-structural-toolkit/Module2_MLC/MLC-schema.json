@@ -1,0 +1,83 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Minimum Legal Chain",
+  "description": "JSON schema for representing the eight structural links of the Minimum Legal Chain (MLC). Each property corresponds to one link and must be present.",
+  "type": "object",
+  "properties": {
+    "authority": {
+      "description": "Source of authority. Should reference an entity capable of conferring power.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Identifier or URI of the authority." },
+        "valid": { "type": "boolean", "description": "Whether the authority is validly conferred." },
+        "details": { "type": "string", "description": "Additional information about the authority." }
+      },
+      "required": ["id", "valid"]
+    },
+    "jurisdiction": {
+      "description": "Jurisdictional scope of the authority.",
+      "type": "object",
+      "properties": {
+        "domain": { "type": "string", "description": "Spatial / temporal / subject‑matter domain." },
+        "withinScope": { "type": "boolean", "description": "Whether the event falls within the jurisdiction." }
+      },
+      "required": ["domain", "withinScope"]
+    },
+    "role": {
+      "description": "Role conferral for the actor.",
+      "type": "object",
+      "properties": {
+        "actor": { "type": "string", "description": "Identifier of the agent." },
+        "roleName": { "type": "string", "description": "Name of the role (e.g., doctor, police officer)." },
+        "valid": { "type": "boolean", "description": "Whether the role was validly conferred." }
+      },
+      "required": ["actor", "roleName", "valid"]
+    },
+    "norm": {
+      "description": "Normative content (obligation/permission/power).",
+      "type": "object",
+      "properties": {
+        "reference": { "type": "string", "description": "URI or citation of the norm." },
+        "inForce": { "type": "boolean", "description": "Whether the norm is in force at the relevant time." }
+      },
+      "required": ["reference", "inForce"]
+    },
+    "process": {
+      "description": "Authorised process followed by the actor.",
+      "type": "object",
+      "properties": {
+        "procedure": { "type": "string", "description": "Name or description of the procedure followed." },
+        "complied": { "type": "boolean", "description": "Whether the procedure was complied with." }
+      },
+      "required": ["procedure", "complied"]
+    },
+    "event": {
+      "description": "Legal event produced by the process.",
+      "type": "object",
+      "properties": {
+        "description": { "type": "string", "description": "Description of the event." },
+        "time": { "type": "string", "format": "date-time", "description": "Time of the event." }
+      },
+      "required": ["description", "time"]
+    },
+    "recognition": {
+      "description": "Recognition or recording of the legal event by an institution.",
+      "type": "object",
+      "properties": {
+        "institution": { "type": "string", "description": "Identifier of the institution recognising the event." },
+        "recognised": { "type": "boolean", "description": "Whether the event was recognised." }
+      },
+      "required": ["institution", "recognised"]
+    },
+    "remedy": {
+      "description": "Remedy or repair mechanism provided.",
+      "type": "object",
+      "properties": {
+        "available": { "type": "boolean", "description": "Whether a remedy exists." },
+        "description": { "type": "string", "description": "Description of the remedy or repair." }
+      },
+      "required": ["available"]
+    }
+  },
+  "required": ["authority", "jurisdiction", "role", "norm", "process", "event", "recognition", "remedy"]
+}

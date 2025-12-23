@@ -1,0 +1,61 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sool: <http://example.org/sool#> .
+
+# Contract case – unauthorised employee signs contract
+#
+# This file declares the individuals and relations for the contract case.  The
+# corporate board confers authority and defines who may sign contracts.  The
+# intern lacks role conferral, so the chain fails at link 3.  The contract may
+# still be recorded, and a remedy (ratification or rescission) is available.
+
+sool:ContractCaseAuthority a sool:Authority ;
+  rdfs:label "Board Contract Authority" .
+
+sool:ContractCaseJurisdiction a sool:Jurisdiction ;
+  rdfs:label "Corporate Jurisdiction" .
+
+sool:ContractCaseRole a sool:Role ;
+  rdfs:label "Contracting Officer Role" .
+
+sool:ContractCaseNorm a sool:Norm ;
+  rdfs:label "Corporate Contract Norm" .
+
+sool:ContractCaseProcess a sool:AuthorisedProcess ;
+  rdfs:label "Contract Approval Process" .
+
+sool:ContractCaseEvent a sool:LegalEvent ;
+  rdfs:label "Contract Signing Event" .
+
+sool:ContractCaseRecognition a sool:Recognition ;
+  rdfs:label "Contract Recording" .
+
+sool:ContractCaseRemedy a sool:Remedy ;
+  rdfs:label "Ratification or Rescission" .
+
+sool:Board a sool:Institution ;
+  rdfs:label "Corporate Board" .
+
+sool:CompanyRegistrar a sool:Institution ;
+  rdfs:label "Company Registrar" .
+
+sool:Intern a sool:Agent ;
+  rdfs:label "Intern" .
+
+sool:Supplier a sool:Agent ;
+  rdfs:label "Supplier" .
+
+# Relations
+sool:Board sool:confersAuthority sool:ContractCaseAuthority .
+
+sool:ContractCaseAuthority sool:hasJurisdiction sool:ContractCaseJurisdiction .
+
+sool:ContractCaseAuthority sool:assignsRole sool:ContractCaseRole .
+
+sool:ContractCaseRole sool:roleRealises sool:ContractCaseNorm .
+
+sool:ContractCaseProcess sool:processRealisesEvent sool:ContractCaseEvent .
+
+sool:CompanyRegistrar sool:recognisesEvent sool:ContractCaseEvent .
+
+sool:Board sool:providesRemedy sool:ContractCaseRemedy .

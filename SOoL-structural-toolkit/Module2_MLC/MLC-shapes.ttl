@@ -1,0 +1,108 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sool: <http://example.org/sool#> .
+@prefix mlc: <http://example.org/mlc#> .
+
+# Shape for Minimum Legal Chain completeness
+mlc:MLCShape a sh:NodeShape ;
+  sh:targetClass mlc:MLCRecord ;
+  sh:property [
+    sh:path mlc:authority ;
+    sh:node mlc:AuthorityShape ;
+    sh:minCount 1 ;
+  ] ;
+  sh:property [
+    sh:path mlc:jurisdiction ;
+    sh:node mlc:JurisdictionShape ;
+    sh:minCount 1 ;
+  ] ;
+  sh:property [
+    sh:path mlc:role ;
+    sh:node mlc:RoleShape ;
+    sh:minCount 1 ;
+  ] ;
+  sh:property [
+    sh:path mlc:norm ;
+    sh:node mlc:NormShape ;
+    sh:minCount 1 ;
+  ] ;
+  sh:property [
+    sh:path mlc:process ;
+    sh:node mlc:ProcessShape ;
+    sh:minCount 1 ;
+  ] ;
+  sh:property [
+    sh:path mlc:event ;
+    sh:node mlc:EventShape ;
+    sh:minCount 1 ;
+  ] ;
+  sh:property [
+    sh:path mlc:recognition ;
+    sh:node mlc:RecognitionShape ;
+    sh:minCount 1 ;
+  ] ;
+  sh:property [
+    sh:path mlc:remedy ;
+    sh:node mlc:RemedyShape ;
+    sh:minCount 1 ;
+  ] .
+
+# Authority shape: must be valid
+mlc:AuthorityShape a sh:NodeShape ;
+  sh:property [
+    sh:path mlc:valid ;
+    sh:datatype xsd:boolean ;
+    sh:hasValue true ;
+  ] .
+
+# Jurisdiction shape: withinScope must be true
+mlc:JurisdictionShape a sh:NodeShape ;
+  sh:property [
+    sh:path mlc:withinScope ;
+    sh:datatype xsd:boolean ;
+    sh:hasValue true ;
+  ] .
+
+# Role shape: valid must be true
+mlc:RoleShape a sh:NodeShape ;
+  sh:property [
+    sh:path mlc:valid ;
+    sh:datatype xsd:boolean ;
+    sh:hasValue true ;
+  ] .
+
+# Norm shape: inForce must be true
+mlc:NormShape a sh:NodeShape ;
+  sh:property [
+    sh:path mlc:inForce ;
+    sh:datatype xsd:boolean ;
+    sh:hasValue true ;
+  ] .
+
+# Process shape: complied must be true
+mlc:ProcessShape a sh:NodeShape ;
+  sh:property [
+    sh:path mlc:complied ;
+    sh:datatype xsd:boolean ;
+    sh:hasValue true ;
+  ] .
+
+# Event shape: optional time; no constraint beyond existence
+mlc:EventShape a sh:NodeShape .
+
+# Recognition shape: recognised must be true
+mlc:RecognitionShape a sh:NodeShape ;
+  sh:property [
+    sh:path mlc:recognised ;
+    sh:datatype xsd:boolean ;
+    sh:hasValue true ;
+  ] .
+
+# Remedy shape: available must be true
+mlc:RemedyShape a sh:NodeShape ;
+  sh:property [
+    sh:path mlc:available ;
+    sh:datatype xsd:boolean ;
+    sh:hasValue true ;
+  ] .
+

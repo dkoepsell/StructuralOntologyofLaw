@@ -1,0 +1,65 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sool: <http://example.org/sool#> .
+
+# Theft of property case (criminal law)
+#
+# This file declares the individuals and relations for the theft case using the
+# SOoL kernel ontology.  It demonstrates a complete Minimum Legal Chain: the
+# authority is validly conferred, jurisdiction is appropriate, a role is
+# assigned, a norm exists, an authorised process is followed, a legal event
+# occurs, the event is recognised by the court and a remedy is available.
+
+sool:TheftCaseAuthority a sool:Authority ;
+  rdfs:label "Theft Statute Authority" .
+
+sool:TheftCaseJurisdiction a sool:Jurisdiction ;
+  rdfs:label "State Jurisdiction" .
+
+sool:TheftCaseRole a sool:Role ;
+  rdfs:label "Prosecutor Role" .
+
+sool:TheftCaseNorm a sool:Norm ;
+  rdfs:label "Prohibition of Theft" .
+
+sool:TheftCaseProcess a sool:AuthorisedProcess ;
+  rdfs:label "Prosecution Process" .
+
+sool:TheftCaseEvent a sool:LegalEvent ;
+  rdfs:label "Theft Act" .
+
+sool:TheftCaseRecognition a sool:Recognition ;
+  rdfs:label "Conviction Recognition" .
+
+sool:TheftCaseRemedy a sool:Remedy ;
+  rdfs:label "Sentencing Remedy" .
+
+sool:StateLegislature a sool:Institution ;
+  rdfs:label "State Legislature" .
+
+sool:StateCourt a sool:Institution ;
+  rdfs:label "State Court" .
+
+sool:Alice a sool:Agent ;
+  rdfs:label "Alice" .
+
+sool:Bob a sool:Agent ;
+  rdfs:label "Bob" .
+
+sool:Prosecutor a sool:Agent ;
+  rdfs:label "Prosecutor" .
+
+# Relations
+sool:StateLegislature sool:confersAuthority sool:TheftCaseAuthority .
+
+sool:TheftCaseAuthority sool:hasJurisdiction sool:TheftCaseJurisdiction .
+
+sool:TheftCaseAuthority sool:assignsRole sool:TheftCaseRole .
+
+sool:TheftCaseRole sool:roleRealises sool:TheftCaseNorm .
+
+sool:TheftCaseProcess sool:processRealisesEvent sool:TheftCaseEvent .
+
+sool:StateCourt sool:recognisesEvent sool:TheftCaseEvent .
+
+sool:StateCourt sool:providesRemedy sool:TheftCaseRemedy .

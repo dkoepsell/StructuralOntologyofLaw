@@ -1,0 +1,61 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sool: <http://example.org/sool#> .
+
+# Constitutional / public law case – agency rule without statutory authority
+#
+# The agency issues a rule but lacks an enabling statute.  Here the authority
+# link is invalid (Type 1 Conferral Failure).  The process is followed and the
+# rule is recorded, but without authority the legal effect cannot obtain.
+
+sool:AgencyRuleAuthority a sool:Authority ;
+  rdfs:label "Agency Rule Authority" .
+
+sool:AgencyRuleJurisdiction a sool:Jurisdiction ;
+  rdfs:label "National Jurisdiction" .
+
+sool:AgencyRuleRole a sool:Role ;
+  rdfs:label "Administrator Role" .
+
+sool:AgencyRuleNorm a sool:Norm ;
+  rdfs:label "Proposed Regulatory Norm" .
+
+sool:AgencyRuleProcess a sool:AuthorisedProcess ;
+  rdfs:label "Notice and Comment Process" .
+
+sool:AgencyRuleEvent a sool:LegalEvent ;
+  rdfs:label "Rule Promulgation Event" .
+
+sool:AgencyRuleRecognition a sool:Recognition ;
+  rdfs:label "Federal Register Publication" .
+
+sool:AgencyRuleRemedy a sool:Remedy ;
+  rdfs:label "Judicial Review Remedy" .
+
+sool:Legislature a sool:Institution ;
+  rdfs:label "Legislature" .
+
+sool:Agency a sool:Institution ;
+  rdfs:label "Administrative Agency" .
+
+sool:FederalRegister a sool:Institution ;
+  rdfs:label "Federal Register" .
+
+sool:AgencyOfficial a sool:Agent ;
+  rdfs:label "Agency Official" .
+
+# Relations
+# Authority not conferred: we intentionally omit confersAuthority to reflect lack of enabling statute.
+
+# Jurisdiction is still described for completeness, although the authority is invalid.
+sool:AgencyRuleAuthority sool:hasJurisdiction sool:AgencyRuleJurisdiction .
+
+sool:AgencyRuleAuthority sool:assignsRole sool:AgencyRuleRole .
+
+sool:AgencyRuleRole sool:roleRealises sool:AgencyRuleNorm .
+
+sool:AgencyRuleProcess sool:processRealisesEvent sool:AgencyRuleEvent .
+
+sool:FederalRegister sool:recognisesEvent sool:AgencyRuleEvent .
+
+sool:Legislature sool:providesRemedy sool:AgencyRuleRemedy .
