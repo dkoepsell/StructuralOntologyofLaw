@@ -39,7 +39,7 @@ Refer to the colour‑coded diagram (MLC‑BFO) for visual guidance.
 
 ## Suggested Readings
 
-- BFO classification of continuants and occurrents【873523715407077†L155-L159】.
+- BFO classification of continuants and occurrents.
 - SOoL One‑Page Cheat Sheet.
 - MLC Specification Document (Module 2).
 
