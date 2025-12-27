@@ -71,7 +71,7 @@
   <text class="t" x="96" y="321">Institutions</text>
 
   <rect class="pill" x="80" y="342" rx="14" ry="14" width="250" height="34"/>
-  <text class="t" x="96" y="365">Events & relations</text>
+  <text class="t" x="96" y="365">Events &amp; relations</text>
 
   <!-- 2 MLC -->
   <g filter="url(#softShadow)">
@@ -100,10 +100,10 @@
     <text class="t small" x="430" y="400">6 legal event</text>
 
     <rect class="pill" x="416" y="414" rx="12" ry="12" width="320" height="28"/>
-    <text class="t small" x="430" y="434">7 recognition & recording</text>
+    <text class="t small" x="430" y="434">7 recognition &amp; recording</text>
 
     <rect class="pill" x="416" y="448" rx="12" ry="12" width="320" height="28"/>
-    <text class="t small" x="430" y="468">8 remedy & repair</text>
+    <text class="t small" x="430" y="468">8 remedy &amp; repair</text>
   </g>
 
   <!-- 3 Contradiction -->
