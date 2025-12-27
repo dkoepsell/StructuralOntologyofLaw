@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="180" viewBox="0 0 1120 180" role="img" aria-label="Minimum Legal Chain status bar">
+  <defs>
+    <style>
+      :root{
+        --bg:#0b0e14;
+        --panel:#111827;
+        --text:#e5e7eb;
+        --muted:#9ca3af;
+        --border:#243244;
+        --accent:#60a5fa;
+        --ok:#34d399;
+        --warn:#fbbf24;
+        --bad:#fb7185;
+        --contra:#a78bfa;
+      }
+
+      .bg{fill:var(--bg);}
+      .panel{fill:var(--panel); stroke:var(--border); stroke-width:1.5;}
+      .title{fill:var(--accent); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; font-size:16px; font-weight:700;}
+      .sub{fill:var(--muted); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; font-size:12px;}
+      .label{fill:var(--text); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; font-size:12px; font-weight:600;}
+      .node{fill:#0f172a; stroke:var(--border); stroke-width:1.5;}
+      .nodeText{fill:var(--text); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; font-size:12px; font-weight:600;}
+      .hint{fill:var(--muted); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; font-size:10px; font-weight:500;}
+
+      /* status fills */
+      .st-ok{fill: rgba(52, 211, 153, 0.18); stroke: rgba(52, 211, 153, 0.70);}
+      .st-warn{fill: rgba(251, 191, 36, 0.16); stroke: rgba(251, 191, 36, 0.75); stroke-dasharray:6 4;}
+      .st-bad{fill: rgba(251, 113, 133, 0.16); stroke: rgba(251, 113, 133, 0.80); stroke-width:2.5;}
+      .st-contra{fill: rgba(167, 139, 250, 0.18); stroke: rgba(167, 139, 250, 0.85); stroke-width:2.25;}
+      .st-off{fill:#0f172a; stroke:var(--border); stroke-dasharray:5 6; opacity:0.55;}
+
+      /* connectors */
+      .link{stroke:var(--accent); stroke-width:2.2; fill:none; marker-end:url(#arrowHead);}
+      .link-dotted{stroke:var(--accent); stroke-width:2.2; fill:none; stroke-dasharray:3 6; marker-end:url(#arrowHead); opacity:0.9;}
+      .link-broken{stroke:var(--bad); stroke-width:2.6; fill:none; stroke-dasharray:10 10; marker-end:none;}
+      .link-contra{stroke:var(--contra); stroke-width:2.6; fill:none; stroke-dasharray:2 5; marker-end:url(#arrowHeadContra);}
+      .zig{stroke:var(--contra); stroke-width:2.6; fill:none;}
+
+      /* badges */
+      .badgeCircle{fill:rgba(17, 24, 39, 0.95); stroke:var(--border); stroke-width:1.2;}
+      .badgeText{fill:var(--text); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; font-size:10px; font-weight:800;}
+      .badgeContra{stroke: rgba(167, 139, 250, 0.9);}
+      .badgeBad{stroke: rgba(251, 113, 133, 0.9);}
+      .badgeWarn{stroke: rgba(251, 191, 36, 0.9);}
+
+      /* global pill */
+      .pill{fill:#0f172a; stroke:var(--border); stroke-width:1.5;}
+      .pillText{fill:var(--text); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; font-size:12px; font-weight:700;}
+      .dot{stroke:none;}
+      .dot-ok{fill:var(--ok);}
+      .dot-warn{fill:var(--warn);}
+      .dot-bad{fill:var(--bad);}
+      .dot-contra{fill:var(--contra);}
+    </style>
+
+    <marker id="arrowHead" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#60a5fa"/>
+    </marker>
+    <marker id="arrowHeadContra" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#a78bfa"/>
+    </marker>
+  </defs>
+
+  <!-- background panel -->
+  <rect x="8" y="8" width="1104" height="164" rx="14" class="panel"/>
+  <text x="24" y="34" class="title">Minimum Legal Chain (MLC)</text>
+  <text x="24" y="52" class="sub">Visual status bar for IRAC+ (ok, incomplete, invalid, contradictory)</text>
+
+  <!-- global status pill -->
+  <g id="mlcGlobal" transform="translate(870,20)">
+    <rect x="0" y="0" width="220" height="34" rx="10" class="pill"/>
+    <circle cx="18" cy="17" r="6" class="dot dot-ok" id="mlcGlobalDot"/>
+    <text x="34" y="22" class="pillText" id="mlcGlobalText">Structurally sound</text>
+  </g>
+
+  <!-- nodes -->
+  <!-- geometry -->
+  <!-- node width 150 height 54 gap 22 -->
+  <g id="nodes" transform="translate(24,78)">
+    <!-- Authority -->
+    <g id="n-authority" data-key="authority">
+      <rect x="0" y="0" width="150" height="54" rx="12" class="node st-ok" id="r-authority"/>
+      <text x="75" y="22" text-anchor="middle" class="nodeText">Authority</text>
+      <text x="75" y="40" text-anchor="middle" class="hint">source of power</text>
+      <g id="b-authority" visibility="hidden">
+        <circle cx="138" cy="10" r="10" class="badgeCircle badgeBad"/>
+        <text x="138" y="14" text-anchor="middle" class="badgeText">C1</text>
+      </g>
+    </g>
+
+    <!-- Conferral -->
+    <g id="n-conferral" data-key="conferral" transform="translate(172,0)">
+      <rect x="0" y="0" width="150" height="54" rx="12" class="node st-ok" id="r-conferral"/>
+      <text x="75" y="22" text-anchor="middle" class="nodeText">Conferral</text>
+      <text x="75" y="40" text-anchor="middle" class="hint">valid act</text>
+      <g id="b-conferral" visibility="hidden">
+        <circle cx="138" cy="10" r="10" class="badgeCircle badgeBad"/>
+        <text x="138" y="14" text-anchor="middle" class="badgeText">C1</text>
+      </g>
+    </g>
+
+    <!-- Role -->
+    <g id="n-role" data-key="role" transform="translate(344,0)">
+      <rect x="0" y="0" width="150" height="54" rx="12" class="node st-ok" id="r-role"/>
+      <text x="75" y="22" text-anchor="middle" class="nodeText">Role</text>
+      <text x="75" y="40" text-anchor="middle" class="hint">status in system</text>
+      <g id="b-role" visibility="hidden">
+        <circle cx="138" cy="10" r="10" class="badgeCircle badgeContra"/>
+        <text x="138" y="14" text-anchor="middle" class="badgeText">C5</text>
+      </g>
+    </g>
+
+    <!-- Obligation -->
+    <g id="n-obligation" data-key="obligation" transform="translate(516,0)">
+      <rect x="0" y="0" width="150" height="54" rx="12" class="node st-ok" id="r-obligation"/>
+      <text x="75" y="22" text-anchor="middle" class="nodeText">Obligation</text>
+      <text x="75" y="40" text-anchor="middle" class="hint">duty / power</text>
+      <g id="b-obligation" visibility="hidden">
+        <circle cx="138" cy="10" r="10" class="badgeCircle badgeContra"/>
+        <text x="138" y="14" text-anchor="middle" class="badgeText">C3</text>
+      </g>
+    </g>
+
+    <!-- Correlativity -->
+    <g id="n-correlativity" data-key="correlativity" transform="translate(688,0)">
+      <rect x="0" y="0" width="150" height="54" rx="12" class="node st-ok" id="r-correlativity"/>
+      <text x="75" y="22" text-anchor="middle" class="nodeText">Correlativity</text>
+      <text x="75" y="40" text-anchor="middle" class="hint">right / burden</text>
+      <g id="b-correlativity" visibility="hidden">
+        <circle cx="138" cy="10" r="10" class="badgeCircle badgeBad"/>
+        <text x="138" y="14" text-anchor="middle" class="badgeText">C4</text>
+      </g>
+    </g>
+
+    <!-- Remedy -->
+    <g id="n-remedy" data-key="remedy" transform="translate(860,0)">
+      <rect x="0" y="0" width="150" height="54" rx="12" class="node st-ok" id="r-remedy"/>
+      <text x="75" y="22" text-anchor="middle" class="nodeText">Remedy</text>
+      <text x="75" y="40" text-anchor="middle" class="hint">repair channel</text>
+      <g id="b-remedy" visibility="hidden">
+        <circle cx="138" cy="10" r="10" class="badgeCircle badgeWarn"/>
+        <text x="138" y="14" text-anchor="middle" class="badgeText">C7</text>
+      </g>
+    </g>
+
+    <!-- links -->
+    <path id="l-a-c" class="link" d="M150,27 L172,27"/>
+    <path id="l-c-r" class="link" d="M322,27 L344,27"/>
+    <path id="l-r-o" class="link" d="M494,27 L516,27"/>
+    <path id="l-o-k" class="link" d="M666,27 L688,27"/>
+    <path id="l-k-m" class="link" d="M838,27 L860,27"/>
+
+    <!-- contradiction zig overlay (hidden by default) -->
+    <path id="zig-r-o" class="zig" d="M494,27 L502,19 L510,35 L518,19 L526,35 L534,19 L542,35 L516,27" visibility="hidden"/>
+  </g>
+
+  <!-- legend -->
+  <g id="legend" transform="translate(24,148)">
+    <circle cx="8" cy="0" r="6" class="dot dot-ok"/><text x="18" y="4" class="sub">ok</text>
+    <circle cx="78" cy="0" r="6" class="dot dot-warn"/><text x="88" y="4" class="sub">incomplete</text>
+    <circle cx="178" cy="0" r="6" class="dot dot-bad"/><text x="188" y="4" class="sub">invalid</text>
+    <circle cx="258" cy="0" r="6" class="dot dot-contra"/><text x="268" y="4" class="sub">contradictory</text>
+    <text x="430" y="4" class="sub">Badges C1..C7 map to your contradiction typology</text>
+  </g>
+</svg>

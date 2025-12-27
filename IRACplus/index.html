@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>IRAC+ | Structural Legal Issue Analyzer</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <header class="header">
+    <div class="container">
+      <h1>IRAC+ Structural Legal Issue Analyzer</h1>
+      <p class="subhead">
+        Build the Minimum Legal Chain, diagnose contradiction on the Square (AERR), then generate research guidance and IRAC+ output.
+        Terminology is locked to the SOoL poem.
+      </p>
+
+      <div class="toolbar">
+        
+     <button id="btnLoadSample" class="btn">Load sample (University speech)</button>
+<button id="btnLoadSampleCriminal" class="btn btn-ghost">Load sample (Criminal threat)</button>
+<button id="btnClear" class="btn btn-ghost">Clear all</button>
+<button id="btnExport" class="btn btn-ghost">Export JSON</button>
+<button id="btnPrint" class="btn btn-ghost">Print / Save as PDF</button>
+
+<!-- Navigation additions -->
+<button id="btnExplainer" class="btn btn-ghost"
+        onclick="window.location.href='https://davidkoepsell.com/IRACplus/IRACplusExplainer.html'">
+  Why IRAC+ Works
+</button>
+
+<button id="btnSOoL" class="btn btn-ghost"
+        onclick="window.location.href='https://davidkoepsell.com/AStructuralOntologyOfTheLaw/'">
+  Structural Ontology of Law
+</button>
+
+    </div>
+  </header>
+
+  <main class="container main">
+
+    <!-- Step 0 -->
+    <section class="card">
+      <h2>Step 0: Choose a domain (required)</h2>
+      <p class="hint">This customizes examples and research overlays. You cannot proceed without it.</p>
+
+      <div class="domain">
+        <label class="radio"><input type="radio" name="domain" value="criminal" /><span>Criminal law</span></label>
+        <label class="radio"><input type="radio" name="domain" value="civil" /><span>Civil liability (tort or contract)</span></label>
+        <label class="radio"><input type="radio" name="domain" value="constitutional" /><span>Constitutional law</span></label>
+        <label class="radio"><input type="radio" name="domain" value="administrative" /><span>Administrative / regulatory law</span></label>
+        <label class="radio"><input type="radio" name="domain" value="ethics" /><span>Professional responsibility / ethics</span></label>
+        <label class="radio"><input type="radio" name="domain" value="unsure" /><span>Unsure (guide me)</span></label>
+      </div>
+
+      <div id="domainGate" class="gate gate-warn">Select a domain to unlock the workflow.</div>
+    </section>
+
+    <!-- Step 1 -->
+    <section class="card">
+      <h2>Step 1: One-sentence problem</h2>
+      <p class="hint">Write a neutral description. Avoid conclusions like “this is illegal” or naming an offense.</p>
+      <label class="field">
+        <span>One-sentence problem</span>
+        <textarea id="oneSentence" rows="3" placeholder="Example: A public university requires prior approval for certain classroom topics, raising whether the restriction violates the First Amendment."></textarea>
+      </label>
+      <div id="issueGate" class="gate"></div>
+    </section>
+
+    <!-- Step 2 -->
+    <section class="card">
+      <h2>Step 2: The four anchors</h2>
+      <p class="hint">These help you stay factual and separate structure from conclusions.</p>
+      <div class="grid2">
+        <label class="field">
+          <span>Actors</span>
+          <textarea id="anchorsActors" rows="4" placeholder="List relevant actors (institutions, officials, parties)."></textarea>
+        </label>
+        <label class="field">
+          <span>Roles</span>
+          <textarea id="anchorsRoles" rows="4" placeholder="List legal roles/capacities (state actor, regulator, instructor, claimant...)."></textarea>
+        </label>
+        <label class="field">
+          <span>Norms</span>
+          <textarea id="anchorsNorms" rows="4" placeholder="List controlling texts/tests (statutes, regs, constitutional provisions, doctrines)."></textarea>
+        </label>
+        <label class="field">
+          <span>Event</span>
+          <textarea id="anchorsEvent" rows="4" placeholder="What happened and when? Keep it factual."></textarea>
+        </label>
+      </div>
+    </section>
+
+    <!-- Step 3 -->
+    <section class="card">
+      <h2>Step 3: Minimum Legal Chain (1–8)</h2>
+      <!-- MLC Visual Status Bar -->
+<div class="card" style="padding:12px;">
+  <h3 style="margin-bottom:6px;">Structural Status</h3>
+  <div class="mlcFrame">
+    <div id="mlcHost"></div>
+  </div>
+</div>
+
+      <p class="hint">
+        Authority grants power to bind. Norm names the rule we must mind. Actor in role shows who may act. Triggering facts make the norm react.
+        Act or omission does the deed. Target tells who must take heed. Legal effect is what the law makes real. Remedy fixes and closes the seal.
+      </p>
+
+      <div class="chain">
+
+        <!-- 1 Source of authority -->
+        <div class="block">
+          <div class="blockHead">
+            <h3>1) Source of authority (required)</h3>
+            <div class="small muted">Where does the legal power come from? This is not the norm itself.</div>
+          </div>
+
+          <div class="grid2">
+            <label class="field">
+              <span>Choose a source type</span>
+              <select id="sourceType"></select>
+            </label>
+            <label class="field">
+              <span>Specify (recommended)</span>
+              <input id="sourceSpecify" class="input" type="text" placeholder="Example: Texas Penal Code § __; U.S. Const. amend. I; 42 U.S.C. § __" />
+              <small class="small">Tip: include a section or clause if you can.</small>
+            </label>
+          </div>
+
+          <label class="field">
+            <span>Source of authority (final text)</span>
+            <textarea id="chainSource" rows="2" placeholder="Auto-filled from your choices. You can edit, but generic entries will be blocked."></textarea>
+          </label>
+
+          <div id="sourceGate" class="gate"></div>
+        </div>
+
+        <!-- 2 Norm -->
+        <label class="field">
+          <span>2) Norm</span>
+          <textarea id="chainNorm" rows="2" placeholder="What norm governs? Include key elements if needed."></textarea>
+        </label>
+
+        <!-- 3 Actor in role -->
+        <label class="field">
+          <span>3) Actor in role</span>
+          <textarea id="chainActorRole" rows="2" placeholder="Who is acting, and in what legal capacity?"></textarea>
+        </label>
+
+        <!-- 4 Triggering facts -->
+        <label class="field">
+          <span>4) Triggering facts</span>
+          <textarea id="chainFacts" rows="3" placeholder="Only the facts that activate the norm. Mark unknowns as UNKNOWN."></textarea>
+        </label>
+
+        <!-- 5 Legal action / omission -->
+        <label class="field">
+          <span>5) Legal action / omission</span>
+          <textarea id="chainAction" rows="2" placeholder="Issued order, denied benefit, threatened prosecution, disciplined, failed to hold hearing, etc."></textarea>
+        </label>
+
+        <!-- 6 Target -->
+        <label class="field">
+          <span>6) Target</span>
+          <textarea id="chainTarget" rows="2" placeholder="Who or what is targeted? Include status if relevant."></textarea>
+        </label>
+
+        <!-- 7 Legal effect -->
+        <div class="block">
+          <div class="blockHead">
+            <h3>7) Legal effect (required)</h3>
+            <div class="small muted">What changed legally (rights, duties, status, exposure)? Not feelings or behavior.</div>
+          </div>
+
+          <div class="grid2">
+            <label class="field">
+              <span>Select legal effect category (required)</span>
+              <select id="effectPick"></select>
+            </label>
+            <label class="field">
+              <span>Optional: describe in your own words</span>
+              <input id="effectDescribe" class="input" type="text" placeholder="Example: Increased exposure to criminal liability." />
+              <small class="small">Avoid: “they felt scared,” “they sought advice,” “they got upset.”</small>
+            </label>
+          </div>
+
+          <label class="field">
+            <span>Legal effect (final text)</span>
+            <textarea id="chainEffect" rows="2" placeholder="Auto-filled from your selection. You can edit but non-legal effects will be blocked."></textarea>
+          </label>
+
+          <div id="effectGate" class="gate"></div>
+        </div>
+
+        <!-- 8 Remedy -->
+        <div class="block">
+          <div class="blockHead">
+            <h3>8) Remedy (required)</h3>
+            <div class="small muted">How could the system respond or repair if a violation exists? Do not assume an outcome.</div>
+          </div>
+
+          <div class="grid2">
+            <label class="field">
+              <span>Select remedy type (required)</span>
+              <select id="remedyPick"></select>
+            </label>
+            <label class="field">
+              <span>Optional: describe pathway</span>
+              <input id="remedyDescribe" class="input" type="text" placeholder="Example: Injunction; administrative appeal; criminal investigation; suppression motion." />
+              <small class="small">Avoid: “they will win,” “the person will be convicted.”</small>
+            </label>
+          </div>
+
+          <label class="field">
+            <span>Remedy (final text)</span>
+            <textarea id="chainRemedy" rows="2" placeholder="Auto-filled from your selection. You can edit but assumed outcomes will be blocked."></textarea>
+          </label>
+
+          <div id="remedyGate" class="gate"></div>
+        </div>
+
+      </div>
+
+      <div class="row">
+        <button id="btnMakeChain" class="btn" disabled>Generate chain line</button>
+        <button id="btnCopyChain" class="btn btn-ghost" disabled>Copy chain line</button>
+      </div>
+
+      <div class="output">
+        <div class="outputHead"><h3>Chain line</h3></div>
+        <pre id="chainLine" class="pre"></pre>
+      </div>
+
+      <div id="chainGlobalGate" class="gate gate-warn"></div>
+    </section>
+
+    <!-- Step 4 -->
+    <section class="card">
+      <h2>Step 4: Contradiction Wizard (yes/no)</h2>
+      <p class="hint">Answer yes/no questions. The tool ranks likely contradiction types. You confirm primary and optional secondary tags.</p>
+
+      <div id="wizardGate" class="gate gate-warn">Complete Step 3 validations to unlock the wizard.</div>
+
+      <div id="wizard" class="wizard disabled">
+        <div class="wizardTop">
+          <div class="wizardProgress">
+            <span id="wizStepLabel">Question</span>
+            <span class="muted small" id="wizCount">0/0</span>
+          </div>
+          <div class="wizardControls">
+            <button id="btnWizBack" class="btn btn-ghost btn-small" disabled>Back</button>
+            <button id="btnWizReset" class="btn btn-ghost btn-small">Reset</button>
+          </div>
+        </div>
+
+        <div class="wizardBody">
+          <div id="wizQuestion" class="wizQuestion"></div>
+          <div class="wizHelp small muted" id="wizHelp"></div>
+
+          <div class="row">
+            <button id="btnWizYes" class="btn">Yes</button>
+            <button id="btnWizNo" class="btn btn-ghost">No</button>
+          </div>
+        </div>
+
+        <div class="wizardResults">
+          <h3>Contradiction tags</h3>
+
+          <div class="grid2">
+            <label class="field">
+              <span>Primary contradiction type</span>
+              <select id="primaryTag"></select>
+            </label>
+            <label class="field">
+              <span>Secondary tags (optional)</span>
+              <select id="secondaryTags" multiple size="8"></select>
+              <small class="small">Tip: Ctrl/Cmd selects multiple.</small>
+            </label>
+          </div>
+
+          <label class="field">
+            <span>Where in the chain does it occur?</span>
+            <select id="tagLocation">
+              <option value="">Select link(s)</option>
+              <option value="Link 1→3">Link 1→3 (Conferral failure)</option>
+              <option value="Link 2↔6">Link 2↔6 (Jurisdictional contradiction)</option>
+              <option value="Link 3 or 7">Link 3 or 7 (Role contradiction)</option>
+              <option value="Link 2→5">Link 2→5 (Procedural contradiction)</option>
+              <option value="Link 2↔4">Link 2↔4 (Temporal contradiction)</option>
+              <option value="Link 6/7">Link 6/7 (Recognition failure)</option>
+              <option value="Link 7">Link 7 (Correlativity contradiction)</option>
+              <option value="Link 8">Link 8 (Repair family)</option>
+              <option value="Multiple">Multiple</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Diagnostic statement (auto-generated, editable)</span>
+            <textarea id="diagnosticStatement" rows="4"></textarea>
+          </label>
+
+          <div class="row">
+            <button id="btnMakeDiagnosis" class="btn" disabled>Generate diagnostic statement</button>
+            <button id="btnCopyDiagnosis" class="btn btn-ghost" disabled>Copy</button>
+          </div>
+
+          <div id="tagGate" class="gate"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Step 5 -->
+    <section class="card">
+      <h2>Step 5: Research guidance (typed outlines)</h2>
+      <p class="hint">Generated only after a valid chain and confirmed primary contradiction type.</p>
+
+      <div class="row">
+        <button id="btnMakeResearch" class="btn" disabled>Generate research plan</button>
+        <button id="btnCopyResearch" class="btn btn-ghost" disabled>Copy</button>
+      </div>
+
+      <div class="output">
+        <div class="outputHead"><h3>Research plan</h3></div>
+        <pre id="researchPlan" class="pre"></pre>
+      </div>
+
+      <details class="details">
+        <summary>Show the typology-to-outline overlay map</summary>
+        <div class="detailsBody" id="overlayMap"></div>
+      </details>
+    </section>
+
+    <!-- Step 6 -->
+    <section class="card">
+      <h2>Step 6: IRAC+ draft output</h2>
+      <p class="hint">Blocked unless ontology is valid and a primary contradiction type is confirmed.</p>
+
+      <div class="row">
+        <button id="btnMakeIRAC" class="btn" disabled>Generate IRAC+ draft</button>
+        <button id="btnCopyIRAC" class="btn btn-ghost" disabled>Copy</button>
+      </div>
+
+      <div class="output">
+        <div class="outputHead"><h3>IRAC+ draft</h3></div>
+        <pre id="iracDraft" class="pre"></pre>
+      </div>
+
+      <div id="finalGate" class="gate gate-warn"></div>
+    </section>
+
+    <footer class="footer">
+      <p class="small">Educational use only. This tool models legal structure, not legal advice.</p>
+    </footer>
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

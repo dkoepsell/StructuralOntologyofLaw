@@ -1,0 +1,670 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Why IRAC+ Works + Square Legend</title>
+  <meta name="description" content="A one-page explainer for IRAC+ and a visual legend keyed to the Square of Legal Contradiction (AERR) and the Minimum Legal Chain." />
+<header>
+  <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+    <div>
+      <h1>Why IRAC+ Works</h1>
+      <p class="subtitle">
+        IRAC+ is a structural approach to legal reasoning: build a Minimum Legal Chain, diagnose contradiction on the Square (AERR), then generate research guidance and a defensible IRAC+ draft.
+      </p>
+    </div>
+
+    <div style="margin-top:4px;">
+      <a href="https://davidkoepsell.com/IRACplus/"
+         class="btn"
+         style="text-decoration:none; white-space:nowrap;">
+        ← Back to IRAC+ Analyzer
+      </a>
+    </div>
+  </div>
+</header>
+
+  <style>
+    :root{
+      --bg:#0b0e14;
+      --panel:#111827;
+      --panel2:#0f172a;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --border:#243244;
+      --accent:#60a5fa;
+
+      --ok:#34d399;
+      --warn:#fbbf24;
+      --bad:#fb7185;
+
+      --a:#60a5fa;   /* Authority */
+      --e:#fbbf24;   /* Execution */
+      --r:#34d399;   /* Recognition */
+      --rr:#fb7185;  /* Repair */
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background: linear-gradient(180deg, var(--bg), #06070a 85%);
+      color: var(--text);
+    }
+    a{ color: var(--accent); text-decoration: none; }
+    a:hover{ text-decoration: underline; }
+
+    .container{
+      width:min(1000px, 92vw);
+      margin:0 auto;
+      padding: 28px 0 56px 0;
+    }
+
+    header{
+      border-bottom:1px solid var(--border);
+      padding: 20px 0 18px 0;
+      margin-bottom: 20px;
+    }
+    h1{
+      margin:0 0 8px 0;
+      font-size: 28px;
+      letter-spacing: 0.2px;
+    }
+    .subtitle{
+      margin:0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 16px;
+      margin-top: 18px;
+    }
+    @media (max-width: 920px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(96,165,250,0.08), rgba(17,24,39,0.96) 40%);
+      border:1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px 16px 14px 16px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+    }
+    .card h2{
+      margin:0 0 10px 0;
+      font-size: 18px;
+    }
+    .card h3{
+      margin: 14px 0 8px 0;
+      font-size: 14px;
+      color: var(--text);
+    }
+    p{
+      margin: 0 0 10px 0;
+      color: var(--text);
+      line-height: 1.6;
+      font-size: 14px;
+    }
+    ul{
+      margin: 8px 0 10px 18px;
+      color: var(--text);
+      line-height: 1.6;
+      font-size: 14px;
+    }
+    li{ margin: 4px 0; }
+
+    .pillrow{ display:flex; flex-wrap:wrap; gap:8px; margin: 10px 0 2px 0; }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 10px;
+      border-radius: 999px;
+      border:1px solid var(--border);
+      background: rgba(17,24,39,0.6);
+      font-size: 12px;
+      color: var(--muted);
+      user-select:none;
+      cursor:pointer;
+      transition: transform .08s ease, border-color .12s ease;
+    }
+    .pill:hover{ transform: translateY(-1px); border-color: rgba(96,165,250,0.45); }
+    .dot{ width:10px; height:10px; border-radius:50%; display:inline-block; }
+    .dot.a{ background: var(--a); }
+    .dot.e{ background: var(--e); }
+    .dot.r{ background: var(--r); }
+    .dot.rr{ background: var(--rr); }
+
+    .muted{ color: var(--muted); }
+
+    .legendWrap{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .square{
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      border:1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px;
+    }
+
+    .squareHeader{
+      display:flex;
+      align-items:flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .squareHeader h3{ margin:0; font-size: 14px; }
+    .squareHeader .muted{ font-size: 12px; line-height: 1.4; }
+
+    .sqGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .quad{
+      border:1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px;
+      background: rgba(15,23,42,0.65);
+      min-height: 92px;
+      position: relative;
+      overflow:hidden;
+    }
+    .quad::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      opacity:0.10;
+      pointer-events:none;
+    }
+    .quad.a::before{ background: var(--a); }
+    .quad.e::before{ background: var(--e); }
+    .quad.r::before{ background: var(--r); }
+    .quad.rr::before{ background: var(--rr); }
+
+    .qTitle{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+    .qTitle strong{ font-size: 13px; }
+    .qTitle span{
+      font-size: 11px;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(17,24,39,0.55);
+    }
+    .qBody{
+      font-size: 12px;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .chainStrip{
+      border-top:1px solid var(--border);
+      margin-top: 10px;
+      padding-top: 10px;
+    }
+    .chain{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .link{
+      font-size: 11px;
+      color: var(--muted);
+      border:1px solid var(--border);
+      padding: 5px 8px;
+      border-radius: 12px;
+      background: rgba(17,24,39,0.55);
+      cursor: default;
+    }
+
+    table{
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 12px;
+      overflow:hidden;
+      border-radius: 14px;
+      border:1px solid var(--border);
+    }
+    thead th{
+      text-align:left;
+      padding: 10px 10px;
+      background: rgba(96,165,250,0.10);
+      color: var(--text);
+      border-bottom:1px solid var(--border);
+      font-weight: 600;
+    }
+    tbody td{
+      padding: 10px 10px;
+      border-bottom: 1px solid rgba(36,50,68,0.6);
+      vertical-align: top;
+      color: var(--text);
+      background: rgba(17,24,39,0.45);
+    }
+    tbody tr:last-child td{ border-bottom: none; }
+    .kTag{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border:1px solid var(--border);
+      background: rgba(0,0,0,0.15);
+      font-size: 11px;
+      color: var(--muted);
+      white-space: nowrap;
+      margin-right: 6px;
+    }
+
+    .focus{
+      outline: 2px solid rgba(96,165,250,0.55);
+      outline-offset: 2px;
+    }
+    .hidden{ display:none; }
+
+    footer{
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .btnRow{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top: 12px;
+    }
+    .btn{
+      appearance:none;
+      border:1px solid var(--border);
+      background: rgba(17,24,39,0.55);
+      color: var(--text);
+      padding: 8px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      cursor:pointer;
+    }
+    .btn:hover{ border-color: rgba(96,165,250,0.45); }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>Why IRAC+ Works</h1>
+      <p class="subtitle">
+        IRAC+ is a structural approach to legal reasoning: build a Minimum Legal Chain, diagnose contradiction on the Square (AERR), then generate research guidance and a defensible IRAC+ draft.
+      </p>
+    </header>
+
+    <div class="grid">
+      <!-- Left: Explainer -->
+      <section class="card" aria-label="Explainer">
+        <h2>The problem IRAC+ solves</h2>
+        <p>
+          Traditional analysis often jumps to conclusions (illegal, liable, unconstitutional) before the underlying legal structure is made explicit.
+          IRAC+ slows you down just enough to separate structure from outcomes.
+        </p>
+
+        <h3>What makes IRAC+ different</h3>
+        <ul>
+          <li><strong>Structure first.</strong> Authority, roles, jurisdiction, procedure, recognition, and repair are kept distinct.</li>
+          <li><strong>Completeness by design.</strong> The Minimum Legal Chain prevents missing links and hidden assumptions.</li>
+          <li><strong>Diagnosis before research.</strong> The Square (AERR) maps structural failure to targeted research paths.</li>
+          <li><strong>Writing that can stand up.</strong> The output is not a verdict. It is a structurally grounded draft.</li>
+        </ul>
+
+        <h3>The Minimum Legal Chain (1 to 8)</h3>
+        <p class="muted">
+          Every legally meaningful event can be expressed as a chain. If one link is missing or mismatched, you have a structural contradiction.
+        </p>
+
+        <div class="chain">
+          <span class="link">1. source of authority</span>
+          <span class="link">2. norm</span>
+          <span class="link">3. actor in role</span>
+          <span class="link">4. triggering facts</span>
+          <span class="link">5. legal action or omission</span>
+          <span class="link">6. target</span>
+          <span class="link">7. legal effect</span>
+          <span class="link">8. remedy</span>
+        </div>
+<h2 style="margin-top:18px;">Structural Completeness Theorem</h2>
+
+<p class="muted">
+This theorem explains why IRAC+ can always diagnose a structural problem when legal analysis fails.
+</p>
+
+<div style="border-left:3px solid var(--accent); padding-left:14px; margin-top:12px;">
+
+  <p>
+    <strong>Definition (Minimum Legal Chain).</strong>
+    Any candidate legal event may be represented as an ordered structure:
+  </p>
+
+  <p style="font-size:13px; color:#c7d2fe;">
+    ⟨ source of authority, norm, actor-in-role, triggering facts, legal action or omission,
+    target, legal effect, remedy ⟩
+  </p>
+
+  <p>
+    A chain is <em>well-formed</em> if each element is present, of the correct legal kind,
+    and relationally aligned with the others. A failure of well-formedness constitutes a
+    <strong>structural contradiction</strong>.
+  </p>
+
+  <p>
+    <strong>Theorem (Structural Completeness).</strong><br/>
+    For any candidate legal event, exactly one of the following holds:
+  </p>
+
+  <ul>
+    <li>
+      The Minimum Legal Chain is well-formed, and the event is structurally coherent; or
+    </li>
+    <li>
+      The chain contains at least one structural failure classifiable by the Square of Legal
+      Contradiction (AERR).
+    </li>
+  </ul>
+
+  <p>
+    In other words: every structurally defective legal analysis is diagnosable by at least
+    one contradiction type in IRAC+.
+  </p>
+
+  <p>
+    <strong>Proof sketch.</strong><br/>
+    Each link in the Minimum Legal Chain corresponds to a necessary condition for legal
+    validity. The AERR typology exhaustively enumerates the ways those conditions can fail:
+    authority may be missing or invalid, jurisdiction exceeded, procedure malformed,
+    recognition denied, correlativity broken, or institutional repair unavailable.
+  </p>
+
+  <p>
+    Because every violation of chain well-formedness maps to at least one named contradiction
+    type, the contradiction typology is complete with respect to the structural representation
+    of legal events.
+  </p>
+
+  <p class="muted">
+    This is why IRAC+ does not guess outcomes. If structure fails, it can always say
+    <em>where</em> and <em>how</em>.
+  </p>
+
+</div>
+
+        <h3>What IRAC+ does not do</h3>
+        <ul>
+          <li>It does not decide cases or predict winners.</li>
+          <li>It does not replace judgment or legal research.</li>
+          <li>It does not loosen standards.</li>
+        </ul>
+
+        <p>
+          Instead, it makes legal judgment accountable to structure: if the structure holds, the argument can stand. If it fails, IRAC+ shows where and why.
+        </p>
+      </section>
+
+      <!-- Right: Visual legend keyed to the Square -->
+      <aside class="card" aria-label="Square legend">
+        <h2>Visual legend keyed to the Square (AERR)</h2>
+        <p class="muted">
+          Click a quadrant to highlight the contradiction types that most commonly live there. This is a navigation legend, not a legal conclusion.
+        </p>
+
+        <div class="pillrow" aria-label="Quadrant quick filter">
+          <span class="pill" data-filter="A"><span class="dot a"></span>Authority (A)</span>
+          <span class="pill" data-filter="E"><span class="dot e"></span>Execution (E)</span>
+          <span class="pill" data-filter="R"><span class="dot r"></span>Recognition (R)</span>
+          <span class="pill" data-filter="RR"><span class="dot rr"></span>Repair (R2)</span>
+          <span class="pill" data-filter="ALL"><span class="dot" style="background:var(--muted)"></span>Show all</span>
+        </div>
+
+        <div class="legendWrap">
+          <div class="square" id="squareLegend">
+            <div class="squareHeader">
+              <div>
+                <h3>Square of Legal Contradiction (AERR)</h3>
+                <div class="muted">A = authority and conferral<br/>E = action under law<br/>R = recognition and correlativity<br/>R2 = institutional repair</div>
+              </div>
+              <div class="btnRow">
+                <button class="btn" id="btnCopyLink" type="button">Copy section link</button>
+              </div>
+            </div>
+
+            <div class="sqGrid" role="group" aria-label="AERR quadrants">
+              <div class="quad a" data-filter="A" tabindex="0" role="button" aria-label="Authority quadrant">
+                <div class="qTitle">
+                  <strong><span class="dot a"></span> Authority</strong>
+                  <span>Chain links 1 to 3</span>
+                </div>
+                <div class="qBody">
+                  Problems of power to bind: conferral, delegation, ultra vires, capacity to act in role.
+                </div>
+              </div>
+
+              <div class="quad e" data-filter="E" tabindex="0" role="button" aria-label="Execution quadrant">
+                <div class="qTitle">
+                  <strong><span class="dot e"></span> Execution</strong>
+                  <span>Chain links 4 to 6</span>
+                </div>
+                <div class="qBody">
+                  Problems of acting under law: jurisdiction, procedure, timing, action or omission, targeting.
+                </div>
+              </div>
+
+              <div class="quad r" data-filter="R" tabindex="0" role="button" aria-label="Recognition quadrant">
+                <div class="qTitle">
+                  <strong><span class="dot r"></span> Recognition</strong>
+                  <span>Chain links 6 to 7</span>
+                </div>
+                <div class="qBody">
+                  Problems of legal uptake: recognition of status, correlativity of rights and duties, mismatched effects.
+                </div>
+              </div>
+
+              <div class="quad rr" data-filter="RR" tabindex="0" role="button" aria-label="Repair quadrant">
+                <div class="qTitle">
+                  <strong><span class="dot rr"></span> Repair</strong>
+                  <span>Chain link 8</span>
+                </div>
+                <div class="qBody">
+                  Problems of institutional correction: no avenue of remedy, failed repair, repair that reproduces contradiction.
+                </div>
+              </div>
+            </div>
+
+            <div class="chainStrip">
+              <p class="muted" style="margin:0;">
+                Mapping note: AERR is keyed to the chain segments above. A and E locate primary structural failures. R and R2 locate uptake and institutional response.
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <h3 style="margin:0 0 6px 0;">Contradiction types keyed to AERR and chain links</h3>
+            <p class="muted" style="margin:0 0 10px 0;">
+              This table shows where each type most commonly sits. Some types can span multiple quadrants.
+            </p>
+
+            <table aria-label="Contradiction type mapping table" id="mappingTable">
+              <thead>
+                <tr>
+                  <th style="width: 36%;">Type</th>
+                  <th style="width: 22%;">Square key</th>
+                  <th style="width: 18%;">Chain focus</th>
+                  <th>What it means</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr data-aerr="A">
+                  <td><strong>Type 1: conferral failure</strong></td>
+                  <td><span class="kTag"><span class="dot a"></span>A</span></td>
+                  <td>1 to 3</td>
+                  <td>Power to bind is missing, invalid, or not properly granted to the actor in role.</td>
+                </tr>
+                <tr data-aerr="E">
+                  <td><strong>Type 2: jurisdictional contradiction</strong></td>
+                  <td><span class="kTag"><span class="dot e"></span>E</span></td>
+                  <td>2 to 6</td>
+                  <td>Action is taken without the required jurisdiction, competence, venue, or scope.</td>
+                </tr>
+                <tr data-aerr="A">
+                  <td><strong>Type 3: role contradiction</strong></td>
+                  <td><span class="kTag"><span class="dot a"></span>A</span></td>
+                  <td>3 (or 7)</td>
+                  <td>The actor lacks the legal capacity for the role, or role constraints conflict with what is claimed.</td>
+                </tr>
+                <tr data-aerr="E">
+                  <td><strong>Type 4: procedural contradiction</strong></td>
+                  <td><span class="kTag"><span class="dot e"></span>E</span></td>
+                  <td>2 to 5</td>
+                  <td>Required process is skipped, malformed, or contradictory, such as notice, hearing, warrant, or due steps.</td>
+                </tr>
+                <tr data-aerr="E">
+                  <td><strong>Type 5: temporal contradiction</strong></td>
+                  <td><span class="kTag"><span class="dot e"></span>E</span></td>
+                  <td>2 and 4</td>
+                  <td>Timing conditions fail, such as retroactivity, lapse, statute of limitations, or premature enforcement.</td>
+                </tr>
+                <tr data-aerr="R">
+                  <td><strong>Type 6: recognition failure</strong></td>
+                  <td><span class="kTag"><span class="dot r"></span>R</span></td>
+                  <td>6 and 7</td>
+                  <td>A legally relevant status, standing, entitlement, or classification is not recognized when it should be.</td>
+                </tr>
+                <tr data-aerr="R">
+                  <td><strong>Type 7: correlativity contradiction</strong></td>
+                  <td><span class="kTag"><span class="dot r"></span>R</span></td>
+                  <td>7</td>
+                  <td>Rights and duties do not match, such as a duty without a bearer, or a right with no correlative obligation.</td>
+                </tr>
+                <tr data-aerr="RR">
+                  <td><strong>Type 8: repair failure</strong></td>
+                  <td><span class="kTag"><span class="dot rr"></span>R2</span></td>
+                  <td>8</td>
+                  <td>The system has no effective remedy path, or institutional repair is structurally unavailable.</td>
+                </tr>
+                <tr data-aerr="RR">
+                  <td><strong>Type 9: recognition repair failure</strong></td>
+                  <td><span class="kTag"><span class="dot rr"></span>R2</span><span class="kTag"><span class="dot r"></span>R</span></td>
+                  <td>6 to 8</td>
+                  <td>Even after a repair attempt, the institution still fails to recognize the relevant status or entitlement.</td>
+                </tr>
+                <tr data-aerr="RR">
+                  <td><strong>Type 10: procedural repair failure</strong></td>
+                  <td><span class="kTag"><span class="dot rr"></span>R2</span><span class="kTag"><span class="dot e"></span>E</span></td>
+                  <td>5 to 8</td>
+                  <td>Repair exists in name, but the process for repair is itself defective or nonfunctional.</td>
+                </tr>
+                <tr data-aerr="RR">
+                  <td><strong>Type 11: jurisdictional repair failure</strong></td>
+                  <td><span class="kTag"><span class="dot rr"></span>R2</span><span class="kTag"><span class="dot e"></span>E</span></td>
+                  <td>6 to 8</td>
+                  <td>The forum for repair lacks jurisdiction or authority to grant the needed correction.</td>
+                </tr>
+                <tr data-aerr="ALL">
+                  <td><strong>Type 12: compound contradiction</strong></td>
+                  <td><span class="kTag"><span class="dot a"></span>A</span><span class="kTag"><span class="dot e"></span>E</span><span class="kTag"><span class="dot r"></span>R</span><span class="kTag"><span class="dot rr"></span>R2</span></td>
+                  <td>multiple</td>
+                  <td>More than one primary contradiction type is present and they interact across chain segments.</td>
+                </tr>
+                <tr data-aerr="ALL">
+                  <td><strong>Type 13: institutionalized contradiction</strong></td>
+                  <td><span class="kTag"><span class="dot rr"></span>R2</span><span class="kTag"><span class="dot r"></span>R</span></td>
+                  <td>system-wide</td>
+                  <td>A contradiction persists as a stable feature of institutional operation, often producing recurring contradiction debt.</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <footer>
+              <div><strong>How to use this legend:</strong> build the chain first, then use AERR to locate the kind of structural failure. The contradiction type points you to research priorities and possible remedies.</div>
+            </footer>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const pills = Array.from(document.querySelectorAll(".pill[data-filter]"));
+      const quads = Array.from(document.querySelectorAll(".quad[data-filter]"));
+      const rows  = Array.from(document.querySelectorAll("#mappingTable tbody tr"));
+      const btnCopy = document.getElementById("btnCopyLink");
+
+      function applyFilter(filter){
+        // Clear focus styling
+        pills.forEach(p => p.classList.remove("focus"));
+        quads.forEach(q => q.classList.remove("focus"));
+
+        // Highlight selected control
+        const pill = pills.find(p => p.getAttribute("data-filter") === filter);
+        if (pill) pill.classList.add("focus");
+
+        const quad = quads.find(q => q.getAttribute("data-filter") === filter);
+        if (quad) quad.classList.add("focus");
+
+        // Row visibility
+        rows.forEach(r => {
+          const k = r.getAttribute("data-aerr");
+          const show = (filter === "ALL") || (k === filter) || (k === "ALL" && filter !== "");
+          r.classList.toggle("hidden", !show);
+        });
+      }
+
+      // Pill click
+      pills.forEach(p => {
+        p.addEventListener("click", () => applyFilter(p.getAttribute("data-filter")));
+      });
+
+      // Quad click and keyboard
+      quads.forEach(q => {
+        q.addEventListener("click", () => applyFilter(q.getAttribute("data-filter")));
+        q.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " "){
+            e.preventDefault();
+            applyFilter(q.getAttribute("data-filter"));
+          }
+        });
+      });
+
+      // Copy link to this section
+      btnCopy.addEventListener("click", async () => {
+        const url = new URL(window.location.href);
+        url.hash = "squareLegend";
+        try{
+          await navigator.clipboard.writeText(url.toString());
+          btnCopy.textContent = "Copied";
+          setTimeout(() => btnCopy.textContent = "Copy section link", 1100);
+        }catch(err){
+          // Fallback: select and prompt
+          window.prompt("Copy this link:", url.toString());
+        }
+      });
+
+      // Default
+      applyFilter("ALL");
+    })();
+  </script>
+</body>
+</html>
