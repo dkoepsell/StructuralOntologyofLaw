@@ -1,0 +1,2869 @@
+@prefix : <http://example.org/legal-ontology#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://example.org/legal-ontology> a owl:Ontology ;
+    rdfs:label "Complete Legal Ontology" ;
+    rdfs:comment "Comprehensive ontology of law built on BFO, the Social Ontology of Law, the Minimum Legal Chain (MLC), structural violation classes, tort ontology, and offense mapping." .
+
+:Continuant a owl:Class ;
+    rdfs:label "Continuant" ;
+    rdfs:comment "An entity that persists through time while maintaining identity." .
+
+:Occurrent a owl:Class ;
+    rdfs:label "Occurrent" ;
+    rdfs:comment "An entity that unfolds through time, such as a process or event." .
+
+:Role a owl:Class ;
+    rdfs:label "Role" ;
+    rdfs:comment "A realizable dependent continuant that inheres in a bearer and is realized in processes." .
+
+:Disposition a owl:Class ;
+    rdfs:label "Disposition" ;
+    rdfs:comment "A quality that can produce certain behaviors when triggered." .
+
+:RealizableDependent a owl:Class ;
+    rdfs:label "Realizable dependent" ;
+    rdfs:comment "A dependent continuant that can be realized (e.g., rights, obligations)." .
+
+:RelationalDependent a owl:Class ;
+    rdfs:label "Relational dependent" ;
+    rdfs:comment "A dependent continuant that depends on a relation among bearers." .
+
+:System a owl:Class ;
+    rdfs:label "System" ;
+    rdfs:comment "A complex whole composed of interrelated parts." .
+
+:Process a owl:Class ;
+    rdfs:label "Process" ;
+    rdfs:comment "A kind of occurrent (event or activity)." .
+
+:LegalSystem a owl:Class ;
+    rdfs:label "Legal system" ;
+    rdfs:comment "A historically and socially situated system of norms and practices." .
+
+:Norm a owl:Class ;
+    rdfs:label "Norm" ;
+    rdfs:comment "A rule or standard within a legal system." .
+
+:Agent a owl:Class ;
+    rdfs:label "Agent" ;
+    rdfs:comment "An entity that can bear roles and perform acts (person, organization, state actor)." .
+
+:Person a owl:Class ;
+    rdfs:label "Person" ;
+    rdfs:comment "An individual human agent." .
+
+:Organization a owl:Class ;
+    rdfs:label "Organization" ;
+    rdfs:comment "A collective agent such as a corporation, institution, or government body." .
+
+:LegalEvent a owl:Class ;
+    rdfs:label "Legal event" ;
+    rdfs:comment "A temporally extended occurrence involving agents, norms, roles, procedures, and facts." .
+
+:NormativeEvent a owl:Class ;
+    rdfs:label "Normative event" ;
+    rdfs:comment "A legal event concerning creation, modification, or application of norms." .
+
+:OffenseEvent a owl:Class ;
+    rdfs:label "Offense event" ;
+    rdfs:comment "A legal event that instantiates a wrongful pattern described by an offense type." .
+
+:FactSituation a owl:Class ;
+    rdfs:label "Fact situation" ;
+    rdfs:comment "A concrete factual configuration relevant to legal assessment." .
+
+:Remedy a owl:Class ;
+    rdfs:label "Remedy" ;
+    rdfs:comment "A structured legal response intended to repair, compensate, punish, or restore." .
+
+:Institution a owl:Class ;
+    rdfs:label "Institution" ;
+    rdfs:comment "A structured organization with legal authority and functions." .
+
+:Executive a owl:Class ;
+    rdfs:label "Executive" ;
+    rdfs:comment "An institution responsible for enforcing laws." .
+
+:Registry a owl:Class ;
+    rdfs:label "Registry" ;
+    rdfs:comment "An institution responsible for recording and maintaining legal facts." .
+
+:Legislature a owl:Class ;
+    rdfs:label "Legislature" ;
+    rdfs:comment "An institution with the authority to create norms." .
+
+:Court a owl:Class ;
+    rdfs:label "Court" ;
+    rdfs:comment "An institution responsible for adjudication." .
+
+:LegalFact a owl:Class ;
+    rdfs:label "Legal fact" ;
+    rdfs:comment "A fact recognized by law and which has legal significance." .
+
+:Liability a owl:Class ;
+    rdfs:label "Liability" ;
+    rdfs:comment "A legal fact indicating responsibility for wrongdoing." .
+
+:Ownership a owl:Class ;
+    rdfs:label "Ownership" ;
+    rdfs:comment "A legal fact indicating possession and control over property." .
+
+:Validity a owl:Class ;
+    rdfs:label "Validity" ;
+    rdfs:comment "A legal fact indicating that a norm or act meets formal requirements." .
+
+:Standing a owl:Class ;
+    rdfs:label "Standing" ;
+    rdfs:comment "A legal fact indicating the capacity of a party to bring a claim." .
+
+:NormativeStatus a owl:Class ;
+    rdfs:label "Normative status" ;
+    rdfs:comment "A status that qualifies the legal capacity or standing of an agent." ;
+    rdfs:subClassOf :Norm .
+
+:Right a owl:Class ;
+    rdfs:label "Right" ;
+    rdfs:comment "A normative status conferring entitlements." ;
+    rdfs:subClassOf :Norm .
+
+:Obligation a owl:Class ;
+    rdfs:label "Obligation" ;
+    rdfs:comment "A normative status requiring a bearer to act or refrain from acting." ;
+    rdfs:subClassOf :Norm .
+
+:Prohibition a owl:Class ;
+    rdfs:label "Prohibition" ;
+    rdfs:comment "A normative status forbidding an action." ;
+    rdfs:subClassOf :Norm .
+
+:Permission a owl:Class ;
+    rdfs:label "Permission" ;
+    rdfs:comment "A normative status allowing an action." ;
+    rdfs:subClassOf :Norm .
+
+:NormativeRole a owl:Class ;
+    rdfs:label "Normative role" ;
+    rdfs:comment "A normative continuant conferring legal capacity within an institution." ;
+    rdfs:subClassOf :Norm .
+
+:NormativePower a owl:Class ;
+    rdfs:label "Normative power" ;
+    rdfs:comment "Capacity to alter rights, obligations, or other normative statuses." ;
+    rdfs:subClassOf :Norm .
+
+:NormativeAuthority a owl:Class ;
+    rdfs:label "Normative authority" ;
+    rdfs:comment "Capacity to confer roles or issue binding directives." ;
+    rdfs:subClassOf :Norm .
+
+:NormativeInstitutionalRole a owl:Class ;
+    rdfs:label "Normative institutional role" ;
+    rdfs:comment "A role defined within an institution." ;
+    rdfs:subClassOf :Norm .
+
+:NormativeLegalRole a owl:Class ;
+    rdfs:label "Normative legal role" ;
+    rdfs:comment "A legal role in a specific legal process or proceeding." ;
+    rdfs:subClassOf :Norm .
+
+:BodilyIntegrityRight a owl:Class ;
+    rdfs:label "Bodily integrity right" ;
+    rdfs:comment "A specific legal right protected in tort law." ;
+    rdfs:subClassOf :Right .
+
+:PropertyRight a owl:Class ;
+    rdfs:label "Property right" ;
+    rdfs:comment "A specific legal right protected in tort law." ;
+    rdfs:subClassOf :Right .
+
+:QuietEnjoymentRight a owl:Class ;
+    rdfs:label "Quiet enjoyment right" ;
+    rdfs:comment "A specific legal right protected in tort law." ;
+    rdfs:subClassOf :Right .
+
+:ContractualRight a owl:Class ;
+    rdfs:label "Contractual right" ;
+    rdfs:comment "A specific legal right protected in tort law." ;
+    rdfs:subClassOf :Right .
+
+:ReputationRight a owl:Class ;
+    rdfs:label "Reputation right" ;
+    rdfs:comment "A specific legal right protected in tort law." ;
+    rdfs:subClassOf :Right .
+
+:TortRight a owl:Class ;
+    rdfs:label "Tort right" ;
+    rdfs:comment "A specific legal right protected in tort law." ;
+    rdfs:subClassOf :Right .
+
+:TortDuty a owl:Class ;
+    rdfs:label "Tort duty" ;
+    rdfs:comment "A duty corresponding to a tort right." ;
+    rdfs:subClassOf :Obligation .
+
+:Enforcement a owl:Class ;
+    rdfs:label "Enforcement" ;
+    rdfs:comment "A type of legal process or event." ;
+    rdfs:subClassOf :LegalEvent .
+
+:Promise a owl:Class ;
+    rdfs:label "Promise" ;
+    rdfs:comment "A type of legal process or event." ;
+    rdfs:subClassOf :LegalEvent .
+
+:Legislation a owl:Class ;
+    rdfs:label "Legislation" ;
+    rdfs:comment "A type of legal process or event." ;
+    rdfs:subClassOf :LegalEvent .
+
+:Nullification a owl:Class ;
+    rdfs:label "Nullification" ;
+    rdfs:comment "A type of legal process or event." ;
+    rdfs:subClassOf :LegalEvent .
+
+:Adjudication a owl:Class ;
+    rdfs:label "Adjudication" ;
+    rdfs:comment "A type of legal process or event." ;
+    rdfs:subClassOf :LegalEvent .
+
+:ContractFormation a owl:Class ;
+    rdfs:label "Contract formation" ;
+    rdfs:comment "A type of legal process or event." ;
+    rdfs:subClassOf :LegalEvent .
+
+:Transfer a owl:Class ;
+    rdfs:label "Transfer" ;
+    rdfs:comment "A type of legal process or event." ;
+    rdfs:subClassOf :LegalEvent .
+
+:Recognition a owl:Class ;
+    rdfs:label "Recognition" ;
+    rdfs:comment "A type of legal process or event." ;
+    rdfs:subClassOf :LegalEvent .
+
+:Violation a owl:Class ;
+    rdfs:label "Violation" ;
+    rdfs:comment "A type of legal process or event." ;
+    rdfs:subClassOf :LegalEvent .
+
+:Sanction a owl:Class ;
+    rdfs:label "Sanction" ;
+    rdfs:comment "A type of legal process or event." ;
+    rdfs:subClassOf :LegalEvent .
+
+:Repair a owl:Class ;
+    rdfs:label "Repair" ;
+    rdfs:comment "A type of legal process or event." ;
+    rdfs:subClassOf :LegalEvent .
+
+:Expiration a owl:Class ;
+    rdfs:label "Expiration" ;
+    rdfs:comment "A type of legal process or event." ;
+    rdfs:subClassOf :LegalEvent .
+
+:AuthoritySource a owl:NamedIndividual , :ChainElement ;
+    rdfs:label "Authority source" ;
+    :hasDescription "Source of authority to create or enforce norms (e.g., constitution, legislature, court)." .
+
+:NormSpecification a owl:NamedIndividual , :ChainElement ;
+    rdfs:label "Norm specification" ;
+    :hasDescription "The content of a norm specifying conditions, prohibitions, powers, or permissions." .
+
+:RoleConferral a owl:NamedIndividual , :ChainElement ;
+    rdfs:label "Role conferral" ;
+    :hasDescription "The conferral of roles or legal capacities upon agents." .
+
+:FactualTrigger a owl:NamedIndividual , :ChainElement ;
+    rdfs:label "Factual trigger" ;
+    :hasDescription "The factual conditions whose occurrence triggers the application of norms." .
+
+:ProcedureElement a owl:NamedIndividual , :ChainElement ;
+    rdfs:label "Procedure element" ;
+    :hasDescription "Procedures and processes by which norms are applied or enforced." .
+
+:JurisdictionScope a owl:NamedIndividual , :ChainElement ;
+    rdfs:label "Jurisdiction and scope" ;
+    :hasDescription "The jurisdictional and target scope of norms and authorities." .
+
+:CorrelativePosition a owl:NamedIndividual , :ChainElement ;
+    rdfs:label "Correlative position" ;
+    :hasDescription "Positions in correlativity relations, such as rights and corresponding duties." .
+
+:RemedyStage a owl:NamedIndividual , :ChainElement ;
+    rdfs:label "Remedy stage" ;
+    :hasDescription "The stage at which remedies are determined and applied." .
+
+:TemporalOrder a owl:NamedIndividual , :ChainElement ;
+    rdfs:label "Temporal order" ;
+    :hasDescription "The temporal sequencing required for legal acts." .
+
+:EffectPosition a owl:NamedIndividual , :ChainElement ;
+    rdfs:label "Effect position" ;
+    :hasDescription "The legal effect to be achieved by an act." .
+
+:ChainElement a owl:Class ;
+    rdfs:label "Chain element" ;
+    rdfs:comment "A position in the canonical chain of legality (authority, norm, role, facts, procedure, etc.)." .
+
+:StructuralViolationClass a owl:Class ;
+    rdfs:label "Structural violation class" ;
+    rdfs:comment "A generic type of mismatch or failure in the legal chain." .
+
+:SourceOfAuthorityFailure a owl:Class ;
+    rdfs:subClassOf :StructuralViolationClass ;
+    rdfs:label "Source Of Authority Failure" ;
+    rdfs:comment "No valid source of authority to create or enforce a norm; authority is not legitimate or recognized." .
+
+:NormativeContradiction a owl:Class ;
+    rdfs:subClassOf :StructuralViolationClass ;
+    rdfs:label "Normative Contradiction" ;
+    rdfs:comment "A norm conflicts with higher-level law or constitutional provisions, making it invalid or defective." .
+
+:ConferralFailure a owl:Class ;
+    rdfs:subClassOf :StructuralViolationClass ;
+    rdfs:label "Conferral Failure" ;
+    rdfs:comment "Authority fails to confer a role properly; the actor lacks legal power to perform the act." .
+
+:RoleContradictionAuthority a owl:Class ;
+    rdfs:subClassOf :StructuralViolationClass ;
+    rdfs:label "Role Contradiction Authority" ;
+    rdfs:comment "An actor does not occupy the appropriate role or acts outside their assigned role." .
+
+:ProceduralContradiction a owl:Class ;
+    rdfs:subClassOf :StructuralViolationClass ;
+    rdfs:label "Procedural Contradiction" ;
+    rdfs:comment "Procedural requirements are not followed; there is a mismatch between the norm and the legal action." .
+
+:TemporalContradiction a owl:Class ;
+    rdfs:subClassOf :StructuralViolationClass ;
+    rdfs:label "Temporal Contradiction" ;
+    rdfs:comment "Timing mismatch between the norm and triggering facts; norms applied retroactively or prematurely." .
+
+:FactualMisalignment a owl:Class ;
+    rdfs:subClassOf :StructuralViolationClass ;
+    rdfs:label "Factual Misalignment" ;
+    rdfs:comment "Triggering facts do not meet normative conditions; the factual predicate for legal action is absent or wrong." .
+
+:JurisdictionalContradiction a owl:Class ;
+    rdfs:subClassOf :StructuralViolationClass ;
+    rdfs:label "Jurisdictional Contradiction" ;
+    rdfs:comment "A norm or authority is applied to a target outside its jurisdiction or scope." .
+
+:RecognitionFailure a owl:Class ;
+    rdfs:subClassOf :StructuralViolationClass ;
+    rdfs:label "Recognition Failure" ;
+    rdfs:comment "The target or legal effect is not recognized by the relevant actors or institutions." .
+
+:CorrelativityContradiction a owl:Class ;
+    rdfs:subClassOf :StructuralViolationClass ;
+    rdfs:label "Correlativity Contradiction" ;
+    rdfs:comment "Rights and duties are not properly correlated; a right is asserted without a corresponding duty." .
+
+:EffectContradiction a owl:Class ;
+    rdfs:subClassOf :StructuralViolationClass ;
+    rdfs:label "Effect Contradiction" ;
+    rdfs:comment "The legal effect contradicts itself or conflicts with existing legal effects." .
+
+:RepairFailure a owl:Class ;
+    rdfs:subClassOf :StructuralViolationClass ;
+    rdfs:label "Repair Failure" ;
+    rdfs:comment "The system fails to repair itself; remedies are not applied or are ineffective." .
+
+:RemedyUnavailableOrBlocked a owl:Class ;
+    rdfs:subClassOf :StructuralViolationClass ;
+    rdfs:label "Remedy Unavailable Or Blocked" ;
+    rdfs:comment "A remedy is legally barred or practically inaccessible, leaving the harm unaddressed." .
+
+:RecognitionRepairFailure a owl:Class ;
+    rdfs:subClassOf :StructuralViolationClass ;
+    rdfs:label "Recognition Repair Failure" ;
+    rdfs:comment "The remedy depends on recognition which is lacking." .
+
+:ProceduralRepairFailure a owl:Class ;
+    rdfs:subClassOf :StructuralViolationClass ;
+    rdfs:label "Procedural Repair Failure" ;
+    rdfs:comment "The procedure needed to obtain a remedy is blocked or incomplete." .
+
+:JurisdictionalRepairFailure a owl:Class ;
+    rdfs:subClassOf :StructuralViolationClass ;
+    rdfs:label "Jurisdictional Repair Failure" ;
+    rdfs:comment "No court has the power to grant the remedy." .
+
+:CompoundContradiction a owl:Class ;
+    rdfs:subClassOf :StructuralViolationClass ;
+    rdfs:label "Compound Contradiction" ;
+    rdfs:comment "Multiple structural contradictions collide in a single case." .
+
+:InstitutionalizedContradiction a owl:Class ;
+    rdfs:subClassOf :StructuralViolationClass ;
+    rdfs:label "Institutionalized Contradiction" ;
+    rdfs:comment "Contradiction that is known to the system but permitted to persist." .
+
+:ChainFailurePattern a owl:Class ;
+    rdfs:label "Chain failure pattern" ;
+    rdfs:comment "A pattern describing how one or more chain elements are structurally related in a failure." .
+
+:hasOffenseCategory a owl:ObjectProperty ;
+    rdfs:label "hasOffenseCategory" ;
+    rdfs:comment "Links an offense type to its category." ;
+    rdfs:domain :OffenseType ;
+    rdfs:range :OffenseCategory .
+
+:hasStructuralViolationClass a owl:ObjectProperty ;
+    rdfs:label "hasStructuralViolationClass" ;
+    rdfs:comment "Links an offense type to the structural violation classes it instantiates." ;
+    rdfs:domain :OffenseType ;
+    rdfs:range :StructuralViolationClass .
+
+:hasChainFailurePattern a owl:ObjectProperty ;
+    rdfs:label "hasChainFailurePattern" ;
+    rdfs:comment "Links an offense type to its chain failure pattern(s)." ;
+    rdfs:domain :OffenseType ;
+    rdfs:range :ChainFailurePattern .
+
+:focusesOnElement a owl:ObjectProperty ;
+    rdfs:label "focusesOnElement" ;
+    rdfs:comment "Identifies the primary chain element involved in a failure pattern." ;
+    rdfs:domain :ChainFailurePattern ;
+    rdfs:range :ChainElement .
+
+:relatesToSecondaryElement a owl:ObjectProperty ;
+    rdfs:label "relatesToSecondaryElement" ;
+    rdfs:comment "Identifies an additional chain element related to the failure pattern." ;
+    rdfs:domain :ChainFailurePattern ;
+    rdfs:range :ChainElement .
+
+:involvesFactSituation a owl:ObjectProperty ;
+    rdfs:label "involvesFactSituation" ;
+    rdfs:comment "Links a legal event to the fact situation it involves." ;
+    rdfs:domain :LegalEvent ;
+    rdfs:range :FactSituation .
+
+:involvesAgent a owl:ObjectProperty ;
+    rdfs:label "involvesAgent" ;
+    rdfs:comment "Links a legal event to participating agents." ;
+    rdfs:domain :LegalEvent ;
+    rdfs:range :Agent .
+
+:appliesNorm a owl:ObjectProperty ;
+    rdfs:label "appliesNorm" ;
+    rdfs:comment "Links a legal event to norms applied within it." ;
+    rdfs:domain :LegalEvent ;
+    rdfs:range :Norm .
+
+:confersRole a owl:ObjectProperty ;
+    rdfs:label "confersRole" ;
+    rdfs:comment "Relates a normative event to the roles it confers." ;
+    rdfs:domain :NormativeEvent ;
+    rdfs:range :Role .
+
+:hasRemedy a owl:ObjectProperty ;
+    rdfs:label "hasRemedy" ;
+    rdfs:comment "Links a legal event to the remedies triggered or sought." ;
+    rdfs:domain :LegalEvent ;
+    rdfs:range :Remedy .
+
+:instantiatesOffenseType a owl:ObjectProperty ;
+    rdfs:label "instantiatesOffenseType" ;
+    rdfs:comment "Indicates that an offense event instantiates a particular offense type." ;
+    rdfs:domain :OffenseEvent ;
+    rdfs:range :OffenseType .
+
+:qualifies a owl:ObjectProperty ;
+    rdfs:label "qualifies" ;
+    rdfs:comment "A normative status qualifies a right." ;
+    rdfs:domain :NormativeStatus ;
+    rdfs:range :Right .
+
+:inheres_in a owl:ObjectProperty ;
+    rdfs:label "inheres_in" ;
+    rdfs:comment "A normative status inheres in a person or organization." ;
+    rdfs:domain :NormativeStatus ;
+    rdfs:range :Agent .
+
+:bears a owl:ObjectProperty ;
+    rdfs:label "bears" ;
+    rdfs:comment "Prohibitions bear normative status." ;
+    rdfs:domain :Prohibition ;
+    rdfs:range :NormativeStatus .
+
+:bears a owl:ObjectProperty ;
+    rdfs:label "bears" ;
+    rdfs:comment "Permissions bear normative status." ;
+    rdfs:domain :Permission ;
+    rdfs:range :NormativeStatus .
+
+:inheres_in a owl:ObjectProperty ;
+    rdfs:label "inheres_in" ;
+    rdfs:comment "Normative role inheres in a normative status." ;
+    rdfs:domain :NormativeRole ;
+    rdfs:range :NormativeStatus .
+
+:inheres_in a owl:ObjectProperty ;
+    rdfs:label "inheres_in" ;
+    rdfs:comment "Normative power inheres in a normative status." ;
+    rdfs:domain :NormativePower ;
+    rdfs:range :NormativeStatus .
+
+:inheres_in a owl:ObjectProperty ;
+    rdfs:label "inheres_in" ;
+    rdfs:comment "Normative authority inheres in a normative status." ;
+    rdfs:domain :NormativeAuthority ;
+    rdfs:range :NormativeStatus .
+
+:grounds a owl:ObjectProperty ;
+    rdfs:label "grounds" ;
+    rdfs:comment "Authority grounds a role." ;
+    rdfs:domain :NormativeAuthority ;
+    rdfs:range :NormativeRole .
+
+:degrades a owl:ObjectProperty ;
+    rdfs:label "degrades" ;
+    rdfs:comment "Power can degrade or limit a role." ;
+    rdfs:domain :NormativePower ;
+    rdfs:range :NormativeRole .
+
+:specializes a owl:ObjectProperty ;
+    rdfs:label "specializes" ;
+    rdfs:comment "A normative role specializes a legal role." ;
+    rdfs:domain :NormativeRole ;
+    rdfs:range :NormativeLegalRole .
+
+:specializes a owl:ObjectProperty ;
+    rdfs:label "specializes" ;
+    rdfs:comment "An institutional role specializes a legal role." ;
+    rdfs:domain :NormativeInstitutionalRole ;
+    rdfs:range :NormativeLegalRole .
+
+:realizes a owl:ObjectProperty ;
+    rdfs:label "realizes" ;
+    rdfs:comment "A legal role realizes an abstract normative role." ;
+    rdfs:domain :NormativeLegalRole ;
+    rdfs:range :NormativeRole .
+
+:holder a owl:ObjectProperty ;
+    rdfs:label "holder" ;
+    rdfs:comment "Links a right to the agent who holds it." ;
+    rdfs:domain :Right ;
+    rdfs:range :Agent .
+
+:bearer a owl:ObjectProperty ;
+    rdfs:label "bearer" ;
+    rdfs:comment "Links an obligation to the agent who bears the duty." ;
+    rdfs:domain :Obligation ;
+    rdfs:range :Agent .
+
+:correlatesWith a owl:ObjectProperty ;
+    rdfs:label "correlatesWith" ;
+    rdfs:comment "Correlates a right with its corresponding duty." ;
+    rdfs:domain :Right ;
+    rdfs:range :Obligation .
+
+:infringes a owl:ObjectProperty ;
+    rdfs:label "infringes" ;
+    rdfs:comment "The event infringes a right." ;
+    rdfs:domain :OffenseEvent ;
+    rdfs:range :Right .
+
+:threatens a owl:ObjectProperty ;
+    rdfs:label "threatens" ;
+    rdfs:comment "The event threatens a right." ;
+    rdfs:domain :OffenseEvent ;
+    rdfs:range :Right .
+
+:usurps a owl:ObjectProperty ;
+    rdfs:label "usurps" ;
+    rdfs:comment "The event usurps a property right." ;
+    rdfs:domain :OffenseEvent ;
+    rdfs:range :Right .
+
+:violatesBoundaryOf a owl:ObjectProperty ;
+    rdfs:label "violatesBoundaryOf" ;
+    rdfs:comment "The event violates the boundary of a right." ;
+    rdfs:domain :OffenseEvent ;
+    rdfs:range :Right .
+
+:interferesWith a owl:ObjectProperty ;
+    rdfs:label "interferesWith" ;
+    rdfs:comment "The event interferes with a right." ;
+    rdfs:domain :OffenseEvent ;
+    rdfs:range :Right .
+
+:typicallyViolates a owl:ObjectProperty ;
+    rdfs:label "typicallyViolates" ;
+    rdfs:comment "The event typically violates a right." ;
+    rdfs:domain :OffenseEvent ;
+    rdfs:range :Right .
+
+:inducesBreachOf a owl:ObjectProperty ;
+    rdfs:label "inducesBreachOf" ;
+    rdfs:comment "The event induces breach of a right." ;
+    rdfs:domain :OffenseEvent ;
+    rdfs:range :Right .
+
+:violatesRight a owl:ObjectProperty ;
+    rdfs:label "violatesRight" ;
+    rdfs:comment "The event violates a right." ;
+    rdfs:domain :OffenseEvent ;
+    rdfs:range :Right .
+
+:injuresReputation a owl:ObjectProperty ;
+    rdfs:label "injuresReputation" ;
+    rdfs:comment "The event injures reputation associated with a right." ;
+    rdfs:domain :OffenseEvent ;
+    rdfs:range :Right .
+
+:adjudicatedBy a owl:ObjectProperty ;
+    rdfs:label "adjudicatedBy" ;
+    rdfs:comment "Offense event is adjudicated by a tort judgment." ;
+    rdfs:domain :OffenseEvent ;
+    rdfs:range :TortJudgment .
+
+:respondsTo a owl:ObjectProperty ;
+    rdfs:label "respondsTo" ;
+    rdfs:comment "Judgment responds to a tort event." ;
+    rdfs:domain :TortJudgment ;
+    rdfs:range :OffenseEvent .
+
+:declaresOn a owl:ObjectProperty ;
+    rdfs:label "declaresOn" ;
+    rdfs:comment "Judgment declares on normative entities." ;
+    rdfs:domain :TortJudgment ;
+    rdfs:range :Norm .
+
+:records a owl:ObjectProperty ;
+    rdfs:label "records" ;
+    rdfs:comment "Judgment records into a document." ;
+    rdfs:domain :TortJudgment ;
+    rdfs:range :TortDocument .
+
+:documentedBy a owl:ObjectProperty ;
+    rdfs:label "documentedBy" ;
+    rdfs:comment "Document is documented by a judgment." ;
+    rdfs:domain :TortDocument ;
+    rdfs:range :TortJudgment .
+
+:describes a owl:ObjectProperty ;
+    rdfs:label "describes" ;
+    rdfs:comment "Document describes a tort event." ;
+    rdfs:domain :TortDocument ;
+    rdfs:range :OffenseEvent .
+
+:hasName a owl:DatatypeProperty ;
+    rdfs:label "has name" ;
+    rdfs:range xsd:string .
+
+:hasDescription a owl:DatatypeProperty ;
+    rdfs:label "has description" ;
+    rdfs:range xsd:string .
+
+:hasRelationType a owl:DatatypeProperty ;
+    rdfs:label "has relation type" ;
+    rdfs:comment "Encodes relation between chain elements, e.g. FOCUS, FORWARD, BIDIRECTIONAL." ;
+    rdfs:domain :ChainFailurePattern ;
+    rdfs:range xsd:string .
+
+:OffenseCategory a owl:Class ;
+    rdfs:label "Offense category" ;
+    rdfs:comment "A category for offenses such as Crime, Tort, or Constitutional violation." .
+
+:Tort a owl:NamedIndividual , :OffenseCategory ;
+    rdfs:label "Tort" .
+
+:Constitutional a owl:NamedIndividual , :OffenseCategory ;
+    rdfs:label "Constitutional" .
+
+:Crime a owl:NamedIndividual , :OffenseCategory ;
+    rdfs:label "Crime" .
+
+:OffenseType a owl:Class ;
+    rdfs:label "Offense type" ;
+    rdfs:comment "A type-level pattern of wrongful conduct (e.g., Battery, Assault)." .
+
+:TortJudgment a owl:Class ;
+    rdfs:label "Tort judgment" ;
+    rdfs:comment "A judgment issued in a tort case." .
+
+:DamageJudgment a owl:Class ;
+    rdfs:label "Damage judgment" ;
+    rdfs:comment "A type of tort judgment." ;
+    rdfs:subClassOf :TortJudgment .
+
+:InjunctionJudgment a owl:Class ;
+    rdfs:label "Injunction judgment" ;
+    rdfs:comment "A type of tort judgment." ;
+    rdfs:subClassOf :TortJudgment .
+
+:DeclaratoryJudgment a owl:Class ;
+    rdfs:label "Declaratory judgment" ;
+    rdfs:comment "A type of tort judgment." ;
+    rdfs:subClassOf :TortJudgment .
+
+:TortDocument a owl:Class ;
+    rdfs:label "Tort document" ;
+    rdfs:comment "A document relevant to a tort case." .
+
+:ComplaintDocument a owl:Class ;
+    rdfs:label "Complaint document" ;
+    rdfs:comment "A type of tort document." ;
+    rdfs:subClassOf :TortDocument .
+
+:PleadingDocument a owl:Class ;
+    rdfs:label "Pleading document" ;
+    rdfs:comment "A type of tort document." ;
+    rdfs:subClassOf :TortDocument .
+
+:OrderDocument a owl:Class ;
+    rdfs:label "Order document" ;
+    rdfs:comment "A type of tort document." ;
+    rdfs:subClassOf :TortDocument .
+
+:PublicationRecord a owl:Class ;
+    rdfs:label "Publication record" ;
+    rdfs:comment "A type of tort document." ;
+    rdfs:subClassOf :TortDocument .
+
+:ZoningRecord a owl:Class ;
+    rdfs:label "Zoning record" ;
+    rdfs:comment "A type of tort document." ;
+    rdfs:subClassOf :TortDocument .
+
+:ContractDocument a owl:Class ;
+    rdfs:label "Contract document" ;
+    rdfs:comment "A type of tort document." ;
+    rdfs:subClassOf :TortDocument .
+
+:TortEvent a owl:Class ;
+    rdfs:label "Tort event" ;
+    rdfs:comment "An event that constitutes a tort." ;
+    rdfs:subClassOf :OffenseEvent .
+
+:BatteryEvent a owl:Class ;
+    rdfs:label "Battery event" ;
+    rdfs:comment "A tortious event: Battery" ;
+    rdfs:subClassOf :TortEvent .
+
+:BatteryEvent_infringes a owl:ObjectProperty ;
+    rdfs:label "infringes" ;
+    rdfs:comment "Automatically generated relation between BatteryEvent and BodilyIntegrityRight." ;
+    rdfs:domain :BatteryEvent ;
+    rdfs:range :BodilyIntegrityRight .
+
+:AssaultEvent a owl:Class ;
+    rdfs:label "Assault event" ;
+    rdfs:comment "A tortious event: Assault" ;
+    rdfs:subClassOf :TortEvent .
+
+:AssaultEvent_threatens a owl:ObjectProperty ;
+    rdfs:label "threatens" ;
+    rdfs:comment "Automatically generated relation between AssaultEvent and BodilyIntegrityRight." ;
+    rdfs:domain :AssaultEvent ;
+    rdfs:range :BodilyIntegrityRight .
+
+:ConversionEvent a owl:Class ;
+    rdfs:label "Conversion event" ;
+    rdfs:comment "A tortious event: Conversion" ;
+    rdfs:subClassOf :TortEvent .
+
+:ConversionEvent_usurps a owl:ObjectProperty ;
+    rdfs:label "usurps" ;
+    rdfs:comment "Automatically generated relation between ConversionEvent and PropertyRight." ;
+    rdfs:domain :ConversionEvent ;
+    rdfs:range :PropertyRight .
+
+:TrespassToLandEvent a owl:Class ;
+    rdfs:label "TrespassToLand event" ;
+    rdfs:comment "A tortious event: TrespassToLand" ;
+    rdfs:subClassOf :TortEvent .
+
+:TrespassToLandEvent_violatesBoundaryOf a owl:ObjectProperty ;
+    rdfs:label "violatesBoundaryOf" ;
+    rdfs:comment "Automatically generated relation between TrespassToLandEvent and PropertyRight." ;
+    rdfs:domain :TrespassToLandEvent ;
+    rdfs:range :PropertyRight .
+
+:TrespassToChattelsEvent a owl:Class ;
+    rdfs:label "TrespassToChattels event" ;
+    rdfs:comment "A tortious event: TrespassToChattels" ;
+    rdfs:subClassOf :TortEvent .
+
+:TrespassToChattelsEvent_interferesWith a owl:ObjectProperty ;
+    rdfs:label "interferesWith" ;
+    rdfs:comment "Automatically generated relation between TrespassToChattelsEvent and PropertyRight." ;
+    rdfs:domain :TrespassToChattelsEvent ;
+    rdfs:range :PropertyRight .
+
+:NegligenceEvent a owl:Class ;
+    rdfs:label "Negligence event" ;
+    rdfs:comment "A tortious event: Negligence" ;
+    rdfs:subClassOf :TortEvent .
+
+:NegligenceEvent_typicallyViolates a owl:ObjectProperty ;
+    rdfs:label "typicallyViolates" ;
+    rdfs:comment "Automatically generated relation between NegligenceEvent and QuietEnjoymentRight." ;
+    rdfs:domain :NegligenceEvent ;
+    rdfs:range :QuietEnjoymentRight .
+
+:NuisanceEvent a owl:Class ;
+    rdfs:label "Nuisance event" ;
+    rdfs:comment "A tortious event: Nuisance" ;
+    rdfs:subClassOf :TortEvent .
+
+:NuisanceEvent_interferesWith a owl:ObjectProperty ;
+    rdfs:label "interferesWith" ;
+    rdfs:comment "Automatically generated relation between NuisanceEvent and QuietEnjoymentRight." ;
+    rdfs:domain :NuisanceEvent ;
+    rdfs:range :QuietEnjoymentRight .
+
+:InterferenceWithContractEvent a owl:Class ;
+    rdfs:label "InterferenceWithContract event" ;
+    rdfs:comment "A tortious event: InterferenceWithContract" ;
+    rdfs:subClassOf :TortEvent .
+
+:InterferenceWithContractEvent_inducesBreachOf a owl:ObjectProperty ;
+    rdfs:label "inducesBreachOf" ;
+    rdfs:comment "Automatically generated relation between InterferenceWithContractEvent and ContractualRight." ;
+    rdfs:domain :InterferenceWithContractEvent ;
+    rdfs:range :ContractualRight .
+
+:DefamationEvent a owl:Class ;
+    rdfs:label "Defamation event" ;
+    rdfs:comment "A tortious event: Defamation" ;
+    rdfs:subClassOf :TortEvent .
+
+:DefamationEvent_violatesRight a owl:ObjectProperty ;
+    rdfs:label "violatesRight" ;
+    rdfs:comment "Automatically generated relation between DefamationEvent and ReputationRight." ;
+    rdfs:domain :DefamationEvent ;
+    rdfs:range :ReputationRight .
+
+:BodilyIntegrityRight_DutyCorrelation a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "BodilyIntegrityRight duty correlation" ;
+    :focusesOnElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+
+:BodilyIntegrityRight :correlatesWith :TortDuty .
+
+:PropertyRight_DutyCorrelation a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "PropertyRight duty correlation" ;
+    :focusesOnElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+
+:PropertyRight :correlatesWith :TortDuty .
+
+:QuietEnjoymentRight_DutyCorrelation a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "QuietEnjoymentRight duty correlation" ;
+    :focusesOnElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+
+:QuietEnjoymentRight :correlatesWith :TortDuty .
+
+:ContractualRight_DutyCorrelation a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "ContractualRight duty correlation" ;
+    :focusesOnElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+
+:ContractualRight :correlatesWith :TortDuty .
+
+:ReputationRight_DutyCorrelation a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "ReputationRight duty correlation" ;
+    :focusesOnElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+
+:ReputationRight :correlatesWith :TortDuty .
+
+:TortRight_DutyCorrelation a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "TortRight duty correlation" ;
+    :focusesOnElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+
+:TortRight :correlatesWith :TortDuty .
+
+:Murder_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Murder pattern 1" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:Murder_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Murder pattern 2" ;
+    :hasRelationType "FOCUS" .
+:Murder a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Murder" ;
+    :hasOffenseCategory :Crime ;
+    :hasStructuralViolationClass :FactualMisalignment, :NormativeContradiction ;
+    :hasDescription "Unlawful killing violates the norm against homicide and depends on the factual predicate of causing death." ;
+    :hasChainFailurePattern :Murder_Pattern1, :Murder_Pattern2 .
+:Manslaughter_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Manslaughter pattern 1" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:Manslaughter a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Manslaughter" ;
+    :hasOffenseCategory :Crime ;
+    :hasStructuralViolationClass :FactualMisalignment ;
+    :hasDescription "Killing without malice involves misaligned triggering facts affecting culpability." ;
+    :hasChainFailurePattern :Manslaughter_Pattern1 .
+:Assault_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Assault pattern 1" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:Assault a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Assault" ;
+    :hasOffenseCategory :Crime ;
+    :hasStructuralViolationClass :FactualMisalignment ;
+    :hasDescription "Threatening or harming someone violates norms contingent on factual aggression." ;
+    :hasChainFailurePattern :Assault_Pattern1 .
+:Battery_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Battery pattern 1" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:Battery a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Battery" ;
+    :hasOffenseCategory :Crime ;
+    :hasStructuralViolationClass :FactualMisalignment ;
+    :hasDescription "Unlawful physical contact is a factual violation of personal security norms." ;
+    :hasChainFailurePattern :Battery_Pattern1 .
+:Rape_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Rape pattern 1" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:Rape_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Rape pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:Rape a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Rape" ;
+    :hasOffenseCategory :Crime ;
+    :hasStructuralViolationClass :FactualMisalignment, :RecognitionFailure ;
+    :hasDescription "Non-consensual sexual act violates bodily autonomy and fails to recognize the victim's status." ;
+    :hasChainFailurePattern :Rape_Pattern1, :Rape_Pattern2 .
+:Kidnapping_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Kidnapping pattern 1" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:Kidnapping_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Kidnapping pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:Kidnapping a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Kidnapping" ;
+    :hasOffenseCategory :Crime ;
+    :hasStructuralViolationClass :FactualMisalignment, :RecognitionFailure ;
+    :hasDescription "Unlawfully confining or transporting a person violates norms and denies recognition of their freedom." ;
+    :hasChainFailurePattern :Kidnapping_Pattern1, :Kidnapping_Pattern2 .
+:Robbery_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Robbery pattern 1" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:Robbery a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Robbery" ;
+    :hasOffenseCategory :Crime ;
+    :hasStructuralViolationClass :FactualMisalignment ;
+    :hasDescription "Taking property by force combines theft and assault, violating property and personal security norms." ;
+    :hasChainFailurePattern :Robbery_Pattern1 .
+:Burglary_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Burglary pattern 1" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:Burglary a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Burglary" ;
+    :hasOffenseCategory :Crime ;
+    :hasStructuralViolationClass :FactualMisalignment ;
+    :hasDescription "Entering a building unlawfully to commit a crime violates property integrity norms." ;
+    :hasChainFailurePattern :Burglary_Pattern1 .
+:TheftLarceny_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Theft/Larceny pattern 1" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:TheftLarceny a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Theft/Larceny" ;
+    :hasOffenseCategory :Crime ;
+    :hasStructuralViolationClass :FactualMisalignment ;
+    :hasDescription "Taking another’s property without consent violates ownership rights." ;
+    :hasChainFailurePattern :TheftLarceny_Pattern1 .
+:Embezzlement_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Embezzlement pattern 1" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:Embezzlement_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Embezzlement pattern 2" ;
+    :focusesOnElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:Embezzlement a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Embezzlement" ;
+    :hasOffenseCategory :Crime ;
+    :hasStructuralViolationClass :FactualMisalignment, :CorrelativityContradiction ;
+    :hasDescription "Misappropriating property entrusted to one’s care breaches fiduciary obligations and misaligns rights." ;
+    :hasChainFailurePattern :Embezzlement_Pattern1, :Embezzlement_Pattern2 .
+:Fraudcriminal_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Fraud (criminal) pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:Fraudcriminal_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Fraud (criminal) pattern 2" ;
+    :focusesOnElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:Fraudcriminal a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Fraud (criminal)" ;
+    :hasOffenseCategory :Crime ;
+    :hasStructuralViolationClass :RecognitionFailure, :CorrelativityContradiction ;
+    :hasDescription "Deceiving a victim to obtain something creates invalid recognition of facts and duties." ;
+    :hasChainFailurePattern :Fraudcriminal_Pattern1, :Fraudcriminal_Pattern2 .
+:Forgery_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Forgery pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:Forgery a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Forgery" ;
+    :hasOffenseCategory :Crime ;
+    :hasStructuralViolationClass :RecognitionFailure ;
+    :hasDescription "Falsifying documents corrupts recognition of legal status and rights." ;
+    :hasChainFailurePattern :Forgery_Pattern1 .
+:Arson_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Arson pattern 1" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:Arson a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Arson" ;
+    :hasOffenseCategory :Crime ;
+    :hasStructuralViolationClass :FactualMisalignment ;
+    :hasDescription "Intentional burning of property violates norms protecting property and safety." ;
+    :hasChainFailurePattern :Arson_Pattern1 .
+:Bribery_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Bribery pattern 1" ;
+    :focusesOnElement :AuthoritySource ;
+    :relatesToSecondaryElement :RoleConferral ;
+    :hasRelationType "FORWARD" .
+:Bribery_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Bribery pattern 2" ;
+    :focusesOnElement :RoleConferral ;
+    :hasRelationType "FOCUS" .
+:Bribery a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Bribery" ;
+    :hasOffenseCategory :Crime ;
+    :hasStructuralViolationClass :ConferralFailure, :RoleContradictionAuthority ;
+    :hasDescription "Offering a benefit to influence an official corrupts authority and misaligns roles." ;
+    :hasChainFailurePattern :Bribery_Pattern1, :Bribery_Pattern2 .
+:Perjury_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Perjury pattern 1" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :ProcedureElement ;
+    :hasRelationType "FORWARD" .
+:Perjury_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Perjury pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:Perjury a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Perjury" ;
+    :hasOffenseCategory :Crime ;
+    :hasStructuralViolationClass :ProceduralContradiction, :RecognitionFailure ;
+    :hasDescription "Lying under oath disrupts procedures and produces false legal recognitions." ;
+    :hasChainFailurePattern :Perjury_Pattern1, :Perjury_Pattern2 .
+:Extortion_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Extortion pattern 1" ;
+    :focusesOnElement :RoleConferral ;
+    :hasRelationType "FOCUS" .
+:Extortion_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Extortion pattern 2" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:Extortion a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Extortion" ;
+    :hasOffenseCategory :Crime ;
+    :hasStructuralViolationClass :RoleContradictionAuthority, :FactualMisalignment ;
+    :hasDescription "Coercing someone to obtain property or favors abuses role-based authority and violates norms." ;
+    :hasChainFailurePattern :Extortion_Pattern1, :Extortion_Pattern2 .
+:DrugTrafficking_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Drug Trafficking pattern 1" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:DrugTrafficking a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Drug Trafficking" ;
+    :hasOffenseCategory :Crime ;
+    :hasStructuralViolationClass :FactualMisalignment ;
+    :hasDescription "Producing or distributing illegal drugs contravenes regulated norms regarding controlled substances." ;
+    :hasChainFailurePattern :DrugTrafficking_Pattern1 .
+:MoneyLaundering_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Money Laundering pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:MoneyLaundering a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Money Laundering" ;
+    :hasOffenseCategory :Crime ;
+    :hasStructuralViolationClass :RecognitionFailure ;
+    :hasDescription "Concealing the origins of illegal proceeds hides the legal status of property." ;
+    :hasChainFailurePattern :MoneyLaundering_Pattern1 .
+:InsiderTrading_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Insider Trading pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:InsiderTrading_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Insider Trading pattern 2" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :ProcedureElement ;
+    :hasRelationType "FORWARD" .
+:InsiderTrading a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Insider Trading" ;
+    :hasOffenseCategory :Crime ;
+    :hasStructuralViolationClass :RecognitionFailure, :ProceduralContradiction ;
+    :hasDescription "Trading on non-public information misuses fiduciary duty and procedural rules for markets." ;
+    :hasChainFailurePattern :InsiderTrading_Pattern1, :InsiderTrading_Pattern2 .
+:ObstructionofJustice_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Obstruction of Justice pattern 1" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :ProcedureElement ;
+    :hasRelationType "FORWARD" .
+:ObstructionofJustice a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Obstruction of Justice" ;
+    :hasOffenseCategory :Crime ;
+    :hasStructuralViolationClass :ProceduralContradiction ;
+    :hasDescription "Interfering with legal proceedings undermines judicial processes." ;
+    :hasChainFailurePattern :ObstructionofJustice_Pattern1 .
+:Terrorism_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Terrorism pattern 1" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:Terrorism_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Terrorism pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:Terrorism a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Terrorism" ;
+    :hasOffenseCategory :Crime ;
+    :hasStructuralViolationClass :FactualMisalignment, :RecognitionFailure ;
+    :hasDescription "Acts intended to intimidate populations or governments violate fundamental norms and deny recognition of victims." ;
+    :hasChainFailurePattern :Terrorism_Pattern1, :Terrorism_Pattern2 .
+:TaxEvasion_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Tax Evasion pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:TaxEvasion_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Tax Evasion pattern 2" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:TaxEvasion a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Tax Evasion" ;
+    :hasOffenseCategory :Crime ;
+    :hasStructuralViolationClass :RecognitionFailure, :FactualMisalignment ;
+    :hasDescription "Evading taxes misrepresents facts to authorities, leading to invalid recognition and duty violations." ;
+    :hasChainFailurePattern :TaxEvasion_Pattern1, :TaxEvasion_Pattern2 .
+:MoneyLaundering_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Money Laundering pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:MoneyLaundering a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Money Laundering" ;
+    :hasOffenseCategory :Crime ;
+    :hasStructuralViolationClass :RecognitionFailure ;
+    :hasDescription "Concealing the source of funds corrupts recognition of legal ownership." ;
+    :hasChainFailurePattern :MoneyLaundering_Pattern1 .
+:Conspiracy_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Conspiracy pattern 1" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:Conspiracy a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Conspiracy" ;
+    :hasOffenseCategory :Crime ;
+    :hasStructuralViolationClass :FactualMisalignment ;
+    :hasDescription "Agreement to commit a crime, even if not completed, breaks norms through coordinated intent." ;
+    :hasChainFailurePattern :Conspiracy_Pattern1 .
+:ObstructionofJustice_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Obstruction of Justice pattern 1" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :ProcedureElement ;
+    :hasRelationType "FORWARD" .
+:ObstructionofJustice a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Obstruction of Justice" ;
+    :hasOffenseCategory :Crime ;
+    :hasStructuralViolationClass :ProceduralContradiction ;
+    :hasDescription "Interfering with law enforcement or judicial functions contravenes procedural norms." ;
+    :hasChainFailurePattern :ObstructionofJustice_Pattern1 .
+:Negligence_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Negligence pattern 1" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:Negligence_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Negligence pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:Negligence a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Negligence" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :FactualMisalignment, :RecognitionFailure ;
+    :hasDescription "Failure to exercise reasonable care causes harm; recognition of duty and harm is key." ;
+    :hasChainFailurePattern :Negligence_Pattern1, :Negligence_Pattern2 .
+:Defamation_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Defamation pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:Defamation a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Defamation" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :RecognitionFailure ;
+    :hasDescription "False statements harm reputation; they create false recognitions of someone’s character." ;
+    :hasChainFailurePattern :Defamation_Pattern1 .
+:TrespasstoLand_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Trespass to Land pattern 1" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:TrespasstoLand a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Trespass to Land" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :FactualMisalignment ;
+    :hasDescription "Unauthorized entry onto land violates the owner’s property right." ;
+    :hasChainFailurePattern :TrespasstoLand_Pattern1 .
+:TrespasstoChattels_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Trespass to Chattels pattern 1" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:TrespasstoChattels a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Trespass to Chattels" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :FactualMisalignment ;
+    :hasDescription "Interference with personal property violates possession norms." ;
+    :hasChainFailurePattern :TrespasstoChattels_Pattern1 .
+:Conversion_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Conversion pattern 1" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:Conversion a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Conversion" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :FactualMisalignment ;
+    :hasDescription "Wrongfully taking or controlling another’s property deprives the owner of their rights." ;
+    :hasChainFailurePattern :Conversion_Pattern1 .
+:Nuisance_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Nuisance pattern 1" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:Nuisance_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Nuisance pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:Nuisance a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Nuisance" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :FactualMisalignment, :RecognitionFailure ;
+    :hasDescription "Substantial interference with enjoyment of property misaligns norms of coexistence." ;
+    :hasChainFailurePattern :Nuisance_Pattern1, :Nuisance_Pattern2 .
+:Batterycivil_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Battery (civil) pattern 1" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:Batterycivil a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Battery (civil)" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :FactualMisalignment ;
+    :hasDescription "Intentional harmful contact infringes bodily integrity." ;
+    :hasChainFailurePattern :Batterycivil_Pattern1 .
+:Assaultcivil_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Assault (civil) pattern 1" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:Assaultcivil a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Assault (civil)" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :FactualMisalignment ;
+    :hasDescription "Threat of harmful contact causes apprehension and violates personal security norms." ;
+    :hasChainFailurePattern :Assaultcivil_Pattern1 .
+:FalseImprisonment_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "False Imprisonment pattern 1" ;
+    :focusesOnElement :AuthoritySource ;
+    :hasRelationType "FOCUS" .
+:FalseImprisonment_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "False Imprisonment pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:FalseImprisonment a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "False Imprisonment" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :SourceOfAuthorityFailure, :RecognitionFailure ;
+    :hasDescription "Unlawful restraint of another’s freedom lacks valid authority and misrecognizes their liberty." ;
+    :hasChainFailurePattern :FalseImprisonment_Pattern1, :FalseImprisonment_Pattern2 .
+:IntentionalInflictionofEmotionalDistress_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Intentional Infliction of Emotional Distress pattern 1" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:IntentionalInflictionofEmotionalDistress a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Intentional Infliction of Emotional Distress" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :FactualMisalignment ;
+    :hasDescription "Extreme or outrageous conduct causing severe distress violates norms of personal autonomy." ;
+    :hasChainFailurePattern :IntentionalInflictionofEmotionalDistress_Pattern1 .
+:NegligentMisrepresentation_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Negligent Misrepresentation pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:NegligentMisrepresentation a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Negligent Misrepresentation" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :RecognitionFailure ;
+    :hasDescription "False information provided without due care leads others to act on mistaken recognition." ;
+    :hasChainFailurePattern :NegligentMisrepresentation_Pattern1 .
+:StrictLiabilityproducts_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Strict Liability (products) pattern 1" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:StrictLiabilityproducts a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Strict Liability (products)" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :FactualMisalignment ;
+    :hasDescription "Harm from defective products invokes liability regardless of intent, based on factual harm." ;
+    :hasChainFailurePattern :StrictLiabilityproducts_Pattern1 .
+:InvasionofPrivacy_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Invasion of Privacy pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:InvasionofPrivacy_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Invasion of Privacy pattern 2" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:InvasionofPrivacy a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Invasion of Privacy" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :RecognitionFailure, :FactualMisalignment ;
+    :hasDescription "Public disclosure of private facts or intrusion misrecognizes individual privacy rights." ;
+    :hasChainFailurePattern :InvasionofPrivacy_Pattern1, :InvasionofPrivacy_Pattern2 .
+:MaliciousProsecution_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Malicious Prosecution pattern 1" ;
+    :focusesOnElement :RoleConferral ;
+    :hasRelationType "FOCUS" .
+:MaliciousProsecution_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Malicious Prosecution pattern 2" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :ProcedureElement ;
+    :hasRelationType "FORWARD" .
+:MaliciousProsecution a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Malicious Prosecution" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :RoleContradictionAuthority, :ProceduralContradiction ;
+    :hasDescription "Initiating a legal action without probable cause misuses legal procedures and roles." ;
+    :hasChainFailurePattern :MaliciousProsecution_Pattern1, :MaliciousProsecution_Pattern2 .
+:AbuseofProcess_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Abuse of Process pattern 1" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :ProcedureElement ;
+    :hasRelationType "FORWARD" .
+:AbuseofProcess a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Abuse of Process" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :ProceduralContradiction ;
+    :hasDescription "Misusing legal process for an ulterior purpose undermines procedural integrity." ;
+    :hasChainFailurePattern :AbuseofProcess_Pattern1 .
+:WrongfulDeath_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Wrongful Death pattern 1" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:WrongfulDeath a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Wrongful Death" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :FactualMisalignment ;
+    :hasDescription "Death caused by negligence or intentional act infringes the decedent’s life and rights." ;
+    :hasChainFailurePattern :WrongfulDeath_Pattern1 .
+:FiduciaryBreach_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Fiduciary Breach pattern 1" ;
+    :focusesOnElement :AuthoritySource ;
+    :relatesToSecondaryElement :RoleConferral ;
+    :hasRelationType "FORWARD" .
+:FiduciaryBreach_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Fiduciary Breach pattern 2" ;
+    :focusesOnElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:FiduciaryBreach a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Fiduciary Breach" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :ConferralFailure, :CorrelativityContradiction ;
+    :hasDescription "Breach of duty by a fiduciary misaligns delegated authority and rights of the beneficiary." ;
+    :hasChainFailurePattern :FiduciaryBreach_Pattern1, :FiduciaryBreach_Pattern2 .
+:ProfessionalMalpractice_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Professional Malpractice pattern 1" ;
+    :focusesOnElement :RoleConferral ;
+    :hasRelationType "FOCUS" .
+:ProfessionalMalpractice_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Professional Malpractice pattern 2" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:ProfessionalMalpractice a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Professional Malpractice" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :RoleContradictionAuthority, :FactualMisalignment ;
+    :hasDescription "Failure of a professional to meet the standard of care violates their role responsibilities and causes harm." ;
+    :hasChainFailurePattern :ProfessionalMalpractice_Pattern1, :ProfessionalMalpractice_Pattern2 .
+:InterferencewithContractualRelations_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Interference with Contractual Relations pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:InterferencewithContractualRelations_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Interference with Contractual Relations pattern 2" ;
+    :focusesOnElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:InterferencewithContractualRelations a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Interference with Contractual Relations" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :RecognitionFailure, :CorrelativityContradiction ;
+    :hasDescription "Intentionally inducing breach of contract disrupts recognized contractual obligations and correlative rights." ;
+    :hasChainFailurePattern :InterferencewithContractualRelations_Pattern1, :InterferencewithContractualRelations_Pattern2 .
+:UnlawfulSearchandSeizure_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Unlawful Search and Seizure pattern 1" ;
+    :focusesOnElement :AuthoritySource ;
+    :hasRelationType "FOCUS" .
+:UnlawfulSearchandSeizure_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Unlawful Search and Seizure pattern 2" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :ProcedureElement ;
+    :hasRelationType "FORWARD" .
+:UnlawfulSearchandSeizure a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Unlawful Search and Seizure" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :SourceOfAuthorityFailure, :ProceduralContradiction ;
+    :hasDescription "Government search without warrant or probable cause lacks authority and violates procedural safeguards." ;
+    :hasChainFailurePattern :UnlawfulSearchandSeizure_Pattern1, :UnlawfulSearchandSeizure_Pattern2 .
+:UnlawfulArrest_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Unlawful Arrest pattern 1" ;
+    :focusesOnElement :AuthoritySource ;
+    :hasRelationType "FOCUS" .
+:UnlawfulArrest_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Unlawful Arrest pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:UnlawfulArrest a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Unlawful Arrest" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :SourceOfAuthorityFailure, :RecognitionFailure ;
+    :hasDescription "Arrest without legal basis or warrant violates the individual’s right to liberty and proper recognition." ;
+    :hasChainFailurePattern :UnlawfulArrest_Pattern1, :UnlawfulArrest_Pattern2 .
+:DenialofDueProcess_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Denial of Due Process pattern 1" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :ProcedureElement ;
+    :hasRelationType "FORWARD" .
+:DenialofDueProcess_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Denial of Due Process pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:DenialofDueProcess a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Denial of Due Process" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :ProceduralContradiction, :RecognitionFailure ;
+    :hasDescription "Failure to provide notice and an opportunity to be heard undermines procedural fairness and recognition." ;
+    :hasChainFailurePattern :DenialofDueProcess_Pattern1, :DenialofDueProcess_Pattern2 .
+:CruelandUnusualPunishment_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Cruel and Unusual Punishment pattern 1" ;
+    :hasRelationType "FOCUS" .
+:CruelandUnusualPunishment a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Cruel and Unusual Punishment" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :NormativeContradiction ;
+    :hasDescription "Punishment that is disproportionate or barbaric conflicts with constitutional norms." ;
+    :hasChainFailurePattern :CruelandUnusualPunishment_Pattern1 .
+:ViolationofFreeSpeech_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Free Speech pattern 1" ;
+    :hasRelationType "FOCUS" .
+:ViolationofFreeSpeech_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Free Speech pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:ViolationofFreeSpeech a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Violation of Free Speech" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :NormativeContradiction, :RecognitionFailure ;
+    :hasDescription "Government restriction of speech conflicts with constitutional norms and misrecognizes expressive rights." ;
+    :hasChainFailurePattern :ViolationofFreeSpeech_Pattern1, :ViolationofFreeSpeech_Pattern2 .
+:ViolationofEqualProtection_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Equal Protection pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:ViolationofEqualProtection_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Equal Protection pattern 2" ;
+    :focusesOnElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:ViolationofEqualProtection a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Violation of Equal Protection" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :RecognitionFailure, :CorrelativityContradiction ;
+    :hasDescription "Discriminatory laws or practices fail to recognize equal legal status and disrupt correlated rights." ;
+    :hasChainFailurePattern :ViolationofEqualProtection_Pattern1, :ViolationofEqualProtection_Pattern2 .
+:EstablishmentClauseViolation_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Establishment Clause Violation pattern 1" ;
+    :hasRelationType "FOCUS" .
+:EstablishmentClauseViolation a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Establishment Clause Violation" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :NormativeContradiction ;
+    :hasDescription "Government endorsement of religion conflicts with constitutional separation of church and state." ;
+    :hasChainFailurePattern :EstablishmentClauseViolation_Pattern1 .
+:FreeExerciseClauseViolation_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Free Exercise Clause Violation pattern 1" ;
+    :hasRelationType "FOCUS" .
+:FreeExerciseClauseViolation a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Free Exercise Clause Violation" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :NormativeContradiction ;
+    :hasDescription "Government interference with religious practice conflicts with constitutional protection of free exercise." ;
+    :hasChainFailurePattern :FreeExerciseClauseViolation_Pattern1 .
+:TakingwithoutJustCompensation_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Taking without Just Compensation pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:TakingwithoutJustCompensation_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Taking without Just Compensation pattern 2" ;
+    :focusesOnElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:TakingwithoutJustCompensation a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Taking without Just Compensation" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :RecognitionFailure, :CorrelativityContradiction ;
+    :hasDescription "Seizing private property without compensation misrecognizes property rights and disrupts duty to compensate." ;
+    :hasChainFailurePattern :TakingwithoutJustCompensation_Pattern1, :TakingwithoutJustCompensation_Pattern2 .
+:DenialofRighttoCounsel_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Denial of Right to Counsel pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:DenialofRighttoCounsel a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Denial of Right to Counsel" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :RecognitionFailure ;
+    :hasDescription "Refusing legal representation infringes the accused’s right and misrecognizes procedural rights." ;
+    :hasChainFailurePattern :DenialofRighttoCounsel_Pattern1 .
+:SelfIncrimination_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Self-Incrimination pattern 1" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :ProcedureElement ;
+    :hasRelationType "FORWARD" .
+:SelfIncrimination a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Self-Incrimination" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :ProceduralContradiction ;
+    :hasDescription "Compelling a person to testify against themselves violates procedural norms protecting autonomy." ;
+    :hasChainFailurePattern :SelfIncrimination_Pattern1 .
+:ExPostFactoLaw_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Ex Post Facto Law pattern 1" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :FactualTrigger ;
+    :hasRelationType "BIDIRECTIONAL" .
+:ExPostFactoLaw a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Ex Post Facto Law" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :TemporalContradiction ;
+    :hasDescription "Imposing criminal liability retroactively conflicts with temporal conditions of legality." ;
+    :hasChainFailurePattern :ExPostFactoLaw_Pattern1 .
+:DoubleJeopardy_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Double Jeopardy pattern 1" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :ProcedureElement ;
+    :hasRelationType "FORWARD" .
+:DoubleJeopardy_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Double Jeopardy pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:DoubleJeopardy a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Double Jeopardy" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :ProceduralContradiction, :RecognitionFailure ;
+    :hasDescription "Trying someone twice for the same offense violates procedural justice and misrecognizes the finality of judgments." ;
+    :hasChainFailurePattern :DoubleJeopardy_Pattern1, :DoubleJeopardy_Pattern2 .
+:DenialofVotingRights_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Denial of Voting Rights pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:DenialofVotingRights a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Denial of Voting Rights" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :RecognitionFailure ;
+    :hasDescription "Restricting lawful voters undermines recognition of their status as citizens with participatory rights." ;
+    :hasChainFailurePattern :DenialofVotingRights_Pattern1 .
+:RestrictionofAssembly_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Restriction of Assembly pattern 1" ;
+    :hasRelationType "FOCUS" .
+:RestrictionofAssembly_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Restriction of Assembly pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:RestrictionofAssembly a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Restriction of Assembly" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :NormativeContradiction, :RecognitionFailure ;
+    :hasDescription "Limiting peaceful assembly conflicts with constitutional norms and misrecognizes collective rights." ;
+    :hasChainFailurePattern :RestrictionofAssembly_Pattern1, :RestrictionofAssembly_Pattern2 .
+:QuarteringSoldiers_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Quartering Soldiers pattern 1" ;
+    :hasRelationType "FOCUS" .
+:QuarteringSoldiers a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Quartering Soldiers" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :NormativeContradiction ;
+    :hasDescription "Housing soldiers in private residences without consent contradicts constitutional norms protecting privacy." ;
+    :hasChainFailurePattern :QuarteringSoldiers_Pattern1 .
+:UnreasonableBail_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Unreasonable Bail pattern 1" ;
+    :hasRelationType "FOCUS" .
+:UnreasonableBail a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Unreasonable Bail" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :NormativeContradiction ;
+    :hasDescription "Excessive bail infringes constitutional norms against disproportionate conditions for release." ;
+    :hasChainFailurePattern :UnreasonableBail_Pattern1 .
+:UnconstitutionalDelegation_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Unconstitutional Delegation pattern 1" ;
+    :focusesOnElement :AuthoritySource ;
+    :relatesToSecondaryElement :RoleConferral ;
+    :hasRelationType "FORWARD" .
+:UnconstitutionalDelegation_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Unconstitutional Delegation pattern 2" ;
+    :hasRelationType "FOCUS" .
+:UnconstitutionalDelegation a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Unconstitutional Delegation" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :ConferralFailure, :NormativeContradiction ;
+    :hasDescription "Legislative delegation of powers beyond constitutional bounds misconfers authority and conflicts with constitutional norms." ;
+    :hasChainFailurePattern :UnconstitutionalDelegation_Pattern1, :UnconstitutionalDelegation_Pattern2 .
+:DenialofHabeasCorpus_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Denial of Habeas Corpus pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:DenialofHabeasCorpus_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Denial of Habeas Corpus pattern 2" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :ProcedureElement ;
+    :hasRelationType "FORWARD" .
+:DenialofHabeasCorpus a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Denial of Habeas Corpus" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :RecognitionFailure, :ProceduralContradiction ;
+    :hasDescription "Refusing judicial review of detention undermines recognition of individual liberty and procedural safeguards." ;
+    :hasChainFailurePattern :DenialofHabeasCorpus_Pattern1, :DenialofHabeasCorpus_Pattern2 .
+:IntrusionuponSeclusion_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Intrusion upon Seclusion pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:IntrusionuponSeclusion_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Intrusion upon Seclusion pattern 2" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:IntrusionuponSeclusion a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Intrusion upon Seclusion" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :RecognitionFailure, :FactualMisalignment ;
+    :hasDescription "Intruding upon someone's private affairs violates their privacy and misaligns factual and recognized boundaries." ;
+    :hasChainFailurePattern :IntrusionuponSeclusion_Pattern1, :IntrusionuponSeclusion_Pattern2 .
+:PublicDisclosureofPrivateFacts_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Public Disclosure of Private Facts pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:PublicDisclosureofPrivateFacts a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Public Disclosure of Private Facts" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :RecognitionFailure ;
+    :hasDescription "Publishing private information without consent misrecognizes the individual's privacy rights." ;
+    :hasChainFailurePattern :PublicDisclosureofPrivateFacts_Pattern1 .
+:FalseLight_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "False Light pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:FalseLight a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "False Light" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :RecognitionFailure ;
+    :hasDescription "Portraying someone falsely to the public misrecognizes their reputation and status." ;
+    :hasChainFailurePattern :FalseLight_Pattern1 .
+:AppropriationofNameorLikeness_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Appropriation of Name or Likeness pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:AppropriationofNameorLikeness_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Appropriation of Name or Likeness pattern 2" ;
+    :focusesOnElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:AppropriationofNameorLikeness a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Appropriation of Name or Likeness" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :RecognitionFailure, :CorrelativityContradiction ;
+    :hasDescription "Using someone's name or likeness for commercial gain without consent misrecognizes their personal rights and correlated obligations." ;
+    :hasChainFailurePattern :AppropriationofNameorLikeness_Pattern1, :AppropriationofNameorLikeness_Pattern2 .
+:BreachofConfidence_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Breach of Confidence pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:BreachofConfidence a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Breach of Confidence" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :RecognitionFailure ;
+    :hasDescription "Improperly disclosing confidential information violates the duty of confidence and misrecognizes the confider's rights." ;
+    :hasChainFailurePattern :BreachofConfidence_Pattern1 .
+:NegligentInflictionofEmotionalDistress_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Negligent Infliction of Emotional Distress pattern 1" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:NegligentInflictionofEmotionalDistress_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Negligent Infliction of Emotional Distress pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:NegligentInflictionofEmotionalDistress a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Negligent Infliction of Emotional Distress" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :FactualMisalignment, :RecognitionFailure ;
+    :hasDescription "Causing emotional harm through negligence misaligns facts and fails to recognize the victim's emotional well-being." ;
+    :hasChainFailurePattern :NegligentInflictionofEmotionalDistress_Pattern1, :NegligentInflictionofEmotionalDistress_Pattern2 .
+:IntentionalInterferencewithProspectiveEconomicAdvantage_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Intentional Interference with Prospective Economic Advantage pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:IntentionalInterferencewithProspectiveEconomicAdvantage_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Intentional Interference with Prospective Economic Advantage pattern 2" ;
+    :focusesOnElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:IntentionalInterferencewithProspectiveEconomicAdvantage a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Intentional Interference with Prospective Economic Advantage" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :RecognitionFailure, :CorrelativityContradiction ;
+    :hasDescription "Disrupting another's prospective business expectancy misrecognizes economic rights and disrupts correlated obligations." ;
+    :hasChainFailurePattern :IntentionalInterferencewithProspectiveEconomicAdvantage_Pattern1, :IntentionalInterferencewithProspectiveEconomicAdvantage_Pattern2 .
+:UnfairCompetition_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Unfair Competition pattern 1" ;
+    :hasRelationType "FOCUS" .
+:UnfairCompetition_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Unfair Competition pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:UnfairCompetition a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Unfair Competition" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :NormativeContradiction, :RecognitionFailure ;
+    :hasDescription "Engaging in deceptive or wrongful business practices conflicts with normative commercial standards and misrecognizes competitors' rights." ;
+    :hasChainFailurePattern :UnfairCompetition_Pattern1, :UnfairCompetition_Pattern2 .
+:TradeLibel_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Trade Libel pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:TradeLibel a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Trade Libel" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :RecognitionFailure ;
+    :hasDescription "Publishing false statements about a product causes economic harm and misrecognizes the maker's rights." ;
+    :hasChainFailurePattern :TradeLibel_Pattern1 .
+:SlanderofTitle_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Slander of Title pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:SlanderofTitle_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Slander of Title pattern 2" ;
+    :focusesOnElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:SlanderofTitle a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Slander of Title" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :RecognitionFailure, :CorrelativityContradiction ;
+    :hasDescription "False statements casting doubt on a property title misrecognize ownership and disrupt correlated obligations." ;
+    :hasChainFailurePattern :SlanderofTitle_Pattern1, :SlanderofTitle_Pattern2 .
+:InjuriousFalsehood_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Injurious Falsehood pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:InjuriousFalsehood a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Injurious Falsehood" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :RecognitionFailure ;
+    :hasDescription "False statements made to harm business interests misrecognize economic rights." ;
+    :hasChainFailurePattern :InjuriousFalsehood_Pattern1 .
+:PassingOff_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Passing Off pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:PassingOff_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Passing Off pattern 2" ;
+    :focusesOnElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:PassingOff a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Passing Off" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :RecognitionFailure, :CorrelativityContradiction ;
+    :hasDescription "Misrepresenting one's goods or services as those of another misrecognizes trademarks and disrupts correlated rights." ;
+    :hasChainFailurePattern :PassingOff_Pattern1, :PassingOff_Pattern2 .
+:Replevin_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Replevin pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:Replevin_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Replevin pattern 2" ;
+    :focusesOnElement :RemedyStage ;
+    :hasRelationType "FOCUS" .
+:Replevin a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Replevin" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :RecognitionFailure, :RepairFailure ;
+    :hasDescription "An action to recover personal property wrongfully taken involves recognition of ownership and the remedy of return." ;
+    :hasChainFailurePattern :Replevin_Pattern1, :Replevin_Pattern2 .
+:Detinue_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Detinue pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:Detinue_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Detinue pattern 2" ;
+    :focusesOnElement :RemedyStage ;
+    :hasRelationType "FOCUS" .
+:Detinue a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Detinue" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :RecognitionFailure, :RepairFailure ;
+    :hasDescription "A legal action for the wrongful detention of personal property highlights recognition of ownership and remedy requirements." ;
+    :hasChainFailurePattern :Detinue_Pattern1, :Detinue_Pattern2 .
+:Waste_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Waste pattern 1" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:Waste a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Waste" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :FactualMisalignment ;
+    :hasDescription "Causing permanent injury to property (e.g., by a tenant) misaligns factual usage with property norms." ;
+    :hasChainFailurePattern :Waste_Pattern1 .
+:PublicNuisance_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Public Nuisance pattern 1" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:PublicNuisance_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Public Nuisance pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:PublicNuisance a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Public Nuisance" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :FactualMisalignment, :RecognitionFailure ;
+    :hasDescription "Interference with a public right (e.g., blocking a highway) misaligns facts and misrecognizes community rights." ;
+    :hasChainFailurePattern :PublicNuisance_Pattern1, :PublicNuisance_Pattern2 .
+:InterferencewithEasement_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Interference with Easement pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:InterferencewithEasement_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Interference with Easement pattern 2" ;
+    :focusesOnElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:InterferencewithEasement a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Interference with Easement" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :RecognitionFailure, :CorrelativityContradiction ;
+    :hasDescription "Obstructing a rightful easement disrupts the recognized servitude and corresponding duties." ;
+    :hasChainFailurePattern :InterferencewithEasement_Pattern1, :InterferencewithEasement_Pattern2 .
+:LiabilityforDangerousAnimals_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Liability for Dangerous Animals pattern 1" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:LiabilityforDangerousAnimals a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Liability for Dangerous Animals" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :FactualMisalignment ;
+    :hasDescription "Owning dangerous animals that cause harm constitutes strict liability due to misalignment of factual risk and duty." ;
+    :hasChainFailurePattern :LiabilityforDangerousAnimals_Pattern1 .
+:UltrahazardousActivities_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Ultrahazardous Activities pattern 1" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:UltrahazardousActivities a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Ultrahazardous Activities" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :FactualMisalignment ;
+    :hasDescription "Engaging in inherently dangerous activities (e.g., blasting) imposes strict liability due to factual risk to others." ;
+    :hasChainFailurePattern :UltrahazardousActivities_Pattern1 .
+:PremisesLiability_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Premises Liability pattern 1" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:PremisesLiability_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Premises Liability pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:PremisesLiability a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Premises Liability" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :FactualMisalignment, :RecognitionFailure ;
+    :hasDescription "Property owners' failure to maintain safe premises leads to harm and misrecognizes visitors' safety rights." ;
+    :hasChainFailurePattern :PremisesLiability_Pattern1, :PremisesLiability_Pattern2 .
+:NegligentEntrustment_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Negligent Entrustment pattern 1" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:NegligentEntrustment_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Negligent Entrustment pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:NegligentEntrustment a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Negligent Entrustment" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :FactualMisalignment, :RecognitionFailure ;
+    :hasDescription "Entrusting a dangerous instrumentality to an incompetent person causes harm through misaligned facts and recognition of duty." ;
+    :hasChainFailurePattern :NegligentEntrustment_Pattern1, :NegligentEntrustment_Pattern2 .
+:DramShopLiability_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Dram Shop Liability pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:DramShopLiability_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Dram Shop Liability pattern 2" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:DramShopLiability a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Dram Shop Liability" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :RecognitionFailure, :FactualMisalignment ;
+    :hasDescription "Commercial sellers' provision of alcohol to an intoxicated person who causes harm violates statutory duties and misrecognizes third-party rights." ;
+    :hasChainFailurePattern :DramShopLiability_Pattern1, :DramShopLiability_Pattern2 .
+:CivilConspiracytort_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Civil Conspiracy (tort) pattern 1" ;
+    :focusesOnElement :RoleConferral ;
+    :hasRelationType "FOCUS" .
+:CivilConspiracytort_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Civil Conspiracy (tort) pattern 2" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :ProcedureElement ;
+    :hasRelationType "FORWARD" .
+:CivilConspiracytort a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Civil Conspiracy (tort)" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :RoleContradictionAuthority, :ProceduralContradiction ;
+    :hasDescription "An agreement between two or more parties to commit a wrongful act misuses roles and undermines procedural integrity." ;
+    :hasChainFailurePattern :CivilConspiracytort_Pattern1, :CivilConspiracytort_Pattern2 .
+:SpoliationofEvidence_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Spoliation of Evidence pattern 1" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :ProcedureElement ;
+    :hasRelationType "FORWARD" .
+:SpoliationofEvidence_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Spoliation of Evidence pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:SpoliationofEvidence a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Spoliation of Evidence" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :ProceduralContradiction, :RecognitionFailure ;
+    :hasDescription "Intentional destruction or alteration of evidence interferes with legal proceedings and misrecognizes litigants' rights." ;
+    :hasChainFailurePattern :SpoliationofEvidence_Pattern1, :SpoliationofEvidence_Pattern2 .
+:BadFaithInsurance_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Bad Faith (Insurance) pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:BadFaithInsurance_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Bad Faith (Insurance) pattern 2" ;
+    :focusesOnElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:BadFaithInsurance a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Bad Faith (Insurance)" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :RecognitionFailure, :CorrelativityContradiction ;
+    :hasDescription "An insurer's unreasonable refusal to pay a valid claim misrecognizes the insured's rights and breaches correlated obligations." ;
+    :hasChainFailurePattern :BadFaithInsurance_Pattern1, :BadFaithInsurance_Pattern2 .
+:Misfeasance_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Misfeasance pattern 1" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :ProcedureElement ;
+    :hasRelationType "FORWARD" .
+:Misfeasance a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Misfeasance" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :ProceduralContradiction ;
+    :hasDescription "Improper performance of a lawful act violates procedure and causes harm." ;
+    :hasChainFailurePattern :Misfeasance_Pattern1 .
+:Nonfeasance_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Nonfeasance pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:Nonfeasance_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Nonfeasance pattern 2" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:Nonfeasance a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Nonfeasance" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :RecognitionFailure, :FactualMisalignment ;
+    :hasDescription "Failure to act when a duty exists misrecognizes the duty and misaligns facts and norms." ;
+    :hasChainFailurePattern :Nonfeasance_Pattern1, :Nonfeasance_Pattern2 .
+:ProductLiabilityDesignDefect_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Product Liability (Design Defect) pattern 1" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:ProductLiabilityDesignDefect a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Product Liability (Design Defect)" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :FactualMisalignment ;
+    :hasDescription "A defective product design causing injury misaligns the product's safety with normative expectations." ;
+    :hasChainFailurePattern :ProductLiabilityDesignDefect_Pattern1 .
+:ProductLiabilityManufacturingDefect_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Product Liability (Manufacturing Defect) pattern 1" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:ProductLiabilityManufacturingDefect a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Product Liability (Manufacturing Defect)" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :FactualMisalignment ;
+    :hasDescription "A defect in manufacturing leading to injury misaligns the product's factual condition with normative safety standards." ;
+    :hasChainFailurePattern :ProductLiabilityManufacturingDefect_Pattern1 .
+:ProductLiabilityFailuretoWarn_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Product Liability (Failure to Warn) pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:ProductLiabilityFailuretoWarn a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Product Liability (Failure to Warn)" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :RecognitionFailure ;
+    :hasDescription "Failure to provide adequate warnings about a product's risks misrecognizes the consumer's right to informed choice." ;
+    :hasChainFailurePattern :ProductLiabilityFailuretoWarn_Pattern1 .
+:BreachofWarranty_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Breach of Warranty pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:BreachofWarranty_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Breach of Warranty pattern 2" ;
+    :focusesOnElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:BreachofWarranty a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Breach of Warranty" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :RecognitionFailure, :CorrelativityContradiction ;
+    :hasDescription "Violation of an express or implied warranty misrecognizes contractual expectations and disrupts correlated obligations." ;
+    :hasChainFailurePattern :BreachofWarranty_Pattern1, :BreachofWarranty_Pattern2 .
+:LossofConsortium_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Loss of Consortium pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:LossofConsortium_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Loss of Consortium pattern 2" ;
+    :focusesOnElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:LossofConsortium a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Loss of Consortium" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :RecognitionFailure, :CorrelativityContradiction ;
+    :hasDescription "Deprivation of a family relationship due to injury misrecognizes relational rights and duties." ;
+    :hasChainFailurePattern :LossofConsortium_Pattern1, :LossofConsortium_Pattern2 .
+:AlienationofAffection_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Alienation of Affection pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:AlienationofAffection_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Alienation of Affection pattern 2" ;
+    :focusesOnElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:AlienationofAffection a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Alienation of Affection" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :RecognitionFailure, :CorrelativityContradiction ;
+    :hasDescription "Interference with a marital relationship misrecognizes the relational obligations and duties of spouses." ;
+    :hasChainFailurePattern :AlienationofAffection_Pattern1, :AlienationofAffection_Pattern2 .
+:TortiousInterferencewithInheritance_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Tortious Interference with Inheritance pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:TortiousInterferencewithInheritance_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Tortious Interference with Inheritance pattern 2" ;
+    :focusesOnElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:TortiousInterferencewithInheritance a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Tortious Interference with Inheritance" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :RecognitionFailure, :CorrelativityContradiction ;
+    :hasDescription "Interfering with an expected inheritance misrecognizes the beneficiary's expectancy and disrupts correlated duties." ;
+    :hasChainFailurePattern :TortiousInterferencewithInheritance_Pattern1, :TortiousInterferencewithInheritance_Pattern2 .
+:ViolationofFreedomofthePress_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Freedom of the Press pattern 1" ;
+    :hasRelationType "FOCUS" .
+:ViolationofFreedomofthePress_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Freedom of the Press pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:ViolationofFreedomofthePress a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Violation of Freedom of the Press" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :NormativeContradiction, :RecognitionFailure ;
+    :hasDescription "Government restriction of press freedom conflicts with constitutional norms and misrecognizes the press's role." ;
+    :hasChainFailurePattern :ViolationofFreedomofthePress_Pattern1, :ViolationofFreedomofthePress_Pattern2 .
+:ViolationofRighttoPetition_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Right to Petition pattern 1" ;
+    :hasRelationType "FOCUS" .
+:ViolationofRighttoPetition_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Right to Petition pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:ViolationofRighttoPetition a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Violation of Right to Petition" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :NormativeContradiction, :RecognitionFailure ;
+    :hasDescription "Government interference with petitions for redress conflicts with constitutional norms and misrecognizes citizens' rights." ;
+    :hasChainFailurePattern :ViolationofRighttoPetition_Pattern1, :ViolationofRighttoPetition_Pattern2 .
+:ViolationofRighttoBearArms_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Right to Bear Arms pattern 1" ;
+    :hasRelationType "FOCUS" .
+:ViolationofRighttoBearArms a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Violation of Right to Bear Arms" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :NormativeContradiction ;
+    :hasDescription "Government infringement on the right to keep and bear arms conflicts with constitutional norms." ;
+    :hasChainFailurePattern :ViolationofRighttoBearArms_Pattern1 .
+:ViolationofGrandJuryRight_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Grand Jury Right pattern 1" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :ProcedureElement ;
+    :hasRelationType "FORWARD" .
+:ViolationofGrandJuryRight_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Grand Jury Right pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:ViolationofGrandJuryRight a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Violation of Grand Jury Right" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :ProceduralContradiction, :RecognitionFailure ;
+    :hasDescription "Prosecution without a grand jury indictment in serious cases violates procedural safeguards and misrecognizes the accused's rights." ;
+    :hasChainFailurePattern :ViolationofGrandJuryRight_Pattern1, :ViolationofGrandJuryRight_Pattern2 .
+:ViolationofSpeedyTrialRight_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Speedy Trial Right pattern 1" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :ProcedureElement ;
+    :hasRelationType "FORWARD" .
+:ViolationofSpeedyTrialRight_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Speedy Trial Right pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:ViolationofSpeedyTrialRight a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Violation of Speedy Trial Right" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :ProceduralContradiction, :RecognitionFailure ;
+    :hasDescription "Unreasonable delay in trial violates procedural norms and misrecognizes the accused's rights." ;
+    :hasChainFailurePattern :ViolationofSpeedyTrialRight_Pattern1, :ViolationofSpeedyTrialRight_Pattern2 .
+:ViolationofPublicTrialRight_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Public Trial Right pattern 1" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :ProcedureElement ;
+    :hasRelationType "FORWARD" .
+:ViolationofPublicTrialRight a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Violation of Public Trial Right" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :ProceduralContradiction ;
+    :hasDescription "Conducting a trial in secret violates procedural norms requiring openness." ;
+    :hasChainFailurePattern :ViolationofPublicTrialRight_Pattern1 .
+:ViolationofImpartialJuryRight_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Impartial Jury Right pattern 1" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :ProcedureElement ;
+    :hasRelationType "FORWARD" .
+:ViolationofImpartialJuryRight_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Impartial Jury Right pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:ViolationofImpartialJuryRight a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Violation of Impartial Jury Right" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :ProceduralContradiction, :RecognitionFailure ;
+    :hasDescription "Trying a defendant before a biased jury violates procedural fairness and misrecognizes the right to an impartial tribunal." ;
+    :hasChainFailurePattern :ViolationofImpartialJuryRight_Pattern1, :ViolationofImpartialJuryRight_Pattern2 .
+:ViolationofRighttoBeInformedofCharges_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Right to Be Informed of Charges pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:ViolationofRighttoBeInformedofCharges a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Violation of Right to Be Informed of Charges" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :RecognitionFailure ;
+    :hasDescription "Failing to inform the accused of the nature and cause of the accusation misrecognizes their right to prepare a defense." ;
+    :hasChainFailurePattern :ViolationofRighttoBeInformedofCharges_Pattern1 .
+:ViolationofRighttoConfrontWitnesses_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Right to Confront Witnesses pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:ViolationofRighttoConfrontWitnesses_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Right to Confront Witnesses pattern 2" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :ProcedureElement ;
+    :hasRelationType "FORWARD" .
+:ViolationofRighttoConfrontWitnesses a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Violation of Right to Confront Witnesses" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :RecognitionFailure, :ProceduralContradiction ;
+    :hasDescription "Preventing cross-examination of witnesses against a defendant misrecognizes confrontation rights and disrupts procedure." ;
+    :hasChainFailurePattern :ViolationofRighttoConfrontWitnesses_Pattern1, :ViolationofRighttoConfrontWitnesses_Pattern2 .
+:ViolationofCompulsoryProcessRight_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Compulsory Process Right pattern 1" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :ProcedureElement ;
+    :hasRelationType "FORWARD" .
+:ViolationofCompulsoryProcessRight_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Compulsory Process Right pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:ViolationofCompulsoryProcessRight a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Violation of Compulsory Process Right" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :ProceduralContradiction, :RecognitionFailure ;
+    :hasDescription "Denying the defendant the ability to secure witnesses in their favor violates procedural norms and misrecognizes their rights." ;
+    :hasChainFailurePattern :ViolationofCompulsoryProcessRight_Pattern1, :ViolationofCompulsoryProcessRight_Pattern2 .
+:ViolationofCivilJuryRight_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Civil Jury Right pattern 1" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :ProcedureElement ;
+    :hasRelationType "FORWARD" .
+:ViolationofCivilJuryRight a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Violation of Civil Jury Right" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :ProceduralContradiction ;
+    :hasDescription "Denying a civil litigant the right to a jury trial violates procedural norms under the Seventh Amendment." ;
+    :hasChainFailurePattern :ViolationofCivilJuryRight_Pattern1 .
+:ViolationofExcessiveFinesClause_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Excessive Fines Clause pattern 1" ;
+    :hasRelationType "FOCUS" .
+:ViolationofExcessiveFinesClause a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Violation of Excessive Fines Clause" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :NormativeContradiction ;
+    :hasDescription "Imposing excessive fines conflicts with constitutional norms under the Eighth Amendment." ;
+    :hasChainFailurePattern :ViolationofExcessiveFinesClause_Pattern1 .
+:ViolationofNinthAmendmentPrivacyRight_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Ninth Amendment Privacy Right pattern 1" ;
+    :hasRelationType "FOCUS" .
+:ViolationofNinthAmendmentPrivacyRight_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Ninth Amendment Privacy Right pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:ViolationofNinthAmendmentPrivacyRight a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Violation of Ninth Amendment Privacy Right" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :NormativeContradiction, :RecognitionFailure ;
+    :hasDescription "Government intrusion into intimate decision-making conflicts with unenumerated privacy rights and misrecognizes personal autonomy." ;
+    :hasChainFailurePattern :ViolationofNinthAmendmentPrivacyRight_Pattern1, :ViolationofNinthAmendmentPrivacyRight_Pattern2 .
+:ViolationofNinthAmendmentSameSexRelationshipsRight_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Ninth Amendment Same-Sex Relationships Right pattern 1" ;
+    :hasRelationType "FOCUS" .
+:ViolationofNinthAmendmentSameSexRelationshipsRight_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Ninth Amendment Same-Sex Relationships Right pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:ViolationofNinthAmendmentSameSexRelationshipsRight a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Violation of Ninth Amendment Same-Sex Relationships Right" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :NormativeContradiction, :RecognitionFailure ;
+    :hasDescription "Criminalizing consensual same-sex relationships conflicts with constitutional norms and misrecognizes personal rights." ;
+    :hasChainFailurePattern :ViolationofNinthAmendmentSameSexRelationshipsRight_Pattern1, :ViolationofNinthAmendmentSameSexRelationshipsRight_Pattern2 .
+:ViolationofTenthAmendmentStatesRights_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Tenth Amendment (States' Rights) pattern 1" ;
+    :hasRelationType "FOCUS" .
+:ViolationofTenthAmendmentStatesRights a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Violation of Tenth Amendment (States' Rights)" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :NormativeContradiction ;
+    :hasDescription "Federal usurpation of powers reserved to the states conflicts with the constitutional allocation of authority." ;
+    :hasChainFailurePattern :ViolationofTenthAmendmentStatesRights_Pattern1 .
+:ViolationofThirteenthAmendment_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Thirteenth Amendment pattern 1" ;
+    :hasRelationType "FOCUS" .
+:ViolationofThirteenthAmendment a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Violation of Thirteenth Amendment" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :NormativeContradiction ;
+    :hasDescription "Enforcing slavery or involuntary servitude conflicts with constitutional prohibitions." ;
+    :hasChainFailurePattern :ViolationofThirteenthAmendment_Pattern1 .
+:ViolationofPrivilegesorImmunitiesClause_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Privileges or Immunities Clause pattern 1" ;
+    :hasRelationType "FOCUS" .
+:ViolationofPrivilegesorImmunitiesClause a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Violation of Privileges or Immunities Clause" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :NormativeContradiction ;
+    :hasDescription "State infringement of fundamental rights of citizens conflicts with the Fourteenth Amendment." ;
+    :hasChainFailurePattern :ViolationofPrivilegesorImmunitiesClause_Pattern1 .
+:Violationof15thAmendmentVotingRights_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of 15th Amendment Voting Rights pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:Violationof15thAmendmentVotingRights_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of 15th Amendment Voting Rights pattern 2" ;
+    :hasRelationType "FOCUS" .
+:Violationof15thAmendmentVotingRights a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Violation of 15th Amendment Voting Rights" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :RecognitionFailure, :NormativeContradiction ;
+    :hasDescription "Denying the right to vote based on race or color conflicts with constitutional norms and misrecognizes citizens' rights." ;
+    :hasChainFailurePattern :Violationof15thAmendmentVotingRights_Pattern1, :Violationof15thAmendmentVotingRights_Pattern2 .
+:Violationof19thAmendmentVotingRights_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of 19th Amendment Voting Rights pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:Violationof19thAmendmentVotingRights_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of 19th Amendment Voting Rights pattern 2" ;
+    :hasRelationType "FOCUS" .
+:Violationof19thAmendmentVotingRights a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Violation of 19th Amendment Voting Rights" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :RecognitionFailure, :NormativeContradiction ;
+    :hasDescription "Denying the right to vote based on sex conflicts with constitutional norms and misrecognizes citizens' rights." ;
+    :hasChainFailurePattern :Violationof19thAmendmentVotingRights_Pattern1, :Violationof19thAmendmentVotingRights_Pattern2 .
+:Violationof24thAmendmentPollTax_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of 24th Amendment (Poll Tax) pattern 1" ;
+    :hasRelationType "FOCUS" .
+:Violationof24thAmendmentPollTax_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of 24th Amendment (Poll Tax) pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:Violationof24thAmendmentPollTax a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Violation of 24th Amendment (Poll Tax)" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :NormativeContradiction, :RecognitionFailure ;
+    :hasDescription "Imposing a poll tax as a condition for voting conflicts with constitutional norms and misrecognizes citizens' rights." ;
+    :hasChainFailurePattern :Violationof24thAmendmentPollTax_Pattern1, :Violationof24thAmendmentPollTax_Pattern2 .
+:Violationof26thAmendmentVotingRights_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of 26th Amendment Voting Rights pattern 1" ;
+    :hasRelationType "FOCUS" .
+:Violationof26thAmendmentVotingRights_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of 26th Amendment Voting Rights pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:Violationof26thAmendmentVotingRights a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Violation of 26th Amendment Voting Rights" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :NormativeContradiction, :RecognitionFailure ;
+    :hasDescription "Denying citizens 18 years or older the right to vote conflicts with constitutional norms and misrecognizes their rights." ;
+    :hasChainFailurePattern :Violationof26thAmendmentVotingRights_Pattern1, :Violationof26thAmendmentVotingRights_Pattern2 .
+:ViolationofRighttoTravel_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Right to Travel pattern 1" ;
+    :hasRelationType "FOCUS" .
+:ViolationofRighttoTravel a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Violation of Right to Travel" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :NormativeContradiction ;
+    :hasDescription "Restrictions on interstate travel conflict with constitutional norms protecting freedom of movement." ;
+    :hasChainFailurePattern :ViolationofRighttoTravel_Pattern1 .
+:ViolationofRighttoMarry_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Right to Marry pattern 1" ;
+    :hasRelationType "FOCUS" .
+:ViolationofRighttoMarry_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Right to Marry pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:ViolationofRighttoMarry a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Violation of Right to Marry" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :NormativeContradiction, :RecognitionFailure ;
+    :hasDescription "Prohibiting marriage between consenting adults conflicts with constitutional norms and misrecognizes relational rights." ;
+    :hasChainFailurePattern :ViolationofRighttoMarry_Pattern1, :ViolationofRighttoMarry_Pattern2 .
+:ViolationofRighttoProcreate_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Right to Procreate pattern 1" ;
+    :hasRelationType "FOCUS" .
+:ViolationofRighttoProcreate_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Right to Procreate pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:ViolationofRighttoProcreate a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Violation of Right to Procreate" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :NormativeContradiction, :RecognitionFailure ;
+    :hasDescription "State interference with procreation conflicts with constitutional norms and misrecognizes personal autonomy." ;
+    :hasChainFailurePattern :ViolationofRighttoProcreate_Pattern1, :ViolationofRighttoProcreate_Pattern2 .
+:ViolationofBodilyIntegrity_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Bodily Integrity pattern 1" ;
+    :hasRelationType "FOCUS" .
+:ViolationofBodilyIntegrity_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Bodily Integrity pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:ViolationofBodilyIntegrity a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Violation of Bodily Integrity" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :NormativeContradiction, :RecognitionFailure ;
+    :hasDescription "State-imposed medical procedures without consent conflict with constitutional norms and misrecognize personal autonomy." ;
+    :hasChainFailurePattern :ViolationofBodilyIntegrity_Pattern1, :ViolationofBodilyIntegrity_Pattern2 .
+:Section1983DeprivationofRights_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Section 1983 Deprivation of Rights pattern 1" ;
+    :focusesOnElement :AuthoritySource ;
+    :relatesToSecondaryElement :RoleConferral ;
+    :hasRelationType "FORWARD" .
+:Section1983DeprivationofRights_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Section 1983 Deprivation of Rights pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:Section1983DeprivationofRights a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Section 1983 Deprivation of Rights" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :ConferralFailure, :RecognitionFailure ;
+    :hasDescription "State officials' actions under color of law that deprive individuals of rights misconfers authority and misrecognizes rights." ;
+    :hasChainFailurePattern :Section1983DeprivationofRights_Pattern1, :Section1983DeprivationofRights_Pattern2 .
+:ViolationofEqualAccesstoEducation_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Equal Access to Education pattern 1" ;
+    :hasRelationType "FOCUS" .
+:ViolationofEqualAccesstoEducation_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Violation of Equal Access to Education pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:ViolationofEqualAccesstoEducation a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Violation of Equal Access to Education" ;
+    :hasOffenseCategory :Constitutional ;
+    :hasStructuralViolationClass :NormativeContradiction, :RecognitionFailure ;
+    :hasDescription "State actions denying equal educational opportunities conflict with constitutional norms and misrecognize students' rights." ;
+    :hasChainFailurePattern :ViolationofEqualAccesstoEducation_Pattern1, :ViolationofEqualAccesstoEducation_Pattern2 .
+:Fraudcivil_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Fraud (civil) pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:Fraudcivil_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Fraud (civil) pattern 2" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:Fraudcivil a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Fraud (civil)" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :RecognitionFailure, :FactualMisalignment ;
+    :hasDescription "Intentional or negligent misrepresentation of material fact causing reliance and damages in civil context" ;
+    :hasChainFailurePattern :Fraudcivil_Pattern1, :Fraudcivil_Pattern2 .
+:MedicalMalpractice_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Medical Malpractice pattern 1" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :ProcedureElement ;
+    :hasRelationType "FORWARD" .
+:MedicalMalpractice_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Medical Malpractice pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:MedicalMalpractice a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Medical Malpractice" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :ProceduralContradiction, :RecognitionFailure ;
+    :hasDescription "Negligent act or omission by a healthcare professional deviating from standard of care and causing injury" ;
+    :hasChainFailurePattern :MedicalMalpractice_Pattern1, :MedicalMalpractice_Pattern2 .
+:LegalMalpractice_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Legal Malpractice pattern 1" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :ProcedureElement ;
+    :hasRelationType "FORWARD" .
+:LegalMalpractice_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Legal Malpractice pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:LegalMalpractice a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Legal Malpractice" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :ProceduralContradiction, :RecognitionFailure ;
+    :hasDescription "Negligence, breach of fiduciary duty or contract by an attorney causing harm to a client" ;
+    :hasChainFailurePattern :LegalMalpractice_Pattern1, :LegalMalpractice_Pattern2 .
+:WrongfulBirth_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Wrongful Birth pattern 1" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :JurisdictionScope ;
+    :hasRelationType "BIDIRECTIONAL" .
+:WrongfulBirth_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Wrongful Birth pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:WrongfulBirth a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Wrongful Birth" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :NormativeContradiction, :RecognitionFailure ;
+    :hasDescription "Parents claim a physician failed to warn of genetic risks, resulting in birth of a child with defects" ;
+    :hasChainFailurePattern :WrongfulBirth_Pattern1, :WrongfulBirth_Pattern2 .
+:WrongfulLife_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Wrongful Life pattern 1" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :JurisdictionScope ;
+    :hasRelationType "BIDIRECTIONAL" .
+:WrongfulLife_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Wrongful Life pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:WrongfulLife a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Wrongful Life" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :NormativeContradiction, :RecognitionFailure ;
+    :hasDescription "Action by or on behalf of a disabled child alleging failure to prevent the child's birth" ;
+    :hasChainFailurePattern :WrongfulLife_Pattern1, :WrongfulLife_Pattern2 .
+:WrongfulConception_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Wrongful Conception pattern 1" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :ProcedureElement ;
+    :hasRelationType "FORWARD" .
+:WrongfulConception_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Wrongful Conception pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:WrongfulConception a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Wrongful Conception" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :ProceduralContradiction, :RecognitionFailure ;
+    :hasDescription "Parents suffer damages due to negligent sterilization or contraceptive procedure resulting in unwanted birth" ;
+    :hasChainFailurePattern :WrongfulConception_Pattern1, :WrongfulConception_Pattern2 .
+:WrongfulAdoption_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Wrongful Adoption pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:WrongfulAdoption_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Wrongful Adoption pattern 2" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:WrongfulAdoption a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Wrongful Adoption" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :RecognitionFailure, :FactualMisalignment ;
+    :hasDescription "Adoption agency or birth parent misrepresents or fails to disclose health or background information in adoption" ;
+    :hasChainFailurePattern :WrongfulAdoption_Pattern1, :WrongfulAdoption_Pattern2 .
+:NegligentHiring_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Negligent Hiring pattern 1" ;
+    :focusesOnElement :AuthoritySource ;
+    :relatesToSecondaryElement :RoleConferral ;
+    :hasRelationType "FORWARD" .
+:NegligentHiring_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Negligent Hiring pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:NegligentHiring a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Negligent Hiring" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :ConferralFailure, :RecognitionFailure ;
+    :hasDescription "Employer hires an individual with known dangerous propensities without due diligence, leading to harm" ;
+    :hasChainFailurePattern :NegligentHiring_Pattern1, :NegligentHiring_Pattern2 .
+:NegligentSupervisionorRetention_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Negligent Supervision or Retention pattern 1" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :ProcedureElement ;
+    :hasRelationType "FORWARD" .
+:NegligentSupervisionorRetention_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Negligent Supervision or Retention pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:NegligentSupervisionorRetention a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Negligent Supervision or Retention" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :ProceduralContradiction, :RecognitionFailure ;
+    :hasDescription "Employer fails to monitor, control or terminate an employee whose misconduct causes injury" ;
+    :hasChainFailurePattern :NegligentSupervisionorRetention_Pattern1, :NegligentSupervisionorRetention_Pattern2 .
+:WrongfulTerminationPublicPolicy_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Wrongful Termination (Public Policy) pattern 1" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :JurisdictionScope ;
+    :hasRelationType "BIDIRECTIONAL" .
+:WrongfulTerminationPublicPolicy_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Wrongful Termination (Public Policy) pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:WrongfulTerminationPublicPolicy a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Wrongful Termination (Public Policy)" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :NormativeContradiction, :RecognitionFailure ;
+    :hasDescription "Employee is fired for reasons that violate public policy, giving rise to a wrongful discharge claim" ;
+    :hasChainFailurePattern :WrongfulTerminationPublicPolicy_Pattern1, :WrongfulTerminationPublicPolicy_Pattern2 .
+:ToxicTortEnvironmentalContamination_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Toxic Tort (Environmental Contamination) pattern 1" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :FactualTrigger ;
+    :hasRelationType "BIDIRECTIONAL" .
+:ToxicTortEnvironmentalContamination_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Toxic Tort (Environmental Contamination) pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:ToxicTortEnvironmentalContamination a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Toxic Tort (Environmental Contamination)" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :NormativeContradiction, :FactualMisalignment ;
+    :hasDescription "Exposure to toxic chemicals or substances due to negligent or hazardous conduct causing personal or property injury" ;
+    :hasChainFailurePattern :ToxicTortEnvironmentalContamination_Pattern1, :ToxicTortEnvironmentalContamination_Pattern2 .
+:MisappropriationofTradeSecrets_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Misappropriation of Trade Secrets pattern 1" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :JurisdictionScope ;
+    :hasRelationType "BIDIRECTIONAL" .
+:MisappropriationofTradeSecrets_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Misappropriation of Trade Secrets pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:MisappropriationofTradeSecrets a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Misappropriation of Trade Secrets" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :NormativeContradiction, :RecognitionFailure ;
+    :hasDescription "Wrongful acquisition or use of another's trade secret constituting unfair competition" ;
+    :hasChainFailurePattern :MisappropriationofTradeSecrets_Pattern1, :MisappropriationofTradeSecrets_Pattern2 .
+:RestraintofTrade_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Restraint of Trade pattern 1" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :JurisdictionScope ;
+    :hasRelationType "BIDIRECTIONAL" .
+:RestraintofTrade_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Restraint of Trade pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:RestraintofTrade a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Restraint of Trade" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :NormativeContradiction, :RecognitionFailure ;
+    :hasDescription "Unlawful interference with free competition or attempts to monopolize markets" ;
+    :hasChainFailurePattern :RestraintofTrade_Pattern1, :RestraintofTrade_Pattern2 .
+:NonnaturalUseofLandRylands_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Non-natural Use of Land (Rylands) pattern 1" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :FactualTrigger ;
+    :hasRelationType "BIDIRECTIONAL" .
+:NonnaturalUseofLandRylands_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Non-natural Use of Land (Rylands) pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:NonnaturalUseofLandRylands a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Non-natural Use of Land (Rylands)" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :NormativeContradiction, :FactualMisalignment ;
+    :hasDescription "Strict liability for harm caused by hazardous use of land or escape of dangerous substances" ;
+    :hasChainFailurePattern :NonnaturalUseofLandRylands_Pattern1, :NonnaturalUseofLandRylands_Pattern2 .
+:VicariousLiabilityRespondeatSuperior_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Vicarious Liability (Respondeat Superior) pattern 1" ;
+    :focusesOnElement :AuthoritySource ;
+    :relatesToSecondaryElement :RoleConferral ;
+    :hasRelationType "FORWARD" .
+:VicariousLiabilityRespondeatSuperior_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Vicarious Liability (Respondeat Superior) pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:VicariousLiabilityRespondeatSuperior a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Vicarious Liability (Respondeat Superior)" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :ConferralFailure, :RecognitionFailure ;
+    :hasDescription "Imposition of liability on employers for wrongful acts committed by employees within the scope of employment" ;
+    :hasChainFailurePattern :VicariousLiabilityRespondeatSuperior_Pattern1, :VicariousLiabilityRespondeatSuperior_Pattern2 .
+:AttractiveNuisance_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Attractive Nuisance pattern 1" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :FactualTrigger ;
+    :hasRelationType "BIDIRECTIONAL" .
+:AttractiveNuisance_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Attractive Nuisance pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:AttractiveNuisance a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Attractive Nuisance" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :NormativeContradiction, :RecognitionFailure ;
+    :hasDescription "Liability of property owners for dangerous conditions that lure children and result in injury" ;
+    :hasChainFailurePattern :AttractiveNuisance_Pattern1, :AttractiveNuisance_Pattern2 .
+:CriminalConversation_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Criminal Conversation pattern 1" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :JurisdictionScope ;
+    :hasRelationType "BIDIRECTIONAL" .
+:CriminalConversation_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Criminal Conversation pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:CriminalConversation a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Criminal Conversation" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :NormativeContradiction, :RecognitionFailure ;
+    :hasDescription "Civil action by a spouse against a third party for wrongful sexual relations with the claimant's spouse" ;
+    :hasChainFailurePattern :CriminalConversation_Pattern1, :CriminalConversation_Pattern2 .
+:Seduction_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Seduction pattern 1" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :JurisdictionScope ;
+    :hasRelationType "BIDIRECTIONAL" .
+:Seduction_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Seduction pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:Seduction a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Seduction" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :NormativeContradiction, :RecognitionFailure ;
+    :hasDescription "Cause of action arising from deception to engage in sexual relations resulting in harm or societal damage" ;
+    :hasChainFailurePattern :Seduction_Pattern1, :Seduction_Pattern2 .
+:BreachofPromisetoMarry_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Breach of Promise to Marry pattern 1" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :JurisdictionScope ;
+    :hasRelationType "BIDIRECTIONAL" .
+:BreachofPromisetoMarry_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Breach of Promise to Marry pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:BreachofPromisetoMarry a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Breach of Promise to Marry" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :NormativeContradiction, :RecognitionFailure ;
+    :hasDescription "Legal claim based on unjustified refusal to fulfill a promise to marry causing economic or emotional harm" ;
+    :hasChainFailurePattern :BreachofPromisetoMarry_Pattern1, :BreachofPromisetoMarry_Pattern2 .
+:WrongfulEviction_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Wrongful Eviction pattern 1" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :ProcedureElement ;
+    :hasRelationType "FORWARD" .
+:WrongfulEviction_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Wrongful Eviction pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:WrongfulEviction a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Wrongful Eviction" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :NormativeContradiction, :RecognitionFailure ;
+    :hasDescription "Landlord unlawfully expels tenant without legal process or violates tenancy rights" ;
+    :hasChainFailurePattern :WrongfulEviction_Pattern1, :WrongfulEviction_Pattern2 .
+:WrongfulForeclosure_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Wrongful Foreclosure pattern 1" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :ProcedureElement ;
+    :hasRelationType "FORWARD" .
+:WrongfulForeclosure_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Wrongful Foreclosure pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:WrongfulForeclosure a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Wrongful Foreclosure" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :NormativeContradiction, :RecognitionFailure ;
+    :hasDescription "Foreclosing on property without proper notice, authority or justification" ;
+    :hasChainFailurePattern :WrongfulForeclosure_Pattern1, :WrongfulForeclosure_Pattern2 .
+:UnjustEnrichment_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Unjust Enrichment pattern 1" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "BIDIRECTIONAL" .
+:UnjustEnrichment_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Unjust Enrichment pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:UnjustEnrichment a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Unjust Enrichment" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :NormativeContradiction, :RecognitionFailure ;
+    :hasDescription "One party unfairly retains a benefit at another’s expense without lawful justification" ;
+    :hasChainFailurePattern :UnjustEnrichment_Pattern1, :UnjustEnrichment_Pattern2 .
+:WrongfulRepossession_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Wrongful Repossession pattern 1" ;
+    :focusesOnElement :AuthoritySource ;
+    :relatesToSecondaryElement :RoleConferral ;
+    :hasRelationType "FORWARD" .
+:WrongfulRepossession_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Wrongful Repossession pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:WrongfulRepossession a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Wrongful Repossession" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :NormativeContradiction, :RecognitionFailure ;
+    :hasDescription "Repossession of property without proper legal authority, notice or process" ;
+    :hasChainFailurePattern :WrongfulRepossession_Pattern1, :WrongfulRepossession_Pattern2 .
+:CivilRICORacketeering_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Civil RICO (Racketeering) pattern 1" ;
+    :focusesOnElement :NormSpecification ;
+    :relatesToSecondaryElement :JurisdictionScope ;
+    :hasRelationType "BIDIRECTIONAL" .
+:CivilRICORacketeering_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Civil RICO (Racketeering) pattern 2" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:CivilRICORacketeering a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Civil RICO (Racketeering)" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :NormativeContradiction, :RecognitionFailure ;
+    :hasDescription "Civil cause of action under the Racketeer Influenced and Corrupt Organizations Act for participating in an enterprise through a pattern of racketeering activity" ;
+    :hasChainFailurePattern :CivilRICORacketeering_Pattern1, :CivilRICORacketeering_Pattern2 .
+:DataBreachPrivacy_Pattern1 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Data Breach (Privacy) pattern 1" ;
+    :focusesOnElement :JurisdictionScope ;
+    :relatesToSecondaryElement :CorrelativePosition ;
+    :hasRelationType "FOCUS" .
+:DataBreachPrivacy_Pattern2 a owl:NamedIndividual , :ChainFailurePattern ;
+    rdfs:label "Data Breach (Privacy) pattern 2" ;
+    :focusesOnElement :FactualTrigger ;
+    :hasRelationType "FOCUS" .
+:DataBreachPrivacy a owl:NamedIndividual , :OffenseType ;
+    rdfs:label "Data Breach (Privacy)" ;
+    :hasOffenseCategory :Tort ;
+    :hasStructuralViolationClass :RecognitionFailure, :FactualMisalignment ;
+    :hasDescription "Unauthorized disclosure of personal data due to negligent security or breach of privacy obligations" ;
+    :hasChainFailurePattern :DataBreachPrivacy_Pattern1, :DataBreachPrivacy_Pattern2 .
