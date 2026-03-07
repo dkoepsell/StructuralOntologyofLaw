@@ -1,0 +1,1879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOoL MLC Chain Auditor — SEAL Lab</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0d0b08;
+    --parchment: #f5f0e8;
+    --parchment-dark: #ede5d4;
+    --parchment-mid: #e8dfc9;
+    --brass: #b8860b;
+    --brass-light: #d4a017;
+    --brass-dim: #7a5c0a;
+    --amber: #e8a020;
+    --crimson: #8b1a1a;
+    --crimson-light: #c0392b;
+    --forest: #1a3a2a;
+    --forest-light: #2d6a4a;
+    --slate: #2c3e50;
+    --mist: #8b7d6b;
+    --chain-inactive: #c8bfb0;
+    --chain-active: var(--brass);
+    --chain-pass: var(--forest-light);
+    --chain-fail: var(--crimson);
+    --chain-cond: #b8860b;
+    --shadow-deep: 0 8px 40px rgba(13,11,8,0.35);
+    --shadow-card: 0 2px 16px rgba(13,11,8,0.15);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--ink);
+    color: var(--parchment);
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 15px;
+    line-height: 1.65;
+    min-height: 100vh;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.4;
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    border-bottom: 1px solid var(--brass-dim);
+    padding: 28px 48px 24px;
+    display: flex;
+    align-items: baseline;
+    gap: 32px;
+    background: linear-gradient(to bottom, #1a1510, var(--ink));
+  }
+
+  .logo-block h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--brass-light);
+  }
+
+  .logo-block .subtitle {
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--mist);
+    margin-top: 2px;
+  }
+
+  .header-rule {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, var(--brass-dim), transparent);
+    margin-bottom: 4px;
+  }
+
+  .header-meta {
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--mist);
+    text-align: right;
+  }
+
+  /* ─── LAYOUT ─── */
+  .app-layout {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    grid-template-rows: auto 1fr;
+    min-height: calc(100vh - 85px);
+  }
+
+  /* ─── CASE PANEL ─── */
+  .case-panel {
+    grid-row: 1 / 3;
+    border-right: 1px solid #2a2520;
+    padding: 32px 28px;
+    background: #110f0c;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .panel-section-title {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--brass-dim);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .panel-section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #2a2520;
+  }
+
+  .case-input {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .case-input label {
+    font-size: 0.72rem;
+    color: var(--mist);
+    letter-spacing: 0.06em;
+  }
+
+  .case-input input,
+  .case-input textarea {
+    background: #1a1710;
+    border: 1px solid #3a3328;
+    color: var(--parchment);
+    font-family: 'Source Serif 4', serif;
+    font-size: 0.85rem;
+    padding: 10px 12px;
+    border-radius: 2px;
+    outline: none;
+    resize: vertical;
+    transition: border-color 0.2s;
+  }
+
+  .case-input input:focus,
+  .case-input textarea:focus {
+    border-color: var(--brass-dim);
+  }
+
+  .case-input textarea { min-height: 90px; }
+
+  /* Chain map sidebar */
+  .chain-map {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .chain-node-mini {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: background 0.15s;
+    position: relative;
+  }
+
+  .chain-node-mini:hover { background: #1e1b16; }
+  .chain-node-mini.active-node { background: #1e1b16; }
+
+  .chain-node-mini::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: transparent;
+    border-radius: 2px 0 0 2px;
+    transition: background 0.2s;
+  }
+
+  .chain-node-mini.status-pass::before { background: var(--chain-pass); }
+  .chain-node-mini.status-fail::before { background: var(--chain-fail); }
+  .chain-node-mini.status-cond::before { background: var(--chain-cond); }
+  .chain-node-mini.active-node::before { background: var(--brass); }
+
+  .node-num-mini {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: #2a2520;
+    border: 1.5px solid #3a3328;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--mist);
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
+  .status-pass .node-num-mini { background: var(--forest); border-color: var(--forest-light); color: #7fffd4; }
+  .status-fail .node-num-mini { background: #3d0f0f; border-color: var(--crimson); color: #ff9090; }
+  .status-cond .node-num-mini { background: #2a2000; border-color: var(--brass); color: var(--amber); }
+  .active-node .node-num-mini { border-color: var(--brass); color: var(--brass-light); }
+
+  .node-mini-label {
+    font-size: 0.78rem;
+    color: var(--mist);
+    transition: color 0.2s;
+  }
+
+  .active-node .node-mini-label,
+  .chain-node-mini:hover .node-mini-label { color: var(--parchment); }
+
+  .cluster-label-mini {
+    font-size: 0.58rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #3a3328;
+    padding: 6px 10px 2px;
+  }
+
+  /* CD score */
+  .cd-score-display {
+    background: #1a1710;
+    border: 1px solid #3a3328;
+    border-radius: 2px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .cd-score-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--mist);
+    margin-bottom: 8px;
+  }
+
+  .cd-score-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.8rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--parchment);
+    transition: color 0.4s;
+  }
+
+  .cd-score-value.low { color: var(--forest-light); }
+  .cd-score-value.moderate { color: var(--amber); }
+  .cd-score-value.high { color: #e06b1a; }
+  .cd-score-value.critical { color: var(--crimson-light); }
+
+  .cd-stability {
+    font-size: 0.72rem;
+    color: var(--mist);
+    margin-top: 6px;
+    font-style: italic;
+  }
+
+  /* ─── MAIN CONTENT ─── */
+  .main-content {
+    padding: 40px 48px;
+    overflow-y: auto;
+  }
+
+  /* ─── NODE CARD ─── */
+  .node-card {
+    display: none;
+    animation: fadeSlideIn 0.3s ease;
+  }
+
+  .node-card.visible { display: block; }
+
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .node-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 28px;
+  }
+
+  .node-number-large {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: #1a1710;
+    border: 2px solid var(--brass-dim);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--brass-light);
+    flex-shrink: 0;
+  }
+
+  .node-title-block { flex: 1; }
+
+  .node-cluster-tag {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--brass-dim);
+    margin-bottom: 4px;
+  }
+
+  .node-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--parchment);
+    line-height: 1.2;
+  }
+
+  .node-description {
+    color: var(--mist);
+    font-size: 0.88rem;
+    margin-top: 6px;
+    line-height: 1.6;
+    font-style: italic;
+  }
+
+  /* Status selector */
+  .status-section {
+    margin-bottom: 28px;
+  }
+
+  .section-heading {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--brass-dim);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-heading::after {
+    content: ''; flex: 1; height: 1px; background: #2a2520;
+  }
+
+  .status-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .status-btn {
+    padding: 14px 16px;
+    background: #1a1710;
+    border: 1.5px solid #3a3328;
+    color: var(--mist);
+    font-family: 'Source Serif 4', serif;
+    font-size: 0.82rem;
+    cursor: pointer;
+    border-radius: 2px;
+    text-align: center;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .status-btn:hover { border-color: var(--brass-dim); color: var(--parchment); }
+
+  .status-btn.selected-pass {
+    background: #0f2a1a;
+    border-color: var(--forest-light);
+    color: #7fffd4;
+  }
+
+  .status-btn.selected-fail {
+    background: #2a0f0f;
+    border-color: var(--crimson);
+    color: #ff9090;
+  }
+
+  .status-btn.selected-cond {
+    background: #2a2000;
+    border-color: var(--brass);
+    color: var(--amber);
+  }
+
+  .status-icon { font-size: 1.2rem; }
+
+  /* Notes input */
+  .node-notes {
+    margin-bottom: 28px;
+  }
+
+  .node-notes textarea {
+    width: 100%;
+    background: #1a1710;
+    border: 1px solid #3a3328;
+    color: var(--parchment);
+    font-family: 'Source Serif 4', serif;
+    font-size: 0.88rem;
+    padding: 12px 16px;
+    border-radius: 2px;
+    outline: none;
+    resize: vertical;
+    min-height: 80px;
+    transition: border-color 0.2s;
+    line-height: 1.6;
+  }
+
+  .node-notes textarea:focus { border-color: var(--brass-dim); }
+
+  /* Contradiction types */
+  .contradiction-section {
+    margin-bottom: 28px;
+  }
+
+  .contradiction-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .contradiction-chip {
+    padding: 10px 14px;
+    background: #1a1710;
+    border: 1px solid #3a3328;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .contradiction-chip:hover {
+    border-color: var(--brass-dim);
+    background: #201d18;
+  }
+
+  .contradiction-chip.selected {
+    background: #2a1a00;
+    border-color: var(--amber);
+  }
+
+  .chip-check {
+    width: 16px; height: 16px;
+    border: 1.5px solid #3a3328;
+    border-radius: 2px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.65rem;
+    color: transparent;
+    transition: all 0.2s;
+  }
+
+  .contradiction-chip.selected .chip-check {
+    background: var(--amber);
+    border-color: var(--amber);
+    color: var(--ink);
+  }
+
+  .chip-text { flex: 1; }
+
+  .chip-name {
+    font-size: 0.8rem;
+    color: var(--parchment);
+    font-weight: 400;
+    line-height: 1.3;
+  }
+
+  .chip-links {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--mist);
+    margin-top: 2px;
+  }
+
+  .contradiction-chip.selected .chip-name { color: var(--amber); }
+
+  /* Navigation */
+  .node-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 24px;
+    border-top: 1px solid #2a2520;
+  }
+
+  .nav-btn {
+    padding: 12px 28px;
+    background: transparent;
+    border: 1.5px solid #3a3328;
+    color: var(--mist);
+    font-family: 'Source Serif 4', serif;
+    font-size: 0.85rem;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.2s;
+    letter-spacing: 0.04em;
+  }
+
+  .nav-btn:hover { border-color: var(--brass-dim); color: var(--parchment); }
+
+  .nav-btn.primary {
+    background: var(--brass-dim);
+    border-color: var(--brass);
+    color: var(--parchment);
+    font-weight: 600;
+  }
+
+  .nav-btn.primary:hover { background: var(--brass); }
+
+  .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .progress-text {
+    font-size: 0.72rem;
+    color: var(--mist);
+    letter-spacing: 0.1em;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ─── REPORT VIEW ─── */
+  #report-view {
+    display: none;
+    padding: 40px 48px;
+    animation: fadeSlideIn 0.4s ease;
+  }
+
+  #report-view.visible { display: block; }
+
+  .report-header {
+    border-bottom: 2px solid var(--brass-dim);
+    padding-bottom: 24px;
+    margin-bottom: 36px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .report-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--brass-light);
+  }
+
+  .report-title-sub {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-style: italic;
+    color: var(--mist);
+    margin-top: 4px;
+  }
+
+  .report-stamp {
+    text-align: right;
+  }
+
+  .stamp-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stamp-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--mist);
+  }
+
+  .report-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 36px;
+  }
+
+  .meta-card {
+    background: #110f0c;
+    border: 1px solid #2a2520;
+    border-radius: 2px;
+    padding: 16px 20px;
+  }
+
+  .meta-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--mist);
+    margin-bottom: 6px;
+  }
+
+  .meta-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--parchment);
+  }
+
+  /* Chain table */
+  .report-section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--brass-light);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #2a2520;
+  }
+
+  .chain-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 36px;
+    font-size: 0.85rem;
+  }
+
+  .chain-table th {
+    text-align: left;
+    padding: 10px 14px;
+    background: #110f0c;
+    color: var(--mist);
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 400;
+    border-bottom: 1px solid #2a2520;
+  }
+
+  .chain-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #1e1b16;
+    vertical-align: top;
+    color: var(--parchment);
+  }
+
+  .chain-table tr:last-child td { border-bottom: none; }
+
+  .status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 2px;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 400;
+  }
+
+  .badge-pass { background: #0f2a1a; color: #7fffd4; border: 1px solid var(--forest-light); }
+  .badge-fail { background: #2a0f0f; color: #ff9090; border: 1px solid var(--crimson); }
+  .badge-cond { background: #2a2000; color: var(--amber); border: 1px solid var(--brass); }
+  .badge-none { background: #1a1710; color: var(--mist); border: 1px solid #3a3328; }
+
+  .td-cluster {
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--mist);
+  }
+
+  /* Contradiction inventory */
+  .contradiction-inventory {
+    margin-bottom: 36px;
+  }
+
+  .contradiction-item {
+    display: flex;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid #1e1b16;
+    align-items: flex-start;
+  }
+
+  .contradiction-item:last-child { border-bottom: none; }
+
+  .contra-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--amber);
+    min-width: 24px;
+    padding-top: 2px;
+  }
+
+  .contra-content { flex: 1; }
+
+  .contra-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--parchment);
+    margin-bottom: 2px;
+  }
+
+  .contra-desc {
+    font-size: 0.78rem;
+    color: var(--mist);
+    font-style: italic;
+  }
+
+  .contra-links {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--brass-dim);
+    margin-top: 4px;
+  }
+
+  /* Verdict block */
+  .verdict-block {
+    background: #110f0c;
+    border: 2px solid var(--brass-dim);
+    border-radius: 2px;
+    padding: 28px 32px;
+    margin-bottom: 28px;
+  }
+
+  .verdict-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--brass-dim);
+    margin-bottom: 12px;
+  }
+
+  .verdict-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    font-weight: 400;
+    color: var(--parchment);
+    line-height: 1.7;
+  }
+
+  .report-actions {
+    display: flex;
+    gap: 12px;
+    padding-top: 24px;
+    border-top: 1px solid #2a2520;
+  }
+
+  /* Progress bar */
+  .chain-progress-bar {
+    height: 2px;
+    background: #2a2520;
+    margin: 0 -48px;
+    position: relative;
+    overflow: visible;
+  }
+
+  .chain-progress-fill {
+    height: 100%;
+    background: linear-gradient(to right, var(--brass-dim), var(--brass-light));
+    transition: width 0.4s ease;
+  }
+
+  /* Cluster separator in chain map */
+  .cluster-divider {
+    height: 1px;
+    background: #2a2520;
+    margin: 4px 10px;
+  }
+
+  /* Empty state for report contradictions */
+  .empty-note {
+    color: var(--mist);
+    font-style: italic;
+    font-size: 0.85rem;
+    padding: 16px 0;
+  }
+
+  /* ─── WELCOME ─── */
+  .welcome-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    text-align: center;
+    padding: 48px;
+  }
+
+  .welcome-glyph {
+    font-family: 'Playfair Display', serif;
+    font-size: 5rem;
+    color: var(--brass-dim);
+    opacity: 0.4;
+    margin-bottom: 24px;
+    line-height: 1;
+  }
+
+  .welcome-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--parchment);
+    margin-bottom: 12px;
+  }
+
+  .welcome-body {
+    color: var(--mist);
+    font-size: 0.9rem;
+    max-width: 420px;
+    line-height: 1.7;
+    margin-bottom: 28px;
+  }
+
+  .start-btn {
+    padding: 14px 40px;
+    background: var(--brass-dim);
+    border: 1.5px solid var(--brass);
+    color: var(--parchment);
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.2s;
+    letter-spacing: 0.06em;
+  }
+
+  .start-btn:hover { background: var(--brass); }
+
+  /* ─── CLUSTER COLORS ─── */
+  [data-cluster="AUTHORITY"] .node-number-large { border-color: #6a4a1a; color: #d4a850; }
+  [data-cluster="EFFECT"] .node-number-large { border-color: #3a5a2a; color: #8fbb6f; }
+  [data-cluster="RECOGNITION"] .node-number-large { border-color: #2a4a6a; color: #6faadd; }
+  [data-cluster="REPAIR"] .node-number-large { border-color: #6a2a4a; color: #dd6faa; }
+
+  /* ─── SCROLLBAR ─── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #110f0c; }
+  ::-webkit-scrollbar-thumb { background: #3a3328; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--brass-dim); }
+
+  /* ─── EXAMPLES DROPDOWN ─── */
+  .examples-wrapper {
+    position: relative;
+  }
+
+  .examples-btn {
+    width: 100%;
+    padding: 10px 14px;
+    background: #1a1710;
+    border: 1px solid var(--brass-dim);
+    color: var(--brass-light);
+    font-family: 'Source Serif 4', serif;
+    font-size: 0.82rem;
+    cursor: pointer;
+    border-radius: 2px;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s;
+    letter-spacing: 0.04em;
+  }
+
+  .examples-btn:hover {
+    background: #221f18;
+    border-color: var(--brass);
+  }
+
+  .examples-btn .arrow {
+    font-size: 0.6rem;
+    transition: transform 0.2s;
+    color: var(--brass-dim);
+  }
+
+  .examples-btn.open .arrow { transform: rotate(180deg); }
+
+  .examples-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0; right: 0;
+    background: #1a1710;
+    border: 1px solid #3a3328;
+    border-radius: 2px;
+    z-index: 200;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    overflow: hidden;
+  }
+
+  .examples-dropdown.open { display: block; }
+
+  .example-group-label {
+    padding: 8px 14px 4px;
+    font-size: 0.58rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--brass-dim);
+    background: #141210;
+    border-bottom: 1px solid #2a2520;
+  }
+
+  .example-item {
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: background 0.15s;
+    border-bottom: 1px solid #1e1b16;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .example-item:last-child { border-bottom: none; }
+  .example-item:hover { background: #221f18; }
+
+  .example-stability-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 5px;
+  }
+
+  .dot-stable    { background: #2d6a4a; }
+  .dot-stressed  { background: #7a9a40; }
+  .dot-unstable  { background: #e8a020; }
+  .dot-critical  { background: #e06b1a; }
+  .dot-collapse  { background: #c0392b; }
+
+  .example-item-text { flex: 1; }
+
+  .example-name {
+    font-size: 0.82rem;
+    color: var(--parchment);
+    line-height: 1.3;
+  }
+
+  .example-meta {
+    font-size: 0.68rem;
+    color: var(--mist);
+    margin-top: 2px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ─── LOAD FLASH ANIMATION ─── */
+  @keyframes loadFlash {
+    0%   { background: #2a2000; }
+    50%  { background: #3a3010; }
+    100% { background: transparent; }
+  }
+
+  .node-card.loading-flash {
+    animation: fadeSlideIn 0.35s ease, loadFlash 0.6s ease;
+  }
+
+  @media (max-width: 900px) {
+    .app-layout { grid-template-columns: 1fr; }
+    .case-panel { grid-row: auto; border-right: none; border-bottom: 1px solid #2a2520; }
+    .contradiction-grid { grid-template-columns: 1fr; }
+    .report-meta { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-block">
+    <h1>SOoL · MLC Chain Auditor</h1>
+    <div class="subtitle">Structural Ethics &amp; Applied Law Lab · Texas A&amp;M University</div>
+  </div>
+  <div class="header-rule"></div>
+  <div class="header-meta">
+    IRAC+ · v1.0<br>
+    Koepsell 2025
+  </div>
+</header>
+
+<div class="app-layout">
+
+  <!-- ─── SIDEBAR ─── -->
+  <aside class="case-panel">
+
+    <div>
+      <div class="panel-section-title">Load Example</div>
+      <div class="examples-wrapper" id="examples-wrapper">
+        <button class="examples-btn" id="examples-btn" onclick="toggleExamples()">
+          <span>Select a pre-loaded case…</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="examples-dropdown" id="examples-dropdown">
+          <div class="example-group-label">Coherent · Low CD</div>
+          <div class="example-item" onclick="loadExample('valid_contract')">
+            <div class="example-stability-dot dot-stable"></div>
+            <div class="example-item-text">
+              <div class="example-name">Valid Commercial Contract</div>
+              <div class="example-meta">CD: 0 · Stable · All nodes close</div>
+            </div>
+          </div>
+          <div class="example-group-label">Stressed · Moderate CD</div>
+          <div class="example-item" onclick="loadExample('unlawful_search')">
+            <div class="example-stability-dot dot-stressed"></div>
+            <div class="example-item-text">
+              <div class="example-name">Unlawful Search &amp; Seizure</div>
+              <div class="example-meta">CD: 2 · Stressed · Node 1 fails</div>
+            </div>
+          </div>
+          <div class="example-item" onclick="loadExample('naval_warfare')">
+            <div class="example-stability-dot dot-unstable"></div>
+            <div class="example-item-text">
+              <div class="example-name">Naval Warfare — Rescue Refusal</div>
+              <div class="example-meta">CD: 5 · Unstable · IHL correlativity</div>
+            </div>
+          </div>
+          <div class="example-group-label">Critical · High CD</div>
+          <div class="example-item" onclick="loadExample('soviet_showtrial')">
+            <div class="example-stability-dot dot-critical"></div>
+            <div class="example-item-text">
+              <div class="example-name">Soviet Show Trial (1937)</div>
+              <div class="example-meta">CD: 6 · Critical · Fact manipulation</div>
+            </div>
+          </div>
+          <div class="example-item" onclick="loadExample('nazi_nuremberg')">
+            <div class="example-stability-dot dot-collapse"></div>
+            <div class="example-item-text">
+              <div class="example-name">Nazi Racial Laws — Nuremberg</div>
+              <div class="example-meta">CD: 7 · Collapse-Imminent · Recognition collapse</div>
+            </div>
+          </div>
+          <div class="example-group-label">Frontier · AI / Computational Law</div>
+          <div class="example-item" onclick="loadExample('ai_contract')">
+            <div class="example-stability-dot dot-critical"></div>
+            <div class="example-item-text">
+              <div class="example-name">Autonomous AI Contract — Contested Agency</div>
+              <div class="example-meta">CD: 4 · Critical · IAT failure at Node 3</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel-section-title">Case Information</div>
+      <div class="case-input">
+        <label>Case / Scenario Title</label>
+        <input type="text" id="case-title" placeholder="e.g. Naval Warfare — Rescue Refusal" />
+        <label>Fact Situation</label>
+        <textarea id="case-facts" placeholder="Brief description of the operative facts…"></textarea>
+        <label>Applicable Legal Regime(s)</label>
+        <input type="text" id="case-regime" placeholder="e.g. IHL, UNCLOS, Neutrality Law" />
+      </div>
+    </div>
+
+    <div>
+      <div class="panel-section-title">Chain Status</div>
+      <div class="chain-map" id="chain-map-sidebar">
+        <!-- dynamically rendered -->
+      </div>
+    </div>
+
+    <div>
+      <div class="panel-section-title">Contradiction Debt</div>
+      <div class="cd-score-display">
+        <div class="cd-score-label">Active Contradictions</div>
+        <div class="cd-score-value" id="cd-score">0</div>
+        <div class="cd-stability" id="cd-stability">Awaiting audit</div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ─── MAIN ─── -->
+  <main>
+    <div class="main-content" id="main-content">
+
+      <!-- Welcome -->
+      <div class="welcome-state" id="welcome-state">
+        <div class="welcome-glyph">§</div>
+        <div class="welcome-title">Minimum Legal Chain Auditor</div>
+        <div class="welcome-body">
+          Walk each of the 8 MLC nodes in sequence. Assess closure status, identify contradiction types, and record analytical notes. The auditor will generate a structured SOoL report on completion.
+        </div>
+        <button class="start-btn" onclick="startAudit()">Begin Chain Audit</button>
+      </div>
+
+      <!-- Node cards (1–8) -->
+      <div id="node-views">
+        <!-- dynamically rendered -->
+      </div>
+
+    </div>
+
+    <!-- Report -->
+    <div id="report-view">
+      <!-- dynamically rendered -->
+    </div>
+  </main>
+
+</div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────────
+
+const NODES = [
+  {
+    id: 1, cluster: 'AUTHORITY',
+    label: 'Source of Authority',
+    description: 'Identify the entity or instrument that confers the legal power being exercised. The authority must be genuine, institutional, and capable of grounding the norm at Node 2.',
+    contradictions: ['ConferralFailure', 'AuthorityInflation'],
+    prompt: 'Is there a valid, operative source of authority grounding this legal action?'
+  },
+  {
+    id: 2, cluster: 'AUTHORITY',
+    label: 'Norm',
+    description: 'Identify the specific norm (statute, regulation, treaty, customary rule) issued by the authority. The norm must be determinate enough to govern the act.',
+    contradictions: ['ProceduralContradiction', 'TemporalContradiction', 'NormIndeterminacy'],
+    prompt: 'Is there an articulated, determinate norm governing this situation?'
+  },
+  {
+    id: 3, cluster: 'AUTHORITY',
+    label: 'Actor in Role',
+    description: 'Identify the agent acting in a legally recognized role that is properly conferred by the authority and norm. The role must be internally consistent — it cannot simultaneously authorize and prohibit the same conduct.',
+    contradictions: ['RoleContradiction'],
+    prompt: 'Is the actor properly vested in a coherent legal role?'
+  },
+  {
+    id: 4, cluster: 'EFFECT',
+    label: 'Triggering Facts',
+    description: 'Identify the concrete facts that activate the norm. Facts must be genuine, ascertainable, and non-manipulated. Fabricated or suppressed facts destroy chain integrity here.',
+    contradictions: ['FactManipulation', 'TemporalContradiction'],
+    prompt: 'Are the triggering facts real, ascertainable, and sufficient to activate the norm?'
+  },
+  {
+    id: 5, cluster: 'EFFECT',
+    label: 'Legal Act or Omission',
+    description: 'Identify the act or omission performed by the actor in role. This includes legally prohibited omissions — the failure to act where a duty to act exists is itself a legally significant event.',
+    contradictions: ['ProceduralContradiction'],
+    prompt: 'Does a legally cognizable act or omission occur, consistent with the applicable norm?'
+  },
+  {
+    id: 6, cluster: 'RECOGNITION',
+    label: 'Target',
+    description: 'Identify the entity upon whom the legal effect is directed. The target must be legally recognizable as a subject of the effect — recognition cannot be stripped while enforcement continues.',
+    contradictions: ['JurisdictionalContradiction', 'RecognitionFailure', 'RecognitionCollapseUnderEnforcement'],
+    prompt: 'Is the target legally identifiable and recognized as a subject of the legal effect?'
+  },
+  {
+    id: 7, cluster: 'RECOGNITION',
+    label: 'Legal Effect',
+    description: 'Identify the legal effect that attaches — obligation, permission, liability, claim, immunity, or power. Rights claimed here require their Hohfeldian correlative duties; severing them creates a correlativity contradiction.',
+    contradictions: ['RecognitionFailure', 'CorrelativityContradiction', 'SelfUnderminingEffect'],
+    prompt: 'Does the legal effect validly attach to the target, and does the actor honor its correlative duties?'
+  },
+  {
+    id: 8, cluster: 'REPAIR',
+    label: 'Remedy',
+    description: 'Identify the remedy available to address the legal effect or its breach. Structurally available remedies that are politically or institutionally blocked still generate contradiction debt — CD accumulates without discharge.',
+    contradictions: ['RepairFailure', 'RecognitionCollapseUnderEnforcement'],
+    prompt: 'Is a remedy structurally available and practically accessible?'
+  }
+];
+
+const CONTRADICTIONS = {
+  ConferralFailure: {
+    name: 'Conferral Failure',
+    links: '1→3',
+    desc: 'Authority fails to properly vest the actor in role.'
+  },
+  AuthorityInflation: {
+    name: 'Authority Inflation',
+    links: '1→2',
+    desc: 'Authority absorbs the norm; will replaces institutional rule.'
+  },
+  JurisdictionalContradiction: {
+    name: 'Jurisdictional Contradiction',
+    links: '2→6',
+    desc: 'Competing normative regimes claim jurisdiction over the same situation.'
+  },
+  RoleContradiction: {
+    name: 'Role Contradiction',
+    links: 'Node 3',
+    desc: 'The role simultaneously authorizes and prohibits the same conduct.'
+  },
+  ProceduralContradiction: {
+    name: 'Procedural Contradiction',
+    links: '2→5',
+    desc: 'The act required by the norm cannot be performed through the norm\'s own procedures.'
+  },
+  TemporalContradiction: {
+    name: 'Temporal Contradiction',
+    links: '2↔4',
+    desc: 'Bidirectional temporal misalignment between norm and triggering facts.'
+  },
+  RecognitionFailure: {
+    name: 'Recognition Failure',
+    links: '6/7',
+    desc: 'Target or effect fails to achieve required legal recognition.'
+  },
+  CorrelativityContradiction: {
+    name: 'Correlativity Contradiction',
+    links: 'Node 7',
+    desc: 'Rights claimed without their Hohfeldian correlative duties honored.'
+  },
+  RepairFailure: {
+    name: 'Repair Failure',
+    links: 'Node 8',
+    desc: 'Remedy structurally available but blocked or inaccessible.'
+  },
+  FactManipulation: {
+    name: 'Fact Manipulation',
+    links: 'Node 4',
+    desc: 'Triggering facts fabricated, suppressed, or made indeterminate.'
+  },
+  NormIndeterminacy: {
+    name: 'Norm Indeterminacy',
+    links: 'Node 2',
+    desc: 'Norm is ontologically vague; prevents determinate chain closure.'
+  },
+  RecognitionCollapseUnderEnforcement: {
+    name: 'Recognition Collapse',
+    links: '6→8',
+    desc: 'Legal subjecthood stripped while enforcement of obligations continues.'
+  },
+  SelfUnderminingEffect: {
+    name: 'Self-Undermining Effect',
+    links: 'Node 7',
+    desc: 'Legal effect destabilizes the conditions for the system\'s own persistence.'
+  }
+};
+
+const CLUSTERS = ['AUTHORITY', 'EFFECT', 'RECOGNITION', 'REPAIR'];
+const CLUSTER_NODES = { AUTHORITY: [1,2,3], EFFECT: [4,5], RECOGNITION: [6,7], REPAIR: [8] };
+
+// ─── STATE ──────────────────────────────────────────────────────────────────
+
+let state = {
+  currentNode: null,
+  nodes: {},
+  started: false
+};
+
+function initState() {
+  state.nodes = {};
+  NODES.forEach(n => {
+    state.nodes[n.id] = {
+      status: null,
+      notes: '',
+      contradictions: []
+    };
+  });
+}
+
+initState();
+
+// ─── RENDER SIDEBAR ─────────────────────────────────────────────────────────
+
+function renderSidebar() {
+  const map = document.getElementById('chain-map-sidebar');
+  let html = '';
+  let lastCluster = null;
+
+  NODES.forEach(node => {
+    if (node.cluster !== lastCluster) {
+      if (lastCluster) html += '<div class="cluster-divider"></div>';
+      html += `<div class="cluster-label-mini">${node.cluster}</div>`;
+      lastCluster = node.cluster;
+    }
+
+    const ns = state.nodes[node.id];
+    let statusClass = '';
+    if (ns && ns.status === 'pass') statusClass = 'status-pass';
+    else if (ns && ns.status === 'fail') statusClass = 'status-fail';
+    else if (ns && ns.status === 'cond') statusClass = 'status-cond';
+
+    const isActive = state.currentNode === node.id ? 'active-node' : '';
+
+    html += `
+      <div class="chain-node-mini ${statusClass} ${isActive}" onclick="goToNode(${node.id})">
+        <div class="node-num-mini">${node.id}</div>
+        <div class="node-mini-label">${node.label}</div>
+      </div>`;
+  });
+
+  map.innerHTML = html;
+  updateCDScore();
+}
+
+function updateCDScore() {
+  const allSelected = new Set();
+  Object.values(state.nodes).forEach(ns => {
+    ns.contradictions.forEach(c => allSelected.add(c));
+  });
+
+  const count = allSelected.size;
+  const el = document.getElementById('cd-score');
+  const stability = document.getElementById('cd-stability');
+
+  el.textContent = count;
+  el.className = 'cd-score-value';
+
+  if (count === 0) {
+    el.classList.add('low');
+    stability.textContent = 'No contradictions identified';
+  } else if (count <= 2) {
+    el.classList.add('low');
+    stability.textContent = 'Stability: stressed';
+  } else if (count <= 4) {
+    el.classList.add('moderate');
+    stability.textContent = 'Stability: unstable';
+  } else if (count <= 6) {
+    el.classList.add('high');
+    stability.textContent = 'Stability: critical';
+  } else {
+    el.classList.add('critical');
+    stability.textContent = 'Stability: collapse-imminent';
+  }
+}
+
+// ─── START AUDIT ─────────────────────────────────────────────────────────────
+
+function startAudit() {
+  state.started = true;
+  document.getElementById('welcome-state').style.display = 'none';
+  renderNodeViews();
+  goToNode(1);
+}
+
+// ─── RENDER NODE VIEWS ───────────────────────────────────────────────────────
+
+function renderNodeViews() {
+  const container = document.getElementById('node-views');
+  let html = '';
+
+  NODES.forEach(node => {
+    const contradictionChips = node.contradictions.map(cid => {
+      const c = CONTRADICTIONS[cid];
+      return `
+        <div class="contradiction-chip" id="chip-${node.id}-${cid}" onclick="toggleContradiction(${node.id}, '${cid}')">
+          <div class="chip-check" id="check-${node.id}-${cid}">✓</div>
+          <div class="chip-text">
+            <div class="chip-name">${c.name}</div>
+            <div class="chip-links">${c.links} · ${c.desc}</div>
+          </div>
+        </div>`;
+    }).join('');
+
+    html += `
+      <div class="node-card" id="node-card-${node.id}" data-cluster="${node.cluster}">
+        <div class="node-header">
+          <div class="node-number-large">${node.id}</div>
+          <div class="node-title-block">
+            <div class="node-cluster-tag">${node.cluster} CLUSTER · NODE ${node.id} OF 8</div>
+            <div class="node-title">${node.label}</div>
+            <div class="node-description">${node.description}</div>
+          </div>
+        </div>
+
+        <div class="status-section">
+          <div class="section-heading">Chain Closure Status</div>
+          <div class="status-options">
+            <button class="status-btn" id="btn-${node.id}-pass" onclick="setStatus(${node.id}, 'pass')">
+              <span class="status-icon">✓</span>
+              <span>Closes</span>
+            </button>
+            <button class="status-btn" id="btn-${node.id}-cond" onclick="setStatus(${node.id}, 'cond')">
+              <span class="status-icon">◐</span>
+              <span>Conditionally Closes</span>
+            </button>
+            <button class="status-btn" id="btn-${node.id}-fail" onclick="setStatus(${node.id}, 'fail')">
+              <span class="status-icon">✗</span>
+              <span>Fails</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="contradiction-section">
+          <div class="section-heading">Active Contradiction Types</div>
+          <div class="contradiction-grid">${contradictionChips}</div>
+        </div>
+
+        <div class="node-notes">
+          <div class="section-heading">Analytical Notes</div>
+          <textarea
+            placeholder="${node.prompt}"
+            oninput="saveNotes(${node.id}, this.value)"
+            id="notes-${node.id}"
+          ></textarea>
+        </div>
+
+        <div class="node-nav">
+          <button class="nav-btn" onclick="prevNode()" ${node.id === 1 ? 'disabled' : ''}>← Previous</button>
+          <span class="progress-text">NODE ${node.id} / 8</span>
+          ${node.id < 8
+            ? `<button class="nav-btn primary" onclick="nextNode()">Next Node →</button>`
+            : `<button class="nav-btn primary" onclick="generateReport()">Generate Report →</button>`
+          }
+        </div>
+      </div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+// ─── NODE NAVIGATION ─────────────────────────────────────────────────────────
+
+function goToNode(id) {
+  if (!state.started) return;
+  document.querySelectorAll('.node-card').forEach(c => c.classList.remove('visible'));
+  document.getElementById('report-view').classList.remove('visible');
+  document.getElementById('main-content').style.display = 'block';
+
+  const card = document.getElementById(`node-card-${id}`);
+  if (card) {
+    card.classList.add('visible');
+    state.currentNode = id;
+    restoreNodeState(id);
+    renderSidebar();
+  }
+}
+
+function nextNode() {
+  if (state.currentNode < 8) goToNode(state.currentNode + 1);
+}
+
+function prevNode() {
+  if (state.currentNode > 1) goToNode(state.currentNode - 1);
+}
+
+// ─── STATE MUTATIONS ─────────────────────────────────────────────────────────
+
+function setStatus(nodeId, status) {
+  state.nodes[nodeId].status = status;
+  ['pass', 'cond', 'fail'].forEach(s => {
+    const btn = document.getElementById(`btn-${nodeId}-${s}`);
+    btn.className = 'status-btn';
+    if (s === status) {
+      btn.classList.add(`selected-${s}`);
+    }
+  });
+  renderSidebar();
+}
+
+function toggleContradiction(nodeId, cid) {
+  const ns = state.nodes[nodeId];
+  const idx = ns.contradictions.indexOf(cid);
+  if (idx === -1) {
+    ns.contradictions.push(cid);
+    document.getElementById(`chip-${nodeId}-${cid}`).classList.add('selected');
+  } else {
+    ns.contradictions.splice(idx, 1);
+    document.getElementById(`chip-${nodeId}-${cid}`).classList.remove('selected');
+  }
+  updateCDScore();
+}
+
+function saveNotes(nodeId, value) {
+  state.nodes[nodeId].notes = value;
+}
+
+function restoreNodeState(id) {
+  const ns = state.nodes[id];
+  if (ns.status) setStatus(id, ns.status);
+  document.getElementById(`notes-${id}`).value = ns.notes;
+  ns.contradictions.forEach(cid => {
+    document.getElementById(`chip-${id}-${cid}`)?.classList.add('selected');
+  });
+}
+
+// ─── REPORT GENERATION ───────────────────────────────────────────────────────
+
+function generateReport() {
+  const title = document.getElementById('case-title').value || 'Untitled Case';
+  const facts = document.getElementById('case-facts').value || '—';
+  const regime = document.getElementById('case-regime').value || '—';
+
+  const allContradictions = new Set();
+  Object.values(state.nodes).forEach(ns => ns.contradictions.forEach(c => allContradictions.add(c)));
+  const cdCount = allContradictions.size;
+
+  const closures = Object.values(state.nodes).map(n => n.status);
+  const passes = closures.filter(s => s === 'pass').length;
+  const fails = closures.filter(s => s === 'fail').length;
+  const conds = closures.filter(s => s === 'cond').length;
+
+  let stabilityLabel, stabilityColor;
+  if (cdCount === 0 && fails === 0) { stabilityLabel = 'Stable'; stabilityColor = '#7fffd4'; }
+  else if (cdCount <= 2 && fails <= 1) { stabilityLabel = 'Stressed'; stabilityColor = '#b8d485'; }
+  else if (cdCount <= 4 && fails <= 3) { stabilityLabel = 'Unstable'; stabilityColor = var_amber(); }
+  else if (cdCount <= 6) { stabilityLabel = 'Critical'; stabilityColor = '#e06b1a'; }
+  else { stabilityLabel = 'Collapse-Imminent'; stabilityColor = '#c0392b'; }
+
+  function var_amber() { return '#e8a020'; }
+
+  // Chain table rows
+  const chainRows = NODES.map(node => {
+    const ns = state.nodes[node.id];
+    let badgeClass = 'badge-none', badgeText = 'Not assessed';
+    if (ns.status === 'pass') { badgeClass = 'badge-pass'; badgeText = 'CLOSES'; }
+    else if (ns.status === 'fail') { badgeClass = 'badge-fail'; badgeText = 'FAILS'; }
+    else if (ns.status === 'cond') { badgeClass = 'badge-cond'; badgeText = 'CONDITIONAL'; }
+
+    const notesCell = ns.notes ? `<span style="color:#8b7d6b;font-style:italic;">${escHtml(ns.notes)}</span>` : '<span style="color:#3a3328;">—</span>';
+    const contrasList = ns.contradictions.length
+      ? ns.contradictions.map(c => `<span style="color:#e8a020;font-size:0.75rem;">${CONTRADICTIONS[c].name}</span>`).join(', ')
+      : '<span style="color:#3a3328;">—</span>';
+
+    return `
+      <tr>
+        <td style="font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:#8b7d6b;">${node.id}</td>
+        <td class="td-cluster">${node.cluster}</td>
+        <td>${escHtml(node.label)}</td>
+        <td><span class="status-badge ${badgeClass}">${badgeText}</span></td>
+        <td>${contrasList}</td>
+        <td>${notesCell}</td>
+      </tr>`;
+  }).join('');
+
+  // Contradiction inventory
+  const contraItems = [...allContradictions].map((cid, i) => {
+    const c = CONTRADICTIONS[cid];
+    return `
+      <div class="contradiction-item">
+        <div class="contra-num">${String(i+1).padStart(2,'0')}</div>
+        <div class="contra-content">
+          <div class="contra-name">${c.name}</div>
+          <div class="contra-desc">${c.desc}</div>
+          <div class="contra-links">Chain link: ${c.links}</div>
+        </div>
+      </div>`;
+  }).join('');
+
+  // Verdict
+  const verdict = generateVerdict(title, cdCount, fails, conds, passes, [...allContradictions]);
+
+  // Date
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+  const reportHTML = `
+    <div class="report-header">
+      <div>
+        <div class="report-title">SOoL Structural Audit Report</div>
+        <div class="report-title-sub">${escHtml(title)}</div>
+      </div>
+      <div class="report-stamp">
+        <div class="stamp-value" style="color:${stabilityColor};">${cdCount}</div>
+        <div class="stamp-label">Contradiction Debt</div>
+        <div style="margin-top:8px;font-size:0.72rem;font-family:'JetBrains Mono',monospace;color:${stabilityColor};">${stabilityLabel}</div>
+      </div>
+    </div>
+
+    <div class="report-meta">
+      <div class="meta-card">
+        <div class="meta-label">Case / Scenario</div>
+        <div class="meta-value">${escHtml(title)}</div>
+      </div>
+      <div class="meta-card">
+        <div class="meta-label">Legal Regime(s)</div>
+        <div class="meta-value">${escHtml(regime)}</div>
+      </div>
+      <div class="meta-card">
+        <div class="meta-label">Audit Date</div>
+        <div class="meta-value">${dateStr}</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:36px;">
+      <div class="report-section-title">Operative Facts</div>
+      <p style="color:#c8bfb0;font-size:0.9rem;line-height:1.7;font-style:italic;">${escHtml(facts)}</p>
+    </div>
+
+    <div style="margin-bottom:36px;">
+      <div class="report-section-title">MLC Chain Closure Assessment</div>
+      <table class="chain-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Cluster</th>
+            <th>Node</th>
+            <th>Status</th>
+            <th>Contradictions</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>${chainRows}</tbody>
+      </table>
+    </div>
+
+    <div class="contradiction-inventory" style="margin-bottom:36px;">
+      <div class="report-section-title">Contradiction Inventory (${cdCount} type${cdCount !== 1 ? 's' : ''})</div>
+      ${cdCount === 0
+        ? '<div class="empty-note">No contradiction types identified in this audit.</div>'
+        : contraItems
+      }
+    </div>
+
+    <div class="verdict-block">
+      <div class="verdict-label">Structural Verdict</div>
+      <div class="verdict-text">${verdict}</div>
+    </div>
+
+    <div style="margin-bottom:28px;">
+      <div class="report-section-title">SOoL Diagnostic Summary</div>
+      <table class="chain-table">
+        <tbody>
+          <tr><td style="color:#8b7d6b;width:200px;">Nodes Closing</td><td>${passes} of 8</td></tr>
+          <tr><td style="color:#8b7d6b;">Nodes Failing</td><td>${fails} of 8</td></tr>
+          <tr><td style="color:#8b7d6b;">Conditional Closures</td><td>${conds} of 8</td></tr>
+          <tr><td style="color:#8b7d6b;">Contradiction Debt (CD)</td><td style="color:${stabilityColor};">${cdCount} (${stabilityLabel})</td></tr>
+          <tr><td style="color:#8b7d6b;">Stability Level</td><td style="color:${stabilityColor};">${stabilityLabel}</td></tr>
+          <tr><td style="color:#8b7d6b;">External Repair Required</td><td>${(fails >= 3 || cdCount >= 5) ? 'Yes — internal repair mechanisms likely exhausted' : 'No — internal repair may suffice'}</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="report-actions">
+      <button class="nav-btn" onclick="backToChain()">← Revise Audit</button>
+      <button class="nav-btn primary" onclick="printReport()">Export Report</button>
+    </div>
+
+    <div style="margin-top:40px;padding-top:20px;border-top:1px solid #2a2520;font-size:0.72rem;color:#3a3328;font-family:'JetBrains Mono',monospace;">
+      Generated by SOoL MLC Chain Auditor · SEAL Lab, Texas A&amp;M University · Koepsell (2025)
+      A Structural Ontology of the Law, Palgrave (forthcoming) · http://seal.tamu.edu/legal-kernel
+    </div>`;
+
+  document.getElementById('report-view').innerHTML = reportHTML;
+  document.getElementById('main-content').style.display = 'none';
+  document.getElementById('report-view').classList.add('visible');
+  state.currentNode = null;
+  renderSidebar();
+}
+
+function generateVerdict(title, cdCount, fails, conds, passes, contradictionIds) {
+  let parts = [];
+
+  if (fails === 0 && cdCount === 0) {
+    parts.push(`The Minimum Legal Chain closes at all eight nodes without structural contradiction. The legal structure in <em>${escHtml(title)}</em> is coherent in the SOoL sense: authority is properly conferred, norms are determinate, the act conforms to procedure, the target is recognized, the effect attaches, and remedy is accessible.`);
+  } else {
+    const failNodes = NODES.filter(n => state.nodes[n.id].status === 'fail').map(n => `Node ${n.id} (${n.label})`);
+    const condNodes = NODES.filter(n => state.nodes[n.id].status === 'cond').map(n => `Node ${n.id} (${n.label})`);
+
+    if (failNodes.length) {
+      parts.push(`The chain fails to close at ${failNodes.join(', ')}, indicating structural deficiency in the legal architecture.`);
+    }
+    if (condNodes.length) {
+      parts.push(`Conditional closure at ${condNodes.join(', ')} introduces contingent instability that may resolve or compound depending on downstream facts.`);
+    }
+  }
+
+  if (cdCount > 0) {
+    const hasCorrelativity = contradictionIds.includes('CorrelativityContradiction');
+    const hasRepairFailure = contradictionIds.includes('RepairFailure');
+    const hasRoleContradiction = contradictionIds.includes('RoleContradiction');
+
+    parts.push(`${cdCount} contradiction type${cdCount > 1 ? 's are' : ' is'} active.`);
+
+    if (hasCorrelativity) {
+      parts.push(`The correlativity contradiction at Node 7 is structurally significant: the actor cannot claim the rights of a legal regime while refusing the correlative duties that make those rights coherent. This internal contradiction is not resolvable by appeal to the same regime that generates it.`);
+    }
+    if (hasRoleContradiction) {
+      parts.push(`The role contradiction at Node 3 indicates that the actor's role simultaneously authorizes and prohibits the conduct in question. This is an internal incoherence within the authority cluster.`);
+    }
+    if (hasRepairFailure) {
+      parts.push(`Repair failure at Node 8 means contradiction debt accumulates without discharge. Structural instability persists as an ontological condition of the system, independent of whether any tribunal adjudicates the matter.`);
+    }
+  }
+
+  if (cdCount >= 5 || fails >= 3) {
+    parts.push(`The accumulated contradiction debt renders the legal structure ontologically unstable. If unaddressed, the structural conditions for systemic collapse are present. External repair mechanisms may be required.`);
+  } else if (cdCount >= 3 || fails >= 2) {
+    parts.push(`The legal structure is under significant stress. Coherence is compromised but collapse is not yet imminent. Targeted repair at the nodes of failure may restore structural integrity.`);
+  }
+
+  parts.push(`Note: This analysis measures ontological stability, not moral evaluation. A legally coherent structure may be morally monstrous; a structurally contradictory structure may pursue just ends. SOoL provides diagnosis, not prescription.`);
+
+  return parts.join(' ');
+}
+
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function backToChain() {
+  document.getElementById('report-view').classList.remove('visible');
+  document.getElementById('main-content').style.display = 'block';
+  const lastNode = Math.max(...Object.entries(state.nodes)
+    .filter(([,v]) => v.status !== null)
+    .map(([k]) => parseInt(k)));
+  goToNode(isFinite(lastNode) ? lastNode : 8);
+}
+
+function printReport() {
+  window.print();
+}
+
+// ─── EXAMPLES DATA ──────────────────────────────────────────────────────────
+
+const EXAMPLES = {
+
+  valid_contract: {
+    title: 'Valid Commercial Contract — Sale of Goods',
+    facts: 'Two competent adult parties enter a written contract for the sale of 500 units of industrial equipment. Offer, acceptance, and consideration are present. The contract is executed under the Uniform Commercial Code (UCC) Art. 2. Both parties perform. A minor dispute arises over delivery timing; the aggrieved party seeks damages under the contract\'s liquidated damages clause.',
+    regime: 'UCC Article 2 (USA), Common Law Contract',
+    nodes: {
+      1: { status: 'pass', contradictions: [], notes: 'State legislative authority confers UCC; common law backstop. Authority fully operative.' },
+      2: { status: 'pass', contradictions: [], notes: 'UCC Art. 2-601 (perfect tender rule) and Art. 2-714 (damages for breach) both determinate and applicable.' },
+      3: { status: 'pass', contradictions: [], notes: 'Both parties are competent adults acting in their capacity as commercial parties. Roles properly constituted.' },
+      4: { status: 'pass', contradictions: [], notes: 'Late delivery is a concrete, ascertainable fact. Triggering facts satisfied.' },
+      5: { status: 'pass', contradictions: [], notes: 'Breach by late delivery is a legally cognizable act. No prohibited omission issues.' },
+      6: { status: 'pass', contradictions: [], notes: 'Aggrieved buyer is clearly identified. Legal subjecthood uncontested.' },
+      7: { status: 'pass', contradictions: [], notes: 'Liquidated damages clause validly attaches. Legal effect is the obligation to pay damages. No correlativity issues.' },
+      8: { status: 'pass', contradictions: [], notes: 'Damages available under UCC. Courts accessible. Arbitration clause provides alternative mechanism.' }
+    }
+  },
+
+  unlawful_search: {
+    title: 'Unlawful Search & Seizure — Warrantless Home Entry',
+    facts: 'Police officers enter a private residence without a warrant, without consent, and without exigent circumstances. They discover and seize narcotics. The defendant moves to suppress the evidence under the Fourth Amendment exclusionary rule (Mapp v. Ohio, 1961). The prosecution argues inevitable discovery. The officers claim they acted in good faith based on a tip.',
+    regime: 'U.S. Constitutional Law (4th Amendment), Federal Criminal Procedure',
+    nodes: {
+      1: { status: 'fail', contradictions: ['ConferralFailure'], notes: 'The warrant requirement is the mechanism by which the state\'s search authority is conferred onto specific officers for a specific place and time. Without a warrant, no judicial authority was conferred. The officers acted with general police power but not the specific conferral required for a home search. Node 1 fails.' },
+      2: { status: 'pass', contradictions: [], notes: '4th Amendment norm is clear and determinate: warrantless searches of the home are presumptively unreasonable. The norm itself closes.' },
+      3: { status: 'cond', contradictions: ['RoleContradiction'], notes: 'Officers are in the role of law enforcement, but that role requires compliance with the warrant requirement to conduct a home search. Acting without a warrant is internal to the role\'s own normative contradiction: officers have the role-power to seek a warrant but exercised a power the role does not confer without one.' },
+      4: { status: 'pass', contradictions: [], notes: 'The tip and the entry are concrete ascertainable facts. No manipulation.' },
+      5: { status: 'pass', contradictions: [], notes: 'A warrantless entry is a legally cognizable act — cognizable as a constitutional violation.' },
+      6: { status: 'pass', contradictions: [], notes: 'Defendant as homeowner and criminal defendant is clearly identified as the target of both the search and the prosecution.' },
+      7: { status: 'cond', contradictions: ['CorrelativityContradiction'], notes: 'The state claims the right to prosecute using evidence seized. But the seizure violated the constitutional norm whose enforcement gives the prosecution its legitimacy. Claiming prosecution-right while violating the search norm is a correlativity contradiction: the right to evidence is conditioned on lawful acquisition.' },
+      8: { status: 'pass', contradictions: [], notes: 'Exclusionary rule and suppression motion are structurally available and judicially accessible. Remedy closes — the constitutional system has a self-repair mechanism here.' }
+    }
+  },
+
+  naval_warfare: {
+    title: 'Naval Warfare — Sinking & Rescue Refusal Near Neutral Waters',
+    facts: 'A nation that initiated an armed conflict sinks an unarmed enemy warship approximately 11 nautical miles from the territorial sea of a neutral state. After the sinking, the attacking naval commander explicitly refuses to rescue survivors despite the vessel being in distress with surviving crew. The commander invokes operational security as justification. The neutral state protests the proximity of the engagement to its waters.',
+    regime: 'IHL / LOAC, UNCLOS, Hague Convention X, San Remo Manual on Naval Warfare, Jus ad Bellum (UN Charter)',
+    nodes: {
+      1: { status: 'cond', contradictions: ['ConferralFailure'], notes: 'The attacking nation has legitimate belligerent status under IHL for the armed conflict. However, as the war-initiating party, jus ad bellum authority is contested — the source of authority for the entire conflict is itself under challenge. Conditional: IHL in bello authority closes; jus ad bellum authority conditionally fails.' },
+      2: { status: 'cond', contradictions: ['JurisdictionalContradiction'], notes: 'Three normative regimes apply simultaneously: (1) IHL authorises attack on enemy warships; (2) UNCLOS Art. 98 and San Remo Rule 106 mandate rescue of survivors; (3) Neutrality law governs proximity to neutral waters. These regimes are all valid but produce competing normative demands. Jurisdictional contradiction fires at 2→6.' },
+      3: { status: 'cond', contradictions: ['RoleContradiction'], notes: 'The naval commander\'s role under IHL simultaneously authorises the attack AND requires post-engagement rescue. The refusal to rescue is not outside the role — it directly contradicts the normative content of the role itself. Role contradiction at Node 3.' },
+      4: { status: 'pass', contradictions: ['TemporalContradiction'], notes: 'Facts are ascertainable: enemy warship, unarmed, 11nm from neutral coast, survivors in water. However, temporal contradiction fires: the rescue duty attaches immediately upon persons becoming hors de combat, meaning the refusal retroactively affects the lawfulness of the entire engagement.' },
+      5: { status: 'fail', contradictions: ['ProceduralContradiction'], notes: 'Two acts/omissions. (1) The sinking: presumptively lawful act of naval warfare — closes. (2) The rescue refusal: a legally prohibited omission under UNCLOS Art. 98, Hague X Art. 16, San Remo Rule 106. Node 5 FAILS for the rescue chain. The procedural contradiction fires: the rescue procedure is required by the same IHL regime that authorises the attack.' },
+      6: { status: 'cond', contradictions: ['RecognitionFailure'], notes: 'Crew members hors de combat are recognised as protected persons under GC III and AP I Art. 41. Yet they are abandoned. Recognition is asserted by the norm but denied in effect. For the neutrality chain: the neutral state\'s sovereign interest over its 12nm zone is the secondary target — partially recognised.' },
+      7: { status: 'cond', contradictions: ['CorrelativityContradiction'], notes: 'The correlativity contradiction is the structural core of this case. The attacking state claims belligerent privileges under IHL (right to attack) while refusing the correlative duties (rescue) that make those privileges coherent within the IHL regime. Rights and duties under IHL are not severable.' },
+      8: { status: 'cond', contradictions: ['RepairFailure'], notes: 'Remedies exist structurally: ICC jurisdiction, ICJ, UNSC Chapter VII, universal jurisdiction. However, UNSC veto dynamics and state cooperation requirements block practical access. Repair failure fires: CD accumulates without discharge. Structural instability persists as an ontological condition independent of tribunal adjudication.' }
+    }
+  },
+
+  soviet_showtrial: {
+    title: 'Soviet Show Trial — Moscow Trials (1936–38)',
+    facts: 'In the Great Purge, senior Soviet officials including Zinoviev, Kamenev, Bukharin, and Tukhachevsky are charged with treason, sabotage, and conspiracy with foreign powers. Confessions are extracted under torture and psychological coercion. The charges rely on vague statutory language ("enemy of the people," "anti-Soviet activity"). Judges, prosecutors, and defence counsel all operate under explicit Party direction. Several of the accused themselves become investigators of subsequent defendants. Sentences are predetermined. There is no meaningful right of appeal.',
+    regime: 'Soviet Criminal Code (1926), NKVD Special Procedures, Communist Party Directive Law',
+    nodes: {
+      1: { status: 'pass', contradictions: ['AuthorityInflation'], notes: 'Communist Party supremacy formally grounds the authority. However, authority inflation fires: Führerprinzip-equivalent — Stalin\'s will collapses the norm/will distinction. Authority ceases to be institutional and becomes personal. The source formally exists but is ontologically inflated.' },
+      2: { status: 'fail', contradictions: ['NormIndeterminacy', 'ProceduralContradiction'], notes: '"Enemy of the people" is the paradigm of norm indeterminacy: ontologically vague to the point of being unapplicable to determinate facts. The norm cannot anchor determinate chain closure downstream. Procedural contradiction also fires: the criminal procedure code requires independent adjudication, which the Party directive system destroys.' },
+      3: { status: 'fail', contradictions: ['RoleContradiction'], notes: 'Catastrophic role instability. Judges and prosecutors who try defendants today become defendants tomorrow, arbitrarily. Defence counsel are Party appointees with no independence. The role of "judge" is hollowed: it simultaneously requires impartiality (by the code) and Party loyalty (by directive). Role contradiction fires with maximum severity.' },
+      4: { status: 'fail', contradictions: ['FactManipulation'], notes: 'Fact manipulation is the defining feature of the show trial. Confessions fabricated under torture. "Sabotage" evidence manufactured. The triggering facts required to activate the criminal norm are systematically falsified. Node 4 fails completely — chain integrity is destroyed here.' },
+      5: { status: 'cond', contradictions: [], notes: 'The formal acts — trial, verdict, sentencing — occur as legal events. But they rest on the failed nodes above. Conditional: the acts formally happen but are structurally void.' },
+      6: { status: 'cond', contradictions: ['RecognitionCollapseUnderEnforcement'], notes: 'Defendants are recognised as legal subjects for purposes of prosecution and execution, but denied recognition as rights-bearing subjects with procedural protections. The recognition collapse under enforcement fires: the system regulates and punishes persons it refuses to recognise as legally protected subjects.' },
+      7: { status: 'fail', contradictions: ['SelfUnderminingEffect'], notes: 'The legal effect (conviction, execution) is structurally void due to failures at Nodes 2–4. Self-undermining effect fires: purging senior military and party officials destabilises the administrative infrastructure the regime requires for its own persistence (demonstrated by the weakened Red Army in 1941).' },
+      8: { status: 'fail', contradictions: ['RepairFailure'], notes: 'No right of appeal. No independent judiciary. No external mechanism accessible. The remedy node fails completely. Contradiction debt accumulates without any internal discharge mechanism. External repair eventually requires USSR dissolution and post-Soviet rehabilitation proceedings decades later.' }
+    }
+  },
+
+  nazi_nuremberg: {
+    title: 'Nazi Racial Laws — Nuremberg Laws (1935) and Their Application',
+    facts: 'The Nuremberg Laws (Reich Citizenship Law and Law for the Protection of German Blood and German Honour, September 1935) strip Jews, Roma, and other groups of German citizenship, prohibit marriage and sexual relations between Jews and non-Jews, and remove civil service employment rights. These laws are passed through the Reichstag under the Enabling Act (1933), which granted Hitler plenary legislative power. State apparatus — courts, police, bureaucracy — enforces the laws with full institutional efficiency. Victims are simultaneously stripped of legal personhood and subjected to detailed legal regulation.',
+    regime: 'National Socialist German Law, Enabling Act (1933), Nuremberg Laws (1935), International Law (Nuremberg Tribunal 1946)',
+    nodes: {
+      1: { status: 'pass', contradictions: ['AuthorityInflation'], notes: 'The Enabling Act formally confers legislative authority on Hitler. From a purely positivist standpoint, this closes. However, authority inflation fires severely: the Enabling Act collapsed the Reichstag\'s role into the Führer\'s will. The norm/will distinction — essential for institutional authority — is destroyed. Authority is personal, not institutional.' },
+      2: { status: 'pass', contradictions: ['NormIndeterminacy'], notes: 'The Nuremberg Laws are formally articulated statutory norms. They close as legal instruments. However, the concept of "Jewish" required supplementary racial definition decrees that were contested and indeterminate. Partial norm indeterminacy fires in application.' },
+      3: { status: 'pass', contradictions: ['RoleContradiction'], notes: 'Courts, police, and bureaucracy all function in recognisable institutional roles. The system operates with bureaucratic efficiency. However, role contradiction emerges: the judicial role requires impartial application of law, but the racial laws require discriminatory application by design. The role of "judge" is internally contradicted.' },
+      4: { status: 'pass', contradictions: [], notes: 'Triggering facts — racial identity, marriage, employment — are ascertainable (though contested in marginal cases). The chain closes at Node 4 for most applications.' },
+      5: { status: 'pass', contradictions: [], notes: 'Legal acts — citizenship revocation, employment dismissal, criminal prosecution for "racial defilement" — are performed through operative legal machinery. Node 5 closes.' },
+      6: { status: 'fail', contradictions: ['RecognitionFailure', 'RecognitionCollapseUnderEnforcement'], notes: 'This is the structural core of the Nazi contradiction. The laws strip Jewish persons of legal personhood (Reichsbürger status) while continuing to regulate them as legal subjects (imposing duties, prohibitions, criminal liability). Recognition failure fires: targets are denied the subjecthood required for legal effects to validly attach. Recognition collapse under enforcement fires: the system enforces obligations against persons it refuses to recognise as rights-bearing subjects.' },
+      7: { status: 'fail', contradictions: ['CorrelativityContradiction', 'SelfUnderminingEffect'], notes: 'The legal effects (loss of citizenship, criminal liability) cannot validly attach to persons the system refuses to recognise as legal subjects. Correlativity contradiction fires: the state claims enforcement rights while stripping the correlative recognition that makes those rights coherent. Self-undermining effect fires: genocidal expansion progressively destroyed the administrative infrastructure required for the regime\'s own persistence.' },
+      8: { status: 'fail', contradictions: ['RepairFailure'], notes: 'No internal remedy available. The Reichsgericht (Supreme Court) operated within the Nazi framework. No independent constitutional review. External repair required: the Nuremberg Tribunal (1945–46) constituted entirely external repair, validating the SOoL thesis that when internal repair is exhausted, collapse requires external reconstruction. Contradiction debt discharged only post-externally.' }
+    }
+  },
+
+  ai_contract: {
+    title: 'Autonomous AI Contract — Contested Agency (Smart Contract Execution)',
+    facts: 'An autonomous AI system, deployed by a financial services firm, executes a series of derivative contracts on behalf of the firm using a smart contract protocol on a blockchain. The AI was not explicitly authorised to execute contracts above $10M; several executions exceed $50M. The counterparty seeks enforcement. The firm claims the AI lacked authority. The AI\'s decision logic is opaque (black-box model). No human reviewed or approved the transactions in real time. The question arises whether the AI itself, or the firm, or the deploying engineer bears normative accountability under the IAT.',
+    regime: 'Contract Law (UCC / Common Law), Agency Law, Emerging AI Liability Frameworks, Smart Contract Protocol',
+    nodes: {
+      1: { status: 'cond', contradictions: ['ConferralFailure'], notes: 'The firm\'s corporate authority and the deployment agreement ground the authority in principle. However, the AI was not granted authority above $10M. Conferral failure fires: the authority to execute >$10M contracts was never properly conferred to the AI agent. The source of authority closes for sub-threshold contracts; fails for the actual transactions.' },
+      2: { status: 'cond', contradictions: ['NormIndeterminacy'], notes: 'The smart contract protocol encodes the transactional norm. However, the norm governing the AI\'s scope of authority is indeterminate: the deployment agreement does not specify how the $10M limit interacts with autonomous multi-step transactions that aggregate above threshold. Norm indeterminacy fires.' },
+      3: { status: 'fail', contradictions: ['RoleContradiction', 'ConferralFailure'], notes: 'Critical IAT issue. The AI system does not satisfy the Irreversible Accountability Test: it lacks normatively structured standing as a role-bearing agent, cannot bear an attributable breach in the relevant sense, and has no repair capacity. The role of "contracting agent" requires an entity capable of bearing obligations — the AI fails the agency test. Role contradiction fires: the AI is simultaneously treated as an agent (for enforcement purposes) and not-an-agent (for liability purposes). Conferral failure fires: the role was never properly conferred because the entity cannot bear the role.' },
+      4: { status: 'pass', contradictions: [], notes: 'The triggering facts — market conditions, price thresholds, execution events — are real, ascertainable, and recorded on the blockchain with timestamps. Node 4 closes.' },
+      5: { status: 'pass', contradictions: [], notes: 'The contract executions are legally cognizable acts — they occurred, were recorded, and produced real-world financial consequences. The acts close at Node 5 regardless of the authority question.' },
+      6: { status: 'cond', contradictions: ['JurisdictionalContradiction'], notes: 'The counterparty is clearly identified. However, jurisdictional contradiction fires: smart contract protocol law, UCC contract law, and agency law all claim jurisdiction over the same transactions with potentially conflicting results. The target is identifiable; the applicable normative regime is not.' },
+      7: { status: 'cond', contradictions: ['CorrelativityContradiction'], notes: 'The counterparty claims enforcement rights (contract performance). The firm claims the AI lacked authority. Correlativity contradiction fires: the counterparty cannot claim the right to performance while the firm simultaneously denies that a valid obligation was created. The effect is contested at its foundation because the authority chain (Node 1–3) did not close.' },
+      8: { status: 'cond', contradictions: ['RepairFailure'], notes: 'Court-based contract remedies exist in principle. However, the opacity of the AI\'s decision-making (black-box model) makes attribution of breach and determination of damages practically difficult. Partial repair failure fires: remedy is structurally available but practically obstructed by evidentiary and attribution gaps that current law has not resolved.' }
+    }
+  }
+
+};
+
+// ─── LOAD EXAMPLE ────────────────────────────────────────────────────────────
+
+function toggleExamples() {
+  const btn = document.getElementById('examples-btn');
+  const dropdown = document.getElementById('examples-dropdown');
+  btn.classList.toggle('open');
+  dropdown.classList.toggle('open');
+
+  // Close on outside click
+  if (dropdown.classList.contains('open')) {
+    setTimeout(() => {
+      document.addEventListener('click', closeExamplesOnOutside, { once: true });
+    }, 10);
+  }
+}
+
+function closeExamplesOnOutside(e) {
+  const wrapper = document.getElementById('examples-wrapper');
+  if (!wrapper.contains(e.target)) {
+    document.getElementById('examples-btn').classList.remove('open');
+    document.getElementById('examples-dropdown').classList.remove('open');
+  }
+}
+
+function loadExample(key) {
+  const ex = EXAMPLES[key];
+  if (!ex) return;
+
+  // Close dropdown
+  document.getElementById('examples-btn').classList.remove('open');
+  document.getElementById('examples-dropdown').classList.remove('open');
+
+  // Reset state
+  initState();
+
+  // Populate meta fields
+  document.getElementById('case-title').value = ex.title;
+  document.getElementById('case-facts').value = ex.facts;
+  document.getElementById('case-regime').value = ex.regime;
+
+  // Load node data
+  Object.entries(ex.nodes).forEach(([nid, ndata]) => {
+    const id = parseInt(nid);
+    state.nodes[id].status = ndata.status;
+    state.nodes[id].notes = ndata.notes;
+    state.nodes[id].contradictions = [...ndata.contradictions];
+  });
+
+  // Start audit if not started
+  state.started = true;
+  document.getElementById('welcome-state').style.display = 'none';
+  document.getElementById('report-view').classList.remove('visible');
+  document.getElementById('main-content').style.display = 'block';
+
+  // Re-render node views fresh
+  renderNodeViews();
+  goToNode(1);
+
+  // Flash the examples button to confirm load
+  const btn = document.getElementById('examples-btn');
+  btn.querySelector('span').textContent = ex.title.length > 32 ? ex.title.slice(0, 32) + '…' : ex.title;
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+
+renderSidebar();
+</script>
+</body>
+</html>
