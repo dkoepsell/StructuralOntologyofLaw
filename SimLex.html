@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SimLex — Structural Simulation of Law</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#060402; --ink-mid:#100b05; --ink-soft:#1a1208; --ink-panel:rgba(6,4,2,0.96);
+  --brass:#c49020; --brass-dim:#7a5810; --brass-lt:#e0b840; --brass-faint:#221808;
+  --parch:#f0e4c8; --mist:#a89070; --mist-lt:#c8b090; --dim:#5a4a30; --dimmer:#3a2e18;
+  --rule:#2a1e0a; --rust:#cc4422; --rust-lt:#e06040;
+  --forest:#4a8050; --forest-lt:#60aa68; --amber:#cc8822; --cobalt:#3a6aaa;
+}
+html,body{width:100%;height:100%;background:var(--ink);overflow:hidden;font-family:'Crimson Pro',serif}
+#root{width:100%;height:100vh}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--ink-mid)}
+::-webkit-scrollbar-thumb{background:var(--brass-dim);border-radius:2px}
+input[type=range]{-webkit-appearance:none;appearance:none;background:var(--ink-soft);height:3px;border-radius:2px;outline:none;width:100%}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;background:var(--brass);cursor:pointer;border:1px solid var(--brass-lt)}
+input[type=range]::-moz-range-thumb{width:11px;height:11px;border-radius:50%;background:var(--brass);cursor:pointer;border:1px solid var(--brass-lt)}
+.panel{background:var(--ink-panel);border:1px solid var(--rule);border-radius:3px;padding:11px 13px}
+.lbl{font-size:8px;font-family:'JetBrains Mono',monospace;color:var(--mist);letter-spacing:0.10em;text-transform:uppercase;margin-bottom:4px}
+.val{font-size:13px;font-family:'Cormorant Garamond',serif;font-weight:300;color:var(--parch)}
+.mono{font-family:'JetBrains Mono',monospace}
+.serif{font-family:'Cormorant Garamond',serif}
+.verdict-badge{display:inline-block;padding:2px 7px;border-radius:2px;border:1px solid;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:0.08em}
+.v-supported{color:var(--forest-lt);border-color:var(--forest);background:rgba(74,128,80,0.12)}
+.v-weak{color:var(--amber);border-color:var(--amber);background:rgba(204,136,34,0.10)}
+.v-refuted{color:var(--rust-lt);border-color:var(--rust);background:rgba(204,68,34,0.10)}
+.v-running{color:var(--mist);border-color:var(--rule);background:transparent}
+.v-inconclusive{color:var(--amber);border-color:var(--amber);background:rgba(204,136,34,0.10)}
+/* Grain overlay */
+.grain{position:absolute;inset:0;pointer-events:none;opacity:0.35;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E")}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script>
+window.addEventListener('load', function() {
+const {useState,useEffect,useRef,useCallback,createElement:h}=React;
+const THREE=window.THREE;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CONSTANTS
+// ─────────────────────────────────────────────────────────────────────────────
+const WORLD=150, MAX_LINES=280, STEPS_PER_GEN=8;
+
+const MLC_NODES=[
+  {i:0,short:"Auth",  label:"Source of Authority", cluster:"AUTHORITY"},
+  {i:1,short:"Norm",  label:"Norm",                cluster:"AUTHORITY"},
+  {i:2,short:"Actor", label:"Actor in Role",        cluster:"AUTHORITY"},
+  {i:3,short:"Trig",  label:"Triggering Facts",     cluster:"EFFECT"},
+  {i:4,short:"Act",   label:"Legal Act/Omission",   cluster:"EFFECT"},
+  {i:5,short:"Recog", label:"Target/Recognition",   cluster:"RECOGNITION"},
+  {i:6,short:"Eff",   label:"Legal Effect",         cluster:"RECOGNITION"},
+  {i:7,short:"Rem",   label:"Remedy",               cluster:"REPAIR"},
+];
+
+const CT={ // Contradiction types — 13 total, indexed to MLC nodes
+  conferralFailure:       {label:"Conferral Failure",           short:"CF",  nodes:[0,1],     cdW:0.15, col:"#dd4422"},
+  authorityInflation:     {label:"Authority Inflation",         short:"AI",  nodes:[0],        cdW:0.12, col:"#dd6622"},
+  jurisdictionalContra:   {label:"Jurisdictional Contradiction",short:"JC",  nodes:[1],        cdW:0.10, col:"#ddaa22"},
+  roleVacancy:            {label:"Role Vacancy",                short:"RV",  nodes:[2],        cdW:0.08, col:"#bbaa44"},
+  triggeringAmbiguity:    {label:"Triggering Ambiguity",        short:"TA",  nodes:[3],        cdW:0.07, col:"#aabb44"},
+  actEffectMismatch:      {label:"Act–Effect Mismatch",         short:"AE",  nodes:[4],        cdW:0.09, col:"#88bb55"},
+  correlativContradiction:{label:"Correlativity Contradiction", short:"CC",  nodes:[5,6],      cdW:0.14, col:"#44aacc"},
+  recognitionFailure:     {label:"Recognition Failure",         short:"RF",  nodes:[5],        cdW:0.11, col:"#4488cc"},
+  effectNullification:    {label:"Effect Nullification",        short:"EN",  nodes:[6],        cdW:0.10, col:"#5566cc"},
+  repairFailure:          {label:"Repair Failure",              short:"RPF", nodes:[7],        cdW:0.13, col:"#7744cc"},
+  retroactiveContra:      {label:"Retroactive Contradiction",   short:"RC",  nodes:[3,4],      cdW:0.11, col:"#aa44cc"},
+  rechtGesetzRupture:     {label:"Recht/Gesetz Rupture",        short:"RGR", nodes:[0,5,6],    cdW:0.18, col:"#cc4488"},
+  chainSeverance:         {label:"Chain Severance",             short:"CS",  nodes:[0,1,2,3,4,5,6,7],cdW:0.25,col:"#cc2244"},
+};
+
+const ARCHITECTURES={
+  // node weights: [Auth,Norm,Actor,Trig,Act,Recog,Effect,Remedy]
+  // fRate: base denial prob/step  cdMult: CD penalty scaler  repBonus: fulfillment reward scaler
+  // iatSens: how much agent IAT score reduces fRate (0=none, 1=full modulation)
+  ruleOfLaw:    {label:"⚖ Rule of Law",    col:"#c49020", nw:[0.88,0.85,0.80,0.78,0.80,0.78,0.76,0.72], fRate:0.007, cdMult:0.55, repBonus:1.40, iatSens:0.65},
+  positivist:   {label:"§ Positivist",     col:"#8899cc", nw:[0.92,0.90,0.72,0.70,0.72,0.60,0.58,0.40], fRate:0.016, cdMult:0.85, repBonus:0.80, iatSens:0.30},
+  naturalLaw:   {label:"✦ Natural Law",    col:"#88cc88", nw:[0.65,0.68,0.82,0.80,0.75,0.82,0.80,0.80], fRate:0.011, cdMult:0.70, repBonus:1.25, iatSens:0.55},
+  customary:    {label:"⟲ Customary",      col:"#cc9944", nw:[0.75,0.68,0.88,0.78,0.72,0.70,0.65,0.62], fRate:0.019, cdMult:0.80, repBonus:0.95, iatSens:0.45},
+  authoritarian:{label:"⚡ Authoritarian", col:"#cc4444", nw:[0.95,0.93,0.52,0.55,0.72,0.38,0.40,0.18], fRate:0.048, cdMult:1.55, repBonus:0.35, iatSens:0.10},
+  pluralist:    {label:"◈ Pluralist",      col:"#88aacc", nw:[0.80,0.78,0.80,0.78,0.75,0.72,0.70,0.65], fRate:0.013, cdMult:0.72, repBonus:1.15, iatSens:0.60},
+  theocratic:   {label:"☩ Theocratic",     col:"#9966cc", nw:[0.90,0.82,0.62,0.60,0.70,0.50,0.52,0.42], fRate:0.026, cdMult:1.10, repBonus:0.68, iatSens:0.20},
+  collapsed:    {label:"∅ Collapsed",      col:"#665544", nw:[0.20,0.22,0.30,0.28,0.30,0.20,0.22,0.12], fRate:0.095, cdMult:2.20, repBonus:0.15, iatSens:0.05},
+};
+
+const PARAM_SPACE={
+  repairRate:    {label:"Repair Rate",      levels:[0.01,0.06,0.14,0.22], fmt:v=>v.toFixed(3)},
+  chainDecay:    {label:"Chain Decay",      levels:[0.001,0.005,0.015,0.025],fmt:v=>v.toFixed(4)},
+  iatThreshold:  {label:"IAT Threshold",    levels:[0.20,0.40,0.60,0.80], fmt:v=>v.toFixed(2)},
+  detectionSpeed:{label:"Detection Speed",  levels:[0.05,0.20,0.50,0.80],    fmt:v=>v.toFixed(2)},
+};
+
+const DEFAULT_CFG={
+  numAgents:60, obligRadius:40, repairRate:0.06, chainDecay:0.005,
+  iatThreshold:0.50, detectionSpeed:0.30, obligationLife:180,
+  maxObligs:200, externalPressure:0,
+};
+
+const BUILT_IN_HYPS=[
+  {id:"h1",
+   label:"Authoritarian architecture produces 3x higher Contradiction Debt than Rule of Law",
+   cite:"SOoL §4 — Architecture determines structural failure rate, not just failure type",
+   prediction:"Authoritarian avg CD >> Rule of Law avg CD (p<0.01, large effect size)",
+   condA:{arch:"authoritarian",cfg:{},label:"Authoritarian"},
+   condB:{arch:"ruleOfLaw",   cfg:{},label:"Rule of Law"},
+   metric:"debt",direction:1},
+  {id:"h2",
+   label:"Collapsed architecture produces coherence collapse vs. Rule of Law",
+   cite:"SOoL §11 — Structural collapse as qualitative threshold, not quantitative increase",
+   prediction:"Collapsed coherence << Rule of Law coherence (p<0.01)",
+   condA:{arch:"collapsed",   cfg:{},label:"Collapsed"},
+   condB:{arch:"ruleOfLaw",   cfg:{},label:"Rule of Law"},
+   metric:"coherence",direction:-1},
+  {id:"h3",
+   label:"High-IAT agent populations produce lower CD than low-IAT populations",
+   cite:"SOoL §6 — Normative agency capacity (standing+repair+endurance+control) reduces structural failure",
+   prediction:"Population with initialIATMean=0.80 produces lower CD than initialIATMean=0.25 (p<0.05)",
+   condA:{arch:"ruleOfLaw",cfg:{initialIATMean:0.80},label:"High IAT pop (0.80)"},
+   condB:{arch:"ruleOfLaw",cfg:{initialIATMean:0.25},label:"Low IAT pop (0.25)"},
+   metric:"debt",direction:-1},
+  {id:"h4",
+   label:"In Authoritarian systems, CD rise leads coherence decline by k generations",
+   cite:"SOoL §10 — Contradiction Debt as predictive precursor of coherence collapse",
+   prediction:"Peak cross-correlation r>0.35 at lag k=3-12 in Authoritarian architecture",
+   type:"lag",arch:"authoritarian"},
+  {id:"h5",
+   label:"Repair rate dominates chain decay as IRI predictor",
+   cite:"SOoL §5 — Operational repair capacity vs. structural entropy as IRI driver",
+   prediction:"repairRate sensitivity range > chainDecay sensitivity range on IRI",
+   type:"sensitivity",params:["repairRate","chainDecay"],metric:"iri"},
+  {id:"h6",
+   label:"Natural Law outperforms Positivist on IRI due to Repair node advantage",
+   cite:"SOoL §7 — Substantive grounding of Remedy node (Node 8) as resilience differentiator",
+   prediction:"Natural Law IRI > Positivist IRI (p<0.05)",
+   condA:{arch:"naturalLaw",  cfg:{},label:"Natural Law"},
+   condB:{arch:"positivist",  cfg:{},label:"Positivist"},
+   metric:"iri",direction:1},
+  {id:"h7",
+   label:"External pressure collapses Authoritarian coherence but not Pluralist",
+   cite:"SOoL §13 — Structural brittleness under external stress as architecture-dependent",
+   prediction:"At extP=0.70, Authoritarian coherence < Pluralist coherence (p<0.01)",
+   condA:{arch:"authoritarian",cfg:{externalPressure:0.70},label:"Auth P=0.70"},
+   condB:{arch:"pluralist",    cfg:{externalPressure:0.70},label:"Pluralist P=0.70"},
+   metric:"coherence",direction:-1},
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STATISTICS
+// ─────────────────────────────────────────────────────────────────────────────
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const sMean=a=>a.length?a.reduce((s,x)=>s+x,0)/a.length:0;
+const sVar=a=>{if(a.length<2)return 0;const m=sMean(a);return a.reduce((s,x)=>s+(x-m)**2,0)/(a.length-1);};
+const sStd=a=>Math.sqrt(sVar(a));
+const normalCDF=z=>{const t=1/(1+0.2316419*Math.abs(z)),d=0.3989423*Math.exp(-z*z/2);const p=d*t*(0.3193815+t*(-0.3565638+t*(1.7814779+t*(-1.8212560+t*1.3302744))));return z>0?1-p:p;};
+const welchTest=(a,b)=>{
+  if(!a.length||!b.length||a.length<2||b.length<2)return{t:0,p:1,meanA:sMean(a),meanB:sMean(b),n:a.length+b.length,valid:false};
+  const na=a.length,nb=b.length,ma=sMean(a),mb=sMean(b),va=sVar(a),vb=sVar(b);
+  const se=Math.sqrt(va/na+vb/nb)||1e-10;
+  const t=(ma-mb)/se,p=Math.min(1,2*(1-normalCDF(Math.abs(t))));
+  const pSafe=isNaN(p)||!isFinite(p)?0:p;
+  return{t,p:pSafe,meanA:ma,meanB:mb,n:na+nb,valid:true,sdA:sStd(a),sdB:sStd(b)};
+};
+const pearsonR=(x,y)=>{const n=x.length;if(n<3)return 0;const mx=sMean(x),my=sMean(y);let num=0,dx2=0,dy2=0;for(let i=0;i<n;i++){const xi=x[i]-mx,yi=y[i]-my;num+=xi*yi;dx2+=xi**2;dy2+=yi**2;}return num/Math.sqrt(dx2*dy2+1e-10);};
+const lagCorrelation=(s1,s2,maxLag)=>Array.from({length:maxLag+1},(_,lag)=>{const n=Math.min(s1.length,s2.length-lag);if(n<5)return{lag,r:0};return{lag,r:+pearsonR(s1.slice(0,n),s2.slice(lag,lag+n)).toFixed(4)};});
+const mkRng=seed=>{let s=seed>>>0;return()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AGENT
+// ─────────────────────────────────────────────────────────────────────────────
+let _aid=0;
+class Agent{
+  constructor(cfg,pA,pB){
+    this.id=_aid++;
+    const hw=WORLD/2;
+    this.pos=new THREE.Vector3((Math.random()-0.5)*hw*1.6,(Math.random()-0.5)*hw*1.6,(Math.random()-0.5)*hw*1.6);
+    this.vel=new THREE.Vector3((Math.random()-0.5)*0.35,(Math.random()-0.5)*0.35,(Math.random()-0.5)*0.35);
+    const inh=(pa,pb,base,spread)=>pA?clamp((pa+pb)/2+(Math.random()-0.5)*0.12,0,1):clamp(base+(Math.random()-0.5)*spread,0,1);
+    // Core
+    this.legalCoherence=inh(pA?pA.legalCoherence:0,pB?pB.legalCoherence:0,0.72,0.4);
+    this.trust=inh(pA?pA.trust:0,pB?pB.trust:0,0.60,0.4);
+    this.contradictionDebt=pA?0:Math.random()*0.06;
+    // IAT — four necessary conditions; initialIATMean seeds base distribution
+    const iatBase=cfg&&cfg.initialIATMean!=null?cfg.initialIATMean:0.55;
+    this.standing=inh(pA?pA.standing:0,pB?pB.standing:0,iatBase,0.30);
+    this.repairCapacity=inh(pA?pA.repairCapacity:0,pB?pB.repairCapacity:0,iatBase,0.30);
+    this.endurance=inh(pA?pA.endurance:0,pB?pB.endurance:0,iatBase,0.30);
+    this.counterfactualCtrl=inh(pA?pA.counterfactualCtrl:0,pB?pB.counterfactualCtrl:0,iatBase,0.30);
+    this.iatScore=0; this.isNormativeAgent=false;
+    this._updateIAT(cfg?cfg.iatThreshold||0.5:0.5);
+    // Counters
+    this.fulfilled=0; this.denied=0; this.expired=0; this.age=0; this.reprocooldown=0;
+    this.ctCounts={}; for(const k of Object.keys(CT)) this.ctCounts[k]=0;
+    this.dominantCT=null;
+  }
+  _updateIAT(thr){
+    this.iatScore=(this.standing+this.repairCapacity+this.endurance+this.counterfactualCtrl)/4;
+    this.isNormativeAgent=this.iatScore>=thr;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// OBLIGATION — MLC CHAIN
+// ─────────────────────────────────────────────────────────────────────────────
+class Obligation{
+  constructor(issuer,target,archNW){
+    this.issuer=issuer; this.target=target;
+    this.state="active"; this.age=0; this.flashAge=0;
+    this.contradictionType=null;
+    // Node closure weights: architecture base × agent IAT/trust
+    const iatMod=(issuer.iatScore+target.iatScore)/2;
+    const trMod=(issuer.trust+target.trust)/2;
+    this.nw=archNW.map(w=>clamp(w*(0.5+iatMod*0.5)*(0.6+trMod*0.4),0.05,0.98));
+    this.nodeClosed=new Array(8).fill(false);
+  }
+  attemptClose(repairRate,extP){
+    // Each node resolves independently; rate scales the base weight
+    const mult=repairRate*10*(1-extP*0.6);
+    let allClosed=true;
+    for(let i=0;i<8;i++){
+      this.nodeClosed[i]=Math.random()<clamp(this.nw[i]*mult,0,0.98);
+      if(!this.nodeClosed[i]) allClosed=false;
+    }
+    return allClosed?null:this._classify();
+  }
+  _classify(){
+    const f=this.nodeClosed.map((c,i)=>c?-1:i).filter(i=>i>=0);
+    if(f.length>=6) return "chainSeverance";
+    const has=(...ns)=>ns.every(n=>f.includes(n));
+    if(has(0,5,6)) return "rechtGesetzRupture";
+    if(has(0,1))   return "conferralFailure";
+    if(has(5,6))   return "correlativContradiction";
+    if(has(3,4))   return "retroactiveContra";
+    if(has(0))     return "authorityInflation";
+    if(has(1))     return "jurisdictionalContra";
+    if(has(2))     return "roleVacancy";
+    if(has(3))     return "triggeringAmbiguity";
+    if(has(4))     return "actEffectMismatch";
+    if(has(5))     return "recognitionFailure";
+    if(has(6))     return "effectNullification";
+    return "repairFailure";
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SIMULATION
+// ─────────────────────────────────────────────────────────────────────────────
+class Simulation{
+  constructor(){
+    this.architecture="ruleOfLaw";
+    this.agents=[]; this.obligations=[];
+    this.step_count=0; this.generation=0;
+    this.history=[]; this.fullHistory=[];
+    // IRI accumulators
+    this._repairAttempts=0; this._repairSuccesses=0;
+    this._chainAttempts=0; this._chainSuccesses=0;
+    this._dlBuffer=[]; // detection latency samples
+    // Node health (rolling)
+    this.nodeHealth=new Array(8).fill(0.7);
+    this._nAttempts=new Array(8).fill(0);
+    this._nSuccesses=new Array(8).fill(0);
+    // Contradiction totals
+    this.ctTotals={}; for(const k of Object.keys(CT)) this.ctTotals[k]=0;
+    this.stats=this._blankStats();
+    this.cfg={...DEFAULT_CFG};
+  }
+  _blankStats(){
+    return{avgCoherence:0.7,avgTrust:0.6,avgDebt:0.05,avgIAT:0.5,minCoherence:0.5,
+      population:60,issued:0,fulfilled:0,denied:0,expired:0,
+      iriDL:0.5,iriRE:0.5,iriCR:0.7,iriCDScore:0.9,iriComposite:0.5,ctActive:[]};
+  }
+  applyCfg(cfg){
+    this.cfg={...DEFAULT_CFG,...cfg};
+    _aid=0; this.agents=[];
+    for(let i=0;i<this.cfg.numAgents;i++) this.agents.push(new Agent(this.cfg));
+    this.obligations=[];
+  }
+  _archNW(){ return(ARCHITECTURES[this.architecture]||ARCHITECTURES.ruleOfLaw).nw; }
+
+  step(){
+    this.step_count++;
+    const cfg=this.cfg, archNW=this._archNW(), extP=cfg.externalPressure||0;
+
+    // ── Move & update agents
+    for(const a of this.agents){
+      a.pos.add(a.vel);
+      const hw=WORLD/2;
+      if(Math.abs(a.pos.x)>hw) a.vel.x*=-1;
+      if(Math.abs(a.pos.y)>hw) a.vel.y*=-1;
+      if(Math.abs(a.pos.z)>hw) a.vel.z*=-1;
+      a.age++; if(a.reprocooldown>0) a.reprocooldown--;
+      a._updateIAT(cfg.iatThreshold||0.5);
+      // Natural coherence decay
+      a.legalCoherence=clamp(a.legalCoherence-cfg.chainDecay*(1+extP*0.8),0,1);
+      a.contradictionDebt=clamp(a.contradictionDebt-0.0008,0,1);
+      if(a.legalCoherence<0.08){
+        a.legalCoherence=0.35+Math.random()*0.2;
+        a.contradictionDebt=clamp(a.contradictionDebt+0.08,0,1);
+      }
+    }
+
+    // ── Create obligations
+    const ac=this.obligations.filter(o=>o.state==="active").length;
+    if(ac<cfg.maxObligs){
+      for(let i=0;i<this.agents.length;i++){
+        for(let j=i+1;j<this.agents.length;j++){
+          const a=this.agents[i],b=this.agents[j];
+          if(a.pos.distanceTo(b.pos)<cfg.obligRadius&&Math.random()<0.004){
+            const dup=this.obligations.some(o=>o.state==="active"&&((o.issuer===a&&o.target===b)||(o.issuer===b&&o.target===a)));
+            if(!dup){this.obligations.push(new Obligation(a,b,archNW));this.stats.issued++;}
+          }
+        }
+      }
+    }
+
+    // ── Process obligations with MLC chain resolution
+    const nAtD=new Array(8).fill(0), nSuD=new Array(8).fill(0);
+    const archDef=ARCHITECTURES[this.architecture]||ARCHITECTURES.ruleOfLaw;
+    const archFRate=archDef.fRate||0.025, archCDMult=archDef.cdMult||1.0, archRepBonus=archDef.repBonus||1.0, archIATSens=archDef.iatSens||0.0;
+    for(const ob of this.obligations){
+      if(ob.state!=="active"){ob.flashAge++;continue;}
+      ob.age++;
+      const ctType=ob.attemptClose(cfg.repairRate,extP);
+      this._chainAttempts++;
+      if(ctType===null){
+        // Fulfilled — all 8 nodes closed
+        ob.state="fulfilled"; this.stats.fulfilled++; this._chainSuccesses++;
+        this._repairAttempts++; this._repairSuccesses++;
+        ob.issuer.legalCoherence=clamp(ob.issuer.legalCoherence+0.04*archRepBonus,0,1);
+        ob.issuer.trust=clamp(ob.issuer.trust+0.03*archRepBonus,0,1);
+        ob.issuer.contradictionDebt=clamp(ob.issuer.contradictionDebt-0.025*archRepBonus,0,1);
+        ob.target.trust=clamp(ob.target.trust+0.02*archRepBonus,0,1);
+        for(let i=0;i<8;i++){nAtD[i]++;nSuD[i]++;}
+      } else if(ob.age>cfg.obligationLife){
+        ob.state="expired"; this.stats.expired++;
+        ob.contradictionType=ctType;
+        this.ctTotals[ctType]=(this.ctTotals[ctType]||0)+1;
+        ob.issuer.contradictionDebt=clamp(ob.issuer.contradictionDebt+CT[ctType].cdW*0.4*archCDMult,0,1);
+        for(let i=0;i<8;i++){nAtD[i]++;if(ob.nodeClosed[i])nSuD[i]++;}
+      } else {
+        const iatMod=(ob.issuer.iatScore+ob.target.iatScore)/2;
+        const effectiveFRate=archFRate*(1-iatMod*archIATSens)*(1+extP*1.2);
+        if(Math.random()<effectiveFRate){
+        // Denial event
+        ob.state="denied"; this.stats.denied++;
+        ob.contradictionType=ctType;
+        this.ctTotals[ctType]=(this.ctTotals[ctType]||0)+1;
+        const cdw=CT[ctType].cdW*archCDMult;
+        ob.issuer.contradictionDebt=clamp(ob.issuer.contradictionDebt+cdw,0,1);
+        ob.issuer.legalCoherence=clamp(ob.issuer.legalCoherence-cdw*0.45,0,1);
+        ob.issuer.trust=clamp(ob.issuer.trust-0.04,0,1);
+        ob.issuer.ctCounts[ctType]=(ob.issuer.ctCounts[ctType]||0)+1;
+        // Update dominant contradiction type
+        let mk=null,mv=0;
+        for(const k of Object.keys(ob.issuer.ctCounts)){if(ob.issuer.ctCounts[k]>mv){mv=ob.issuer.ctCounts[k];mk=k;}}
+        ob.issuer.dominantCT=mk;
+        for(let i=0;i<8;i++){nAtD[i]++;if(ob.nodeClosed[i])nSuD[i]++;}
+        // Detection latency: did system detect this contradiction?
+        const detected=Math.random()<(cfg.detectionSpeed||0.3);
+        this._dlBuffer.push(detected?Math.round(1/(cfg.detectionSpeed+0.01)):Math.round(4/(cfg.detectionSpeed+0.01)));
+        if(this._dlBuffer.length>60) this._dlBuffer.shift();
+        if(detected) this._repairSuccesses++;
+        }
+      }
+    }
+
+    // Update node health (exponential moving average)
+    for(let i=0;i<8;i++){
+      this._nAttempts[i]=this._nAttempts[i]*0.96+nAtD[i];
+      this._nSuccesses[i]=this._nSuccesses[i]*0.96+nSuD[i];
+      this.nodeHealth[i]=this._nAttempts[i]>0?clamp(this._nSuccesses[i]/this._nAttempts[i],0,1):0.7;
+    }
+
+    this.obligations=this.obligations.filter(o=>!(o.state!=="active"&&o.flashAge>32));
+
+    // ── Compute stats
+    let sC=0,sT=0,sD=0,sI=0,minC=1;
+    for(const a of this.agents){
+      sC+=a.legalCoherence; sT+=a.trust; sD+=a.contradictionDebt; sI+=a.iatScore;
+      if(a.legalCoherence<minC) minC=a.legalCoherence;
+    }
+    const n=Math.max(1,this.agents.length);
+    const avgDebt=sD/n, avgCoherence=sC/n;
+
+    // IRI components
+    const iriDL=this._dlBuffer.length>0?clamp(1-sMean(this._dlBuffer)/12,0,1):0.5;
+    const iriRE=this._repairAttempts>0?clamp(this._repairSuccesses/this._repairAttempts,0,1):0.5;
+    const iriCR=clamp(avgCoherence,0,1);
+    const iriCDScore=clamp(1-avgDebt,0,1);
+    const iriComposite=clamp(iriRE*0.30+iriCR*0.30+iriDL*0.20+iriCDScore*0.20,0,1);
+
+    // Top 5 active contradiction types
+    const ctActive=Object.entries(this.ctTotals).sort((a,b)=>b[1]-a[1]).slice(0,5)
+      .map(([k,v])=>({key:k,count:v,...CT[k]}));
+
+    Object.assign(this.stats,{
+      avgCoherence:+(avgCoherence).toFixed(4),
+      avgTrust:+(sT/n).toFixed(4),
+      avgDebt:+avgDebt.toFixed(4),
+      avgIAT:+(sI/n).toFixed(4),
+      minCoherence:+minC.toFixed(4),
+      population:n,
+      iriDL:+iriDL.toFixed(4), iriRE:+iriRE.toFixed(4),
+      iriCR:+iriCR.toFixed(4), iriCDScore:+iriCDScore.toFixed(4),
+      iriComposite:+iriComposite.toFixed(4),
+      ctActive,
+    });
+
+    if(this.step_count%STEPS_PER_GEN===0){
+      this.generation++;
+      const row={g:this.generation,coherence:+avgCoherence.toFixed(4),debt:+avgDebt.toFixed(4),
+        trust:+(sT/n).toFixed(4),iat:+(sI/n).toFixed(4),iri:+iriComposite.toFixed(4),
+        iriDL:+iriDL.toFixed(4),iriRE:+iriRE.toFixed(4),iriCR:+iriCR.toFixed(4),
+        minCoherence:+minC.toFixed(4),pop:n,arch:this.architecture,
+        fulfilled:this.stats.fulfilled,denied:this.stats.denied};
+      this.history.push(row); this.fullHistory.push(row);
+      if(this.history.length>80) this.history.shift();
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SCIENCE RUNNERS
+// ─────────────────────────────────────────────────────────────────────────────
+const runOneSim=(cfg,arch,depth,seed)=>{
+  const orig=Math.random; Math.random=mkRng(seed);
+  try{
+    const sim=new Simulation();
+    sim.applyCfg({...cfg,numAgents:40}); sim.architecture=arch;
+    for(let i=0;i<depth*STEPS_PER_GEN;i++) sim.step();
+    const s=sim.stats;
+    return{coherence:+s.avgCoherence.toFixed(4),debt:+s.avgDebt.toFixed(4),
+      trust:+s.avgTrust.toFixed(4),iri:+s.iriComposite.toFixed(4),
+      iriDL:+s.iriDL.toFixed(4),iriRE:+s.iriRE.toFixed(4),iriCR:+s.iriCR.toFixed(4),
+      minCoherence:+s.minCoherence.toFixed(4),
+      fulfillRate:s.issued>0?+(s.fulfilled/s.issued).toFixed(4):0};
+  }finally{Math.random=orig;}
+};
+const runOneSimSeries=(cfg,arch,depth,seed)=>{
+  const orig=Math.random; Math.random=mkRng(seed);
+  try{
+    const sim=new Simulation();
+    sim.applyCfg({...cfg,numAgents:40}); sim.architecture=arch;
+    const series=[];
+    for(let i=0;i<depth*STEPS_PER_GEN;i++){
+      sim.step();
+      if(i%STEPS_PER_GEN===0){const s=sim.stats;series.push({g:sim.generation,coherence:s.avgCoherence,debt:s.avgDebt,iri:s.iriComposite,iriDL:s.iriDL,trust:s.avgTrust,minCoherence:s.minCoherence});}
+    }
+    return{series,...sim.stats};
+  }finally{Math.random=orig;}
+};
+const runHypTest=async(hyp,nReps,depth,seed,onProg)=>{
+  if(hyp.type==="lag"){
+    const orig=Math.random; Math.random=mkRng(seed);
+    try{
+      const sim=new Simulation(); sim.applyCfg({...DEFAULT_CFG,numAgents:50}); sim.architecture=hyp.arch||"authoritarian";
+      const debtS=[],coherS=[];
+      for(let i=0;i<depth*5*STEPS_PER_GEN;i++){sim.step();if(i%STEPS_PER_GEN===0){debtS.push(sim.stats.avgDebt);coherS.push(sim.stats.avgCoherence);}}
+      const negDelta=coherS.slice(0,-1).map((c,i)=>c-coherS[i+1]);
+      const maxLag=Math.min(50,Math.floor(debtS.length/5));
+      const lagCorr=lagCorrelation(debtS.slice(0,negDelta.length),negDelta,maxLag);
+      const peak=lagCorr.reduce((b,c)=>c.r>b.r?c:b,{lag:0,r:-Infinity});
+      return{hyp,lagCorr,peak,verdict:peak.r>0.3&&peak.lag>0?"SUPPORTED":peak.r>0.15?"WEAK":"REFUTED",stats:{r:peak.r,lag:peak.lag}};
+    }finally{Math.random=orig;}
+  }
+  if(hyp.type==="sensitivity"){
+    const ranges=[];
+    for(const pk of hyp.params){
+      const levels=(PARAM_SPACE[pk]&&PARAM_SPACE[pk].levels)||[0.02,0.06,0.14];
+      const byLevel=[];
+      for(let li=0;li<levels.length;li++){
+        const runs=[];
+        for(let ri=0;ri<4;ri++) runs.push(runOneSim({...DEFAULT_CFG,[pk]:levels[li]},"pluralist",depth,(seed+li*1000+ri*100)>>>0));
+        byLevel.push({val:levels[li],label:(PARAM_SPACE[pk].fmt||String)(levels[li]),avg:sMean(runs.map(r=>r[hyp.metric]||r.coherence))});
+      }
+      const range=Math.max(...byLevel.map(e=>e.avg))-Math.min(...byLevel.map(e=>e.avg));
+      ranges.push({pk,label:(PARAM_SPACE[pk]&&PARAM_SPACE[pk].label)||pk,range,byLevel});
+      onProg&&onProg(ranges.length,hyp.params.length);
+      await new Promise(r=>setTimeout(r,0));
+    }
+    ranges.sort((a,b)=>b.range-a.range);
+    // Verdict: check whether the FIRST listed param (the predicted dominant) actually wins
+    const predictedWins=ranges.length>=2&&ranges[0].pk===hyp.params[0]&&(ranges[0].range-ranges[1].range)>0.02;
+    return{hyp,ranges,verdict:predictedWins?"SUPPORTED":ranges.length>=2&&(ranges[0].range-ranges[1].range)>0.03?"REFUTED":"INCONCLUSIVE",stats:{dominant:ranges[0]&&ranges[0].label,dominantRange:ranges[0]&&ranges[0].range}};
+  }
+  const valsA=[],valsB=[];
+  for(let i=0;i<nReps;i++){
+    const rA=runOneSim({...DEFAULT_CFG,...(hyp.condA.cfg||{})},hyp.condA.arch,depth,(seed*0x9e3779b9+i*111)>>>0);
+    const rB=runOneSim({...DEFAULT_CFG,...(hyp.condB.cfg||{})},hyp.condB.arch,depth,(seed*0x9e3779b9+i*222+1e6)>>>0);
+    valsA.push(rA[hyp.metric]??rA.coherence); valsB.push(rB[hyp.metric]??rB.coherence);
+    onProg&&onProg(i+1,nReps);
+    if(i%3===2) await new Promise(r=>setTimeout(r,0));
+  }
+  const stats=welchTest(valsA,valsB);
+  const correctDir=hyp.direction>0?stats.meanA>stats.meanB:stats.meanA<stats.meanB;
+  return{hyp,valsA,valsB,stats,verdict:correctDir&&stats.p<0.05?"SUPPORTED":correctDir&&stats.p<0.2?"WEAK":"REFUTED"};
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// EXPORT UTILITIES
+// ─────────────────────────────────────────────────────────────────────────────
+const dlCSV=(rows,filename)=>{
+  if(!rows||!rows.length)return;
+  const keys=Object.keys(rows[0]);
+  const escape=v=>{const s=String(v==null?'':v);return s.includes(',')||s.includes('"')||s.includes('\n')?'"'+s.replace(/"/g,'""')+'"':s;};
+  const blob=new Blob([[keys.join(','),...rows.map(r=>keys.map(k=>escape(r[k])).join(','))].join('\n')],{type:'text/csv'});
+  const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(blob),download:filename});
+  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);
+};
+
+const exportHypResults=(hypResults,builtInHyps)=>{
+  const rows=builtInHyps.map(hyp=>{
+    const res=hypResults[hyp.id];
+    if(!res) return{id:hyp.id,label:hyp.label,type:hyp.type||'welch',verdict:'not_run',condA:'',condB:'',meanA:'',meanB:'',t:'',p:'',n:'',sdA:'',sdB:'',r_peak:'',lag_peak:'',dominantParam:'',dominantRange:''};
+    const r={id:hyp.id,label:hyp.label,cite:hyp.cite,type:hyp.type||'welch',verdict:res.verdict||''};
+    if(res.stats){
+      r.t=res.stats.t!=null?res.stats.t.toFixed(4):'';
+      r.p=res.stats.p!=null?res.stats.p.toFixed(6):'';
+      r.n=res.stats.n||'';
+      r.meanA=res.stats.meanA!=null?res.stats.meanA.toFixed(6):'';
+      r.meanB=res.stats.meanB!=null?res.stats.meanB.toFixed(6):'';
+      r.sdA=res.stats.sdA!=null?res.stats.sdA.toFixed(6):'';
+      r.sdB=res.stats.sdB!=null?res.stats.sdB.toFixed(6):'';
+      r.r_peak=res.stats.r!=null?res.stats.r.toFixed(4):'';
+      r.lag_peak=res.stats.lag!=null?res.stats.lag:'';
+    }
+    r.condA=(hyp.condA&&hyp.condA.label)||hyp.arch||'';
+    r.condB=(hyp.condB&&hyp.condB.label)||'';
+    r.dominantParam=res.stats&&res.stats.dominant?res.stats.dominant:'';
+    r.dominantRange=res.stats&&res.stats.dominantRange!=null?res.stats.dominantRange.toFixed(6):'';
+    if(res.ranges) r.sensitivityDetail=res.ranges.map(rr=>rr.label+'='+rr.range.toFixed(4)).join(' | ');
+    return r;
+  });
+  dlCSV(rows,'SimLex_hypotheses_'+new Date().toISOString().slice(0,10)+'.csv');
+};
+
+const exportTimeSeries=(fullHistory,architecture)=>{
+  if(!fullHistory||!fullHistory.length){alert('No time-series data yet — run the simulation first.');return;}
+  dlCSV(fullHistory,'SimLex_timeseries_'+architecture+'_'+new Date().toISOString().slice(0,10)+'.csv');
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// UI COMPONENTS
+// ─────────────────────────────────────────────────────────────────────────────
+const Btn=({onClick,label,color,small})=>h("button",{onClick,style:{
+  padding:small?"2px 7px":"4px 11px",background:"transparent",cursor:"pointer",fontFamily:"'JetBrains Mono',monospace",
+  border:`1px solid ${color||"#2a1e0a"}`,borderRadius:2,color:color||"#5a4a30",fontSize:small?7.5:8.5,letterSpacing:"0.06em"}},label);
+
+const Pills=({options,val,onChange})=>h("div",{style:{display:"flex",flexWrap:"wrap",gap:3,marginTop:3}},
+  options.map(o=>h("button",{key:o.value,onClick:()=>onChange(o.value),style:{
+    padding:"2px 8px",borderRadius:10,fontSize:8,fontFamily:"'JetBrains Mono',monospace",cursor:"pointer",
+    border:`1px solid ${val===o.value?(o.color||"#c49020"):"#2a1e0a"}`,
+    background:val===o.value?`${o.color||"#c49020"}22`:"transparent",
+    color:val===o.value?(o.color||"#c49020"):"#5a4a30"}},o.label)));
+
+const MiniLine=({data,keys,colors,ht=50})=>{
+  if(!data||data.length<2)return null;
+  const W=220,H=ht,pad=4;
+  const all=keys.flatMap(k=>data.map(d=>d[k]||0));
+  const mn=Math.min(...all),mx=Math.max(...all)||1;
+  const sx=i=>pad+(i/(data.length-1))*(W-pad*2);
+  const sy=v=>H-pad-((v-mn)/(mx-mn||1))*(H-pad*2);
+  return h("svg",{viewBox:`0 0 ${W} ${H}`,style:{width:"100%",height:H,display:"block"}},
+    keys.map((k,ki)=>h("polyline",{key:k,points:data.map((d,i)=>`${sx(i).toFixed(1)},${sy(d[k]||0).toFixed(1)}`).join(" "),fill:"none",stroke:colors[ki],strokeWidth:"1.5",strokeLinejoin:"round"})));
+};
+
+const LagChart=({lagCorr,peak})=>{
+  if(!lagCorr||lagCorr.length<2)return null;
+  const W=360,H=118,pL=32,pB=18,pT=8,pR=8,iW=W-pL-pR,iH=H-pB-pT;
+  const mn=Math.min(-0.05,...lagCorr.map(d=>d.r)),mx=Math.max(0.35,...lagCorr.map(d=>d.r));
+  const sx=i=>pL+i/(lagCorr.length-1)*iW, sy=v=>pT+iH-((v-mn)/(mx-mn||1))*iH;
+  return h("svg",{viewBox:`0 0 ${W} ${H}`,style:{width:"100%",height:H,display:"block"}},
+    h("line",{x1:pL,y1:pT,x2:pL,y2:pT+iH,stroke:"#3a2e18",strokeWidth:0.5}),
+    h("line",{x1:pL,y1:pT+iH,x2:pL+iW,y2:pT+iH,stroke:"#3a2e18",strokeWidth:0.5}),
+    [mn,0,mx].map((v,i)=>h("text",{key:i,x:pL-3,y:sy(v)+3,fontSize:7,fill:"#5a4a30",textAnchor:"end"},v.toFixed(2))),
+    h("line",{x1:pL,y1:sy(0),x2:pL+iW,y2:sy(0),stroke:"#3a2e18",strokeDasharray:"3 2",strokeWidth:0.8}),
+    mx>=0.3?h("line",{x1:pL,y1:sy(0.3),x2:pL+iW,y2:sy(0.3),stroke:"#60aa68",strokeDasharray:"3 2",strokeWidth:0.8}):null,
+    h("polyline",{points:lagCorr.map((d,i)=>`${sx(i).toFixed(1)},${sy(d.r).toFixed(1)}`).join(" "),fill:"none",stroke:"#c49020",strokeWidth:1.8,strokeLinejoin:"round"}),
+    peak?h("circle",{cx:sx(peak.lag),cy:sy(peak.r),r:4,fill:"#cc8822",opacity:0.9}):null,
+    peak?h("text",{x:sx(peak.lag)+6,y:sy(peak.r)-3,fontSize:8,fill:"#cc8822"},`k=${peak.lag}`):null,
+    h("text",{x:pL+iW/2,y:H-2,fontSize:7,fill:"#5a4a30",textAnchor:"middle"},"lag (generations)"));
+};
+
+// MLC Chain Diagram (the centrepiece)
+const MLCChainDiagram=({nodeHealth=[],ctActive=[]})=>{
+  const W=580,H=112,nodeR=20,gap=10;
+  const totalW=8*(nodeR*2)+7*gap, startX=(W-totalW)/2, cy=H/2;
+  const nodeCol=nh=>nh>0.70?"#c49020":nh>0.40?"#cc8822":"#cc4422";
+  const clusters=[
+    {label:"AUTHORITY",  nodes:[0,1,2],col:"#c49020"},
+    {label:"EFFECT",     nodes:[3,4],  col:"#cc8822"},
+    {label:"RECOGNITION",nodes:[5,6],  col:"#4488cc"},
+    {label:"REPAIR",     nodes:[7],    col:"#60aa68"},
+  ];
+  return h("svg",{viewBox:`0 0 ${W} ${H}`,style:{width:"100%",height:H,display:"block"}},
+    clusters.map(cl=>{
+      const xs=cl.nodes.map(ni=>startX+ni*(nodeR*2+gap)+nodeR);
+      const x1=xs[0]-nodeR-5,x2=xs[xs.length-1]+nodeR+5;
+      return h("g",{key:cl.label},
+        h("rect",{x:x1,y:cy-nodeR-16,width:x2-x1,height:nodeR*2+32,rx:3,fill:"transparent",stroke:cl.col,strokeWidth:0.5,strokeDasharray:"4 3",opacity:0.35}),
+        h("text",{x:(x1+x2)/2,y:cy+nodeR+13,fontSize:6.5,fill:cl.col,textAnchor:"middle",fontFamily:"'JetBrains Mono',monospace",letterSpacing:"0.12em",opacity:0.65},cl.label));
+    }),
+    MLC_NODES.slice(0,-1).map((_,i)=>{
+      const x1=startX+i*(nodeR*2+gap)+nodeR*2, x2=startX+(i+1)*(nodeR*2+gap);
+      const mh=Math.min(nodeHealth[i]||0.7,nodeHealth[i+1]||0.7);
+      return h("line",{key:`c${i}`,x1,y1:cy,x2,y2:cy,stroke:nodeCol(mh),strokeWidth:1.2,opacity:0.45});
+    }),
+    // Chain direction arrows
+    MLC_NODES.slice(0,-1).map((_,i)=>{
+      const mx=startX+i*(nodeR*2+gap)+nodeR*2+(startX+(i+1)*(nodeR*2+gap)-startX-i*(nodeR*2+gap)-nodeR*2)/2;
+      const mh=Math.min(nodeHealth[i]||0.7,nodeHealth[i+1]||0.7);
+      return h("text",{key:`ar${i}`,x:mx,y:cy+3,fontSize:6,fill:nodeCol(mh),textAnchor:"middle",opacity:0.4},"›");
+    }),
+    MLC_NODES.map((nd,i)=>{
+      const cx=startX+i*(nodeR*2+gap)+nodeR, nh=nodeHealth[i]||0.7, col=nodeCol(nh);
+      return h("g",{key:`nd${i}`},
+        h("circle",{cx,cy,r:nodeR,fill:`${col}18`,stroke:col,strokeWidth:1.5}),
+        h("text",{x:cx,y:cy-5,fontSize:8.5,fill:col,textAnchor:"middle",fontFamily:"'JetBrains Mono',monospace",fontWeight:"500"},nd.short),
+        h("text",{x:cx,y:cy+7,fontSize:6.5,fill:"#5a4a30",textAnchor:"middle",fontFamily:"'JetBrains Mono',monospace"},(nh*100).toFixed(0)+"%"),
+        h("text",{x:cx,y:cy-nodeR-5,fontSize:6,fill:"#3a2e18",textAnchor:"middle",fontFamily:"'JetBrains Mono',monospace"},i+1));
+    }));
+};
+
+// IRI Panel
+const IRIPanel=({stats})=>{
+  const bars=[
+    {key:"iriDL",    label:"DL",desc:"Detection Latency",col:"#cc8822"},
+    {key:"iriRE",    label:"RE",desc:"Repair Efficiency", col:"#60aa68"},
+    {key:"iriCR",    label:"CR",desc:"Coherence Retention",col:"#c49020"},
+    {key:"iriCDScore",label:"CD",desc:"CD Stability",      col:"#4488cc"},
+  ];
+  const comp=stats.iriComposite||0;
+  const compCol=comp>0.65?"#c49020":comp>0.40?"#cc8822":"#cc4422";
+  return h("div",{className:"panel"},
+    h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:10}},
+      h("span",{className:"lbl",style:{marginBottom:0}},"Institutional Resilience Index"),
+      h("span",{style:{fontSize:22,fontFamily:"'Cormorant Garamond',serif",fontWeight:300,color:compCol}},
+        (comp*100).toFixed(0))
+    ),
+    bars.map(b=>h("div",{key:b.key,style:{marginBottom:5}},
+      h("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:2}},
+        h("span",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:b.col,fontSize:"8.5px"}},
+          b.label+" ",h("span",{style:{color:"#9a8060"}},b.desc)),
+        h("span",{style:{fontSize:9.5,fontFamily:"'JetBrains Mono',monospace",color:b.col,fontWeight:"500"}},
+          ((stats[b.key]||0)*100).toFixed(1)+"%")
+      ),
+      h("div",{style:{height:3,background:"#1a1208",borderRadius:1.5}},
+        h("div",{style:{height:"100%",width:((stats[b.key]||0)*100)+"%",background:b.col,borderRadius:1.5,transition:"width 0.4s"}}))
+    ))
+  );
+};
+
+const VerdictBadge=({v})=>{
+  const cls={SUPPORTED:"v-supported",WEAK:"v-weak",REFUTED:"v-refuted",INCONCLUSIVE:"v-inconclusive"}[v]||"v-running";
+  return h("span",{className:`verdict-badge ${cls}`},v||"—");
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MAIN COMPONENT
+// ─────────────────────────────────────────────────────────────────────────────
+function SimLex(){
+  const mountRef=useRef(null), simRef=useRef(null), archRef=useRef("ruleOfLaw");
+  const pausedRef=useRef(false), speedRef=useRef(1), cancelRef=useRef(false);
+  if(!simRef.current){simRef.current=new Simulation();simRef.current.applyCfg({...DEFAULT_CFG});}
+
+  const[ds,setDs]=useState({...simRef.current.stats,generation:0,nodeHealth:new Array(8).fill(0.7)});
+  const[history,setHistory]=useState([]);
+  const[arch,setArch]=useState("ruleOfLaw");
+  const[paused,setPaused]=useState(false);
+  const[speed,setSpeed]=useState(1);
+  const[cfg,setCfg]=useState({...DEFAULT_CFG});
+  const[showChain,setShowChain]=useState(true);
+  const[showCharts,setShowCharts]=useState(true);
+  const[showScience,setShowScience]=useState(false);
+  const[hypResults,setHypResults]=useState({});
+  const[hypRunning,setHypRunning]=useState(null);
+  const[sciProg,setSciProg]=useState({current:0,total:0});
+  const sciCfg=useRef({seed:42,nReps:12,depth:200});
+
+  const handleArch=useCallback(a=>{archRef.current=a;simRef.current.architecture=a;setArch(a);},[]);
+  const handlePause=useCallback(()=>{const np=!pausedRef.current;pausedRef.current=np;setPaused(np);},[]);
+  const handleReset=useCallback(()=>{
+    simRef.current=new Simulation();
+    simRef.current.applyCfg({...cfg});
+    simRef.current.architecture=archRef.current;
+    setHistory([]);
+  },[cfg]);
+
+  // ── Three.js
+  useEffect(()=>{
+    const el=mountRef.current; if(!el)return;
+    const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+    renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+    renderer.setSize(el.clientWidth,el.clientHeight);
+    renderer.setClearColor(0x060402,1);
+    el.appendChild(renderer.domElement);
+    const scene=new THREE.Scene();
+    const camera=new THREE.PerspectiveCamera(52,el.clientWidth/el.clientHeight,0.1,1000);
+    camera.position.set(0,30,230);
+    scene.add(new THREE.AmbientLight(0xc49020,0.35));
+    const dl=new THREE.DirectionalLight(0xf0e4c8,0.9);
+    dl.position.set(1,1,1); scene.add(dl);
+    const dl2=new THREE.DirectionalLight(0x4488cc,0.3);
+    dl2.position.set(-1,-0.5,0.5); scene.add(dl2);
+
+    // Agents — instanced mesh
+    const agGeo=new THREE.SphereGeometry(1.1,7,7);
+    const agMat=new THREE.MeshPhongMaterial({shininess:40});
+    const maxAg=300;
+    const iMesh=new THREE.InstancedMesh(agGeo,agMat,maxAg);
+    iMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    scene.add(iMesh);
+
+    // Obligation lines
+    const lPos=new Float32Array(MAX_LINES*6), lCol=new Float32Array(MAX_LINES*6);
+    const lGeo=new THREE.BufferGeometry();
+    lGeo.setAttribute("position",new THREE.BufferAttribute(lPos,3));
+    lGeo.setAttribute("color",new THREE.BufferAttribute(lCol,3));
+    const lMat=new THREE.LineBasicMaterial({vertexColors:true,opacity:0.35,transparent:true});
+    const lObj=new THREE.LineSegments(lGeo,lMat);
+    scene.add(lObj);
+
+    const colorOf=c=>{
+      if(c>0.70) return new THREE.Color(0xc49020);
+      if(c>0.45) return new THREE.Color(0xcc8822);
+      return new THREE.Color(0xcc4422);
+    };
+    const dummy=new THREE.Object3D();
+    let frame=0,animId;
+
+    const animate=()=>{
+      animId=requestAnimationFrame(animate);
+      if(!pausedRef.current) for(let i=0;i<speedRef.current;i++) simRef.current.step();
+      const agents=simRef.current.agents;
+      const n=Math.min(agents.length,maxAg);
+      for(let i=0;i<n;i++){
+        const a=agents[i];
+        dummy.position.copy(a.pos);
+        const sc=a.isNormativeAgent?2.0:1.1;
+        dummy.scale.set(sc,sc,sc);
+        dummy.updateMatrix();
+        iMesh.setMatrixAt(i,dummy.matrix);
+        iMesh.setColorAt(i,colorOf(a.legalCoherence));
+      }
+      iMesh.count=n;
+      iMesh.instanceMatrix.needsUpdate=true;
+      if(iMesh.instanceColor) iMesh.instanceColor.needsUpdate=true;
+
+      const obligs=simRef.current.obligations.filter(o=>o.state!=="expired"&&o.issuer&&o.target);
+      const nl=Math.min(obligs.length,MAX_LINES);
+      for(let i=0;i<nl;i++){
+        const ob=obligs[i], off=i*6;
+        lPos[off]=ob.issuer.pos.x;lPos[off+1]=ob.issuer.pos.y;lPos[off+2]=ob.issuer.pos.z;
+        lPos[off+3]=ob.target.pos.x;lPos[off+4]=ob.target.pos.y;lPos[off+5]=ob.target.pos.z;
+        const c=ob.state==="fulfilled"?[0.77,0.56,0.13]:ob.state==="denied"?[0.80,0.27,0.13]:[0.35,0.26,0.12];
+        for(let j=0;j<6;j+=3){lCol[off+j]=c[0];lCol[off+j+1]=c[1];lCol[off+j+2]=c[2];}
+      }
+      lGeo.setDrawRange(0,nl*2);
+      lGeo.attributes.position.needsUpdate=true;
+      lGeo.attributes.color.needsUpdate=true;
+
+      // Slow orbital camera
+      frame++;
+      camera.position.x=Math.sin(frame*0.0015)*230;
+      camera.position.z=Math.cos(frame*0.0015)*230;
+      camera.position.y=30+Math.sin(frame*0.0007)*20;
+      camera.lookAt(0,0,0);
+      renderer.render(scene,camera);
+
+      if(frame%8===0){
+        setDs({...simRef.current.stats,generation:simRef.current.generation,nodeHealth:[...simRef.current.nodeHealth]});
+        setHistory([...simRef.current.history]);
+      }
+    };
+    animate();
+
+    const onResize=()=>{
+      camera.aspect=el.clientWidth/el.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(el.clientWidth,el.clientHeight);
+    };
+    window.addEventListener("resize",onResize);
+    return()=>{cancelAnimationFrame(animId);window.removeEventListener("resize",onResize);renderer.dispose();if(el.contains(renderer.domElement))el.removeChild(renderer.domElement);};
+  },[]);
+
+  const runHyp=useCallback(async hyp=>{
+    setHypRunning(hyp.id); cancelRef.current=false;
+    const res=await runHypTest(hyp,sciCfg.current.nReps,sciCfg.current.depth,sciCfg.current.seed,(c,t)=>setSciProg({current:c,total:t}));
+    setHypResults(r=>({...r,[hyp.id]:res}));
+    setHypRunning(null);
+  },[]);
+
+  const archOpts=Object.entries(ARCHITECTURES).map(([k,v])=>({value:k,label:v.label,color:v.col}));
+  const archCol=(ARCHITECTURES[arch]&&ARCHITECTURES[arch].col)||"#c49020";
+
+  // ── IAT population averages
+  const iatAvgs=["standing","repairCapacity","endurance","counterfactualCtrl"].map(k=>
+    sMean((simRef.current.agents||[]).map(a=>a[k]||0)));
+  const normativeCount=(simRef.current.agents||[]).filter(a=>a.isNormativeAgent).length;
+
+  // ── PARAMS list
+  const PARAMS=[
+    {k:"repairRate",      label:"Repair Rate",      min:0.01,max:0.20,step:0.01},
+    {k:"chainDecay",      label:"Chain Decay",       min:0.001,max:0.020,step:0.001},
+    {k:"iatThreshold",    label:"IAT Threshold",     min:0.10,max:0.90,step:0.05},
+    {k:"externalPressure",label:"Ext. Pressure",     min:0,max:1,step:0.05},
+  ];
+
+  return h("div",{style:{position:"relative",width:"100%",height:"100vh",overflow:"hidden"}},
+
+    // Three.js canvas mount
+    h("div",{ref:mountRef,style:{position:"absolute",inset:0}}),
+    h("div",{className:"grain"}),
+
+    // ── TITLE STRIP (top center)
+    h("div",{style:{position:"absolute",top:14,left:"50%",transform:"translateX(-50%)",zIndex:10,textAlign:"center",pointerEvents:"none"}},
+      h("div",{style:{fontSize:7,fontFamily:"'JetBrains Mono',monospace",color:"#7a5810",letterSpacing:"0.3em",marginBottom:2}},"SIMLEX · v1"),
+      h("div",{style:{fontSize:20,fontFamily:"'Cormorant Garamond',serif",fontWeight:300,color:"#f0e4c8",letterSpacing:"0.06em"}},
+        "Structural Simulation ",h("em",{style:{fontStyle:"italic",color:"#c49020"}},"of Law")),
+      h("div",{style:{fontSize:11,fontFamily:"'Crimson Pro',serif",fontStyle:"italic",color:"#a89070"}},"A Structural Ontology of the Law · Koepsell (Palgrave)"),
+    ),
+
+    // ── LEFT PANEL
+    h("div",{style:{position:"absolute",top:14,left:14,width:238,display:"flex",flexDirection:"column",gap:7,maxHeight:"calc(100vh - 28px)",overflowY:"auto",zIndex:10}},
+
+      // Architecture selector
+      h("div",{className:"panel"},
+        h("div",{className:"lbl",style:{marginBottom:6}},"Legal Architecture"),
+        h(Pills,{options:archOpts,val:arch,onChange:handleArch}),
+        h("div",{style:{marginTop:7,fontSize:8.5,fontFamily:"'Crimson Pro',serif",fontStyle:"italic",color:archCol}},
+          ARCHITECTURES[arch]&&ARCHITECTURES[arch].label),
+      ),
+
+      // Controls
+      h("div",{className:"panel"},
+        h("div",{className:"lbl",style:{marginBottom:6}},"Simulation Controls"),
+        h("div",{style:{display:"flex",gap:5,marginBottom:8}},
+          h(Btn,{onClick:handlePause,label:paused?"▶ Resume":"⏸ Pause",color:paused?"#60aa68":"#cc8822"}),
+          h(Btn,{onClick:handleReset,label:"↺ Reset",color:"#3a2e18"}),
+        ),
+        h("div",{style:{marginBottom:9}},
+          h("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:2}},
+            h("span",{className:"lbl",style:{marginBottom:0}},"Speed"),
+            h("span",{style:{fontSize:9,fontFamily:"'JetBrains Mono',monospace",color:"#c49020"}},speed+"×")),
+          h("input",{type:"range",min:1,max:8,step:1,value:speed,onChange:e=>{const s=parseInt(e.target.value);speedRef.current=s;setSpeed(s);}})
+        ),
+        PARAMS.map(({k,label,min,max,step})=>{
+          const v=cfg[k]||DEFAULT_CFG[k];
+          return h("div",{key:k,style:{marginBottom:6}},
+            h("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:2}},
+              h("span",{className:"lbl",style:{marginBottom:0}},label),
+              h("span",{style:{fontSize:9,fontFamily:"'JetBrains Mono',monospace",color:"#e0b840"}},typeof v==="number"?v.toFixed(3):"")),
+            h("input",{type:"range",min,max,step,value:v,onChange:e=>{const nv=parseFloat(e.target.value);setCfg(c=>({...c,[k]:nv}));simRef.current.cfg[k]=nv;}}));
+        })
+      ),
+
+      // IAT Panel
+      h("div",{className:"panel"},
+        h("div",{className:"lbl",style:{marginBottom:5}},"IAT · Normative Agency Test"),
+        h("div",{style:{fontSize:7.5,fontFamily:"'JetBrains Mono',monospace",color:"#3a2e18",marginBottom:8,lineHeight:1.6,fontStyle:"italic"}},
+          "IAT(E): standing + attributable breach + enduring residue + repair capacity + counterfactual control"),
+        [
+          {label:"Standing",              val:iatAvgs[0],col:"#c49020"},
+          {label:"Repair Capacity",       val:iatAvgs[1],col:"#60aa68"},
+          {label:"Enduring Residue",      val:iatAvgs[2],col:"#cc8822"},
+          {label:"Counterfactual Ctrl",   val:iatAvgs[3],col:"#4488cc"},
+        ].map(({label,val,col})=>h("div",{key:label,style:{marginBottom:5}},
+          h("div",{style:{display:"flex",justifyContent:"space-between"}},
+            h("span",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:col}},label),
+            h("span",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:col}},(val*100).toFixed(1)+"%")),
+          h("div",{style:{height:3,background:"#1a1208",borderRadius:1.5,marginTop:2}},
+            h("div",{style:{height:"100%",width:(val*100)+"%",background:col,borderRadius:1.5,transition:"width 0.5s"}}))
+        )),
+        h("div",{style:{marginTop:8,paddingTop:7,borderTop:"1px solid #1a1208",display:"flex",justifyContent:"space-between",alignItems:"center"}},
+          h("span",{style:{fontSize:9,fontFamily:"'JetBrains Mono',monospace",color:"#7a6040"}},"Normative agents"),
+          h("span",{style:{fontSize:14,fontFamily:"'Cormorant Garamond',serif",fontWeight:300,color:"#e0b840"}},
+            normativeCount+"/"+(simRef.current.agents||[]).length))
+      ),
+
+      // Science Hub button
+      h("div",{className:"panel",style:{cursor:"pointer",textAlign:"center",padding:"8px 12px"},onClick:()=>setShowScience(true)},
+        h("span",{style:{fontSize:11.5,fontFamily:"'Crimson Pro',serif",color:"#c49020",letterSpacing:"0.04em"}},"⚖ Science Hub — Test Hypotheses"))
+    ),
+
+    // ── RIGHT PANEL
+    h("div",{style:{position:"absolute",top:14,right:14,width:238,display:"flex",flexDirection:"column",gap:7,zIndex:10}},
+
+      // System state
+      h("div",{className:"panel"},
+        h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:8}},
+          h("span",{className:"lbl",style:{marginBottom:0}},"System State"),
+          h("span",{style:{fontSize:11,fontFamily:"'JetBrains Mono',monospace",color:"#5a4a30"}},"gen "+ds.generation)
+        ),
+        [
+          {label:"Legal Coherence",   val:ds.avgCoherence||0,   col:"#c49020"},
+          {label:"Contradiction Debt",val:ds.avgDebt||0,         col:"#cc4422"},
+          {label:"Trust",             val:ds.avgTrust||0,         col:"#60aa68"},
+          {label:"Avg IAT Score",     val:ds.avgIAT||0,           col:"#cc8822"},
+        ].map(({label,val,col})=>h("div",{key:label,style:{marginBottom:6}},
+          h("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:2}},
+            h("span",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#5a4a30"}},label),
+            h("span",{style:{fontSize:12,fontFamily:"'Cormorant Garamond',serif",fontWeight:300,color:col}},(val*100).toFixed(1)+"%")),
+          h("div",{style:{height:2.5,background:"#1a1208",borderRadius:1.5}},
+            h("div",{style:{height:"100%",width:(Math.min(1,val)*100)+"%",background:col,borderRadius:1.5,transition:"width 0.3s"}}))
+        )),
+        h("div",{style:{marginTop:6,paddingTop:5,borderTop:"1px solid #1a1208",display:"flex",justifyContent:"space-between"}},
+          h("span",{style:{fontSize:8.5,fontFamily:"'JetBrains Mono',monospace",color:"#7a6040"}},"Obligations"),
+          h("span",{style:{fontSize:10,fontFamily:"'JetBrains Mono',monospace",color:"#c8a860"}},
+            "✓ "+ds.fulfilled+"  ✗ "+ds.denied+"  ∅ "+ds.expired))
+      ),
+
+      h(IRIPanel,{stats:ds}),
+
+      // Active contradiction types
+      ds.ctActive&&ds.ctActive.length>0&&h("div",{className:"panel"},
+        h("div",{className:"lbl",style:{marginBottom:6}},"Active Contradiction Types"),
+        (ds.ctActive||[]).slice(0,5).map(ct=>h("div",{key:ct.key,style:{
+          display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4,
+          padding:"3px 7px",background:"#0f0b0525",borderRadius:2,borderLeft:`2px solid ${ct.col}`}},
+          h("span",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:ct.col,minWidth:28}},ct.short),
+          h("span",{style:{fontSize:7,fontFamily:"'JetBrains Mono',monospace",color:"#5a4a30",flex:1,marginLeft:6,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}},ct.label),
+          h("span",{style:{fontSize:9,fontFamily:"'JetBrains Mono',monospace",color:"#a89070"}},ct.count)))
+      )
+    ),
+
+    // ── SPARKLINES (bottom-right, above chain)
+    showCharts&&history.length>3&&h("div",{style:{position:"absolute",bottom:showChain?145:16,right:14,width:238,zIndex:10,...{background:"rgba(6,4,2,0.96)",border:"1px solid #2a1e0a",borderRadius:3,padding:"10px 13px"}}}),
+    showCharts&&history.length>3&&h("div",{className:"panel",style:{position:"absolute",bottom:showChain?145:16,right:14,width:238,zIndex:10}},
+      h("div",{className:"lbl",style:{marginBottom:5}},"History"),
+      ...[
+        {title:"Coherence · Debt",   keys:["coherence","debt"],   cols:["#c49020","#cc4422"]},
+        {title:"IRI Composite",      keys:["iri"],                 cols:["#cc8822"]},
+        {title:"Trust · IAT",        keys:["trust","iat"],         cols:["#60aa68","#4488cc"]},
+      ].map(({title,keys,cols})=>h("div",{key:title,style:{marginBottom:7}},
+        h("div",{style:{fontSize:8.5,fontFamily:"'JetBrains Mono',monospace",color:"#6a5a3a",marginBottom:2}},title),
+        h(MiniLine,{data:history,keys,colors:cols})))
+    ),
+
+    // ── MLC CHAIN PANEL (bottom center)
+    showChain&&h("div",{className:"panel",style:{position:"absolute",bottom:14,left:"50%",transform:"translateX(-50%)",width:640,zIndex:10}},
+      h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:7}},
+        h("div",{style:{fontSize:9,fontFamily:"'JetBrains Mono',monospace",color:"#a89070",letterSpacing:"0.10em",textTransform:"uppercase",marginBottom:0}},"Minimum Legal Chain — Node Health"),
+        h("div",{style:{display:"flex",alignItems:"center",gap:8}},
+          h("span",{style:{fontSize:9,fontFamily:"'JetBrains Mono',monospace",color:archCol}},
+            ARCHITECTURES[arch]&&ARCHITECTURES[arch].label),
+          h(Btn,{onClick:()=>setShowChain(false),label:"−",small:true,color:"#3a2e18"})
+        )
+      ),
+      h(MLCChainDiagram,{nodeHealth:ds.nodeHealth||new Array(8).fill(0.7),ctActive:ds.ctActive||[],arch})
+    ),
+    !showChain&&h("button",{onClick:()=>setShowChain(true),style:{
+      position:"absolute",bottom:14,left:"50%",transform:"translateX(-50%)",zIndex:10,
+      background:"rgba(6,4,2,0.96)",border:"1px solid #2a1e0a",borderRadius:3,padding:"4px 16px",
+      cursor:"pointer",fontFamily:"'JetBrains Mono',monospace",fontSize:8,color:"#7a5810",letterSpacing:"0.1em"
+    }},"⊶ Show MLC Chain"),
+
+    // ── SCIENCE HUB OVERLAY
+    showScience&&h("div",{style:{position:"fixed",inset:0,background:"rgba(3,2,1,0.97)",zIndex:50,overflowY:"auto",padding:24}},
+      h("div",{style:{maxWidth:780,margin:"0 auto"}},
+        h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-end",marginBottom:20,borderBottom:"1px solid #2a1e0a",paddingBottom:14}},
+          h("div",null,
+            h("div",{style:{fontSize:7.5,fontFamily:"'JetBrains Mono',monospace",color:"#7a5810",letterSpacing:"0.25em",marginBottom:4}},"SIMLEX · SCIENCE HUB"),
+            h("div",{style:{fontSize:24,fontFamily:"'Cormorant Garamond',serif",fontWeight:300,color:"#f0e4c8"}},"Structural Hypotheses"),
+            h("div",{style:{fontSize:12,fontFamily:"'Crimson Pro',serif",fontStyle:"italic",color:"#a89070"}},"Derived from A Structural Ontology of the Law — Koepsell (Palgrave, forthcoming)")),
+          h("div",{style:{display:"flex",gap:6,alignItems:"center"}},
+            h(Btn,{onClick:()=>exportHypResults(hypResults,BUILT_IN_HYPS),label:"⬇ Hypotheses CSV",color:"#c49020"}),
+            h(Btn,{onClick:()=>exportTimeSeries(simRef.current.fullHistory,arch),label:"⬇ Time-Series CSV",color:"#60aa68"}),
+            h(Btn,{onClick:()=>setShowScience(false),label:"✕ Close",color:"#cc4422"})
+          )
+        ),
+
+        h("div",{style:{marginBottom:18,padding:"10px 14px",background:"#0f0b05",border:"1px solid #1a1208",borderRadius:3}},
+          h("div",{style:{fontSize:9,fontFamily:"'JetBrains Mono',monospace",color:"#7a5810",letterSpacing:"0.1em",marginBottom:5}},"HOW TO READ RESULTS"),
+          h("div",{style:{fontSize:9,fontFamily:"'Crimson Pro',serif",color:"#a89070",lineHeight:1.7}},
+            "Each hypothesis is run as an agent-based experiment — the two conditions simulated in parallel, with Welch t-test on the output metric. Lag analysis tests whether Contradiction Debt at time ",h("em",null,"t"),
+            " predicts coherence decline at ",h("em",null,"t+k"),". Sensitivity tests rank which parameters drive the most IRI variance. ",
+            h("strong",{style:{color:"#c49020"}},"SUPPORTED"),": p<0.05, correct direction. ",
+            h("strong",{style:{color:"#cc8822"}},"WEAK"),": p<0.20. ",
+            h("strong",{style:{color:"#cc4422"}},"REFUTED"),": p≥0.20 or wrong direction.")
+        ),
+
+        ...BUILT_IN_HYPS.map(hyp=>{
+          const res=hypResults[hyp.id], running=hypRunning===hyp.id;
+          return h("div",{key:hyp.id,className:"panel",style:{marginBottom:12}},
+            h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}},
+              h("div",{style:{flex:1}},
+                h("div",{style:{fontSize:12,fontFamily:"'Crimson Pro',serif",color:"#c8b090",marginBottom:4}},hyp.label),
+                h("div",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#7a5810",marginBottom:4}},hyp.cite),
+                h("div",{style:{fontSize:8.5,fontFamily:"'Crimson Pro',serif",fontStyle:"italic",color:"#5a4a30"}},hyp.prediction)),
+              h("div",{style:{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:6,marginLeft:14}},
+                res&&h(VerdictBadge,{v:res.verdict}),
+                h(Btn,{onClick:()=>!running&&runHyp(hyp),label:running?"Running…":"▶ Run",color:running?"#cc8822":"#c49020",small:true}))
+            ),
+            running&&h("div",{style:{marginTop:8,fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#cc8822"}},
+              "Simulating… "+sciProg.current+" / "+sciProg.total+" runs"),
+            res&&!running&&h("div",{style:{marginTop:10,paddingTop:8,borderTop:"1px solid #1a1208"}},
+              // Lag result
+              res.lagCorr&&h("div",null,
+                h("div",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#a89070",marginBottom:4}},
+                  `Peak r=${res.stats&&res.stats.r?res.stats.r.toFixed(4):"—"} at k=${res.stats&&res.stats.lag?res.stats.lag:"—"} generations`),
+                h(LagChart,{lagCorr:res.lagCorr,peak:res.peak})),
+              // Sensitivity result
+              res.ranges&&h("div",null,
+                res.ranges.map(r=>h("div",{key:r.pk,style:{marginBottom:4}},
+                  h("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:2}},
+                    h("span",{style:{fontSize:8.5,fontFamily:"'JetBrains Mono',monospace",color:"#c49020"}},r.label),
+                    h("span",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#a89070"}},"sensitivity range: "+r.range.toFixed(4))),
+                  h("div",{style:{height:3,background:"#1a1208",borderRadius:1.5}},
+                    h("div",{style:{height:"100%",width:(r.range/(res.ranges[0].range||0.01)*100)+"%",background:"#c49020",borderRadius:1.5}})))
+              )),
+              // A vs B result
+              !res.lagCorr&&!res.ranges&&res.stats&&h("div",null,
+                h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:8}},
+                  [{k:"A",v:res.stats.meanA,lbl:(hyp.condA&&hyp.condA.label)||"Condition A"},{k:"B",v:res.stats.meanB,lbl:(hyp.condB&&hyp.condB.label)||"Condition B"}].map(({k,v,lbl})=>
+                    h("div",{key:k,style:{padding:"6px 10px",background:"#0f0b05",border:"1px solid #1a1208",borderRadius:2}},
+                      h("div",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#5a4a30",marginBottom:2}},lbl),
+                      h("div",{style:{fontSize:16,fontFamily:"'Cormorant Garamond',serif",fontWeight:300,color:"#c49020"}},(+v).toFixed(4))))
+                ),
+                h("div",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#5a4a30"}},
+                  `t = ${res.stats.t?res.stats.t.toFixed(3):"—"}  ·  p = ${res.stats.p?res.stats.p.toFixed(4):"—"}  ·  n = ${res.stats.n||""}  ·  sd(A) = ${res.stats.sdA?res.stats.sdA.toFixed(4):"—"}  sd(B) = ${res.stats.sdB?res.stats.sdB.toFixed(4):"—"}`)
+              )
+            )
+          );
+        }),
+
+        h("div",{style:{marginTop:16,paddingTop:14,borderTop:"1px solid #1a1208",fontSize:9,fontFamily:"'JetBrains Mono',monospace",color:"#3a2e18",textAlign:"center"}},
+          "SimLex v1 · SOoL framework · Koepsell (SEAL Lab, Texas A&M) · ",
+          h("em",{style:{fontStyle:"italic"}},"A Structural Ontology of the Law"),
+          " (Palgrave, forthcoming)")
+      )
+    )
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(h(SimLex));
+}); // end window.onload
+</script>
+</body>
+</html>
