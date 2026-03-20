@@ -102,26 +102,38 @@ const PARAM_SPACE={
 };
 
 const DEFAULT_CFG={
-  numAgents:60, obligRadius:40, repairRate:0.06, chainDecay:0.005,
+  numAgents:100, obligRadius:40, repairRate:0.06, chainDecay:0.005,
   iatThreshold:0.50, detectionSpeed:0.30, obligationLife:180,
   maxObligs:200, externalPressure:0,
 };
 
+
+// ── Statistical power utility ─────────────────────────────────────────────
+const computePower=(d,n,alpha=0.05)=>{
+  const se=Math.sqrt(2/n), z=d/se-1.96;
+  const ncdf=z=>{const t=1/(1+0.2316419*Math.abs(z)),dp=0.3989423*Math.exp(-z*z/2);
+    const p=dp*t*(0.3193815+t*(-0.3565638+t*(1.7814779+t*(-1.8212560+t*1.3302744))));
+    return z>0?1-p:p;};
+  return Math.min(1,Math.max(0,ncdf(z)));
+};
+const powerLabel=pw=>pw>=0.95?"✦ High":pw>=0.80?"✓ Adequate":pw>=0.50?"~ Marginal":"✗ Low";
+const powerColor=pw=>pw>=0.95?"#60aa68":pw>=0.80?"#c49020":pw>=0.50?"#cc8822":"#cc4422";
+
 const BUILT_IN_HYPS=[
   {id:"h1",
-   label:"Authoritarian architecture produces 3x higher Contradiction Debt than Rule of Law",
-   cite:"SOoL §4 — Architecture determines structural failure rate, not just failure type",
-   prediction:"Authoritarian avg CD >> Rule of Law avg CD (p<0.01, large effect size)",
+   label:"Authoritarian accumulates CD faster than Rule of Law (debt slope comparison)",
+   cite:"SOoL §4 — Architecture determines structural failure rate and trajectory, not just type",
+   prediction:"Authoritarian debt slope >> Rule of Law debt slope (p<0.01) — rate of accumulation, not ceiling",
    condA:{arch:"authoritarian",cfg:{},label:"Authoritarian"},
    condB:{arch:"ruleOfLaw",   cfg:{},label:"Rule of Law"},
-   metric:"debt",direction:1},
+   metric:"debtSlope",direction:1},
   {id:"h2",
-   label:"Collapsed architecture produces coherence collapse vs. Rule of Law",
-   cite:"SOoL §11 — Structural collapse as qualitative threshold, not quantitative increase",
-   prediction:"Collapsed coherence << Rule of Law coherence (p<0.01)",
+   label:"Collapsed architecture produces lower minimum coherence than Rule of Law",
+   cite:"SOoL §11 — Structural collapse visible in tail-risk (minCoherence), not population mean",
+   prediction:"Collapsed minCoherence << Rule of Law minCoherence (p<0.01) — floor effect reveals collapse",
    condA:{arch:"collapsed",   cfg:{},label:"Collapsed"},
    condB:{arch:"ruleOfLaw",   cfg:{},label:"Rule of Law"},
-   metric:"coherence",direction:-1},
+   metric:"minCoherence",direction:-1},
   {id:"h3",
    label:"High-IAT agent populations produce lower CD than low-IAT populations",
    cite:"SOoL §6 — Normative agency capacity (standing+repair+endurance+control) reduces structural failure",
@@ -153,6 +165,20 @@ const BUILT_IN_HYPS=[
    condA:{arch:"authoritarian",cfg:{externalPressure:0.70},label:"Auth P=0.70"},
    condB:{arch:"pluralist",    cfg:{externalPressure:0.70},label:"Pluralist P=0.70"},
    metric:"coherence",direction:-1},
+  {id:"h8",
+   label:"Pluralist repair ratio exceeds Authoritarian repair ratio",
+   cite:"SOoL §5 — Repair capacity as primary discriminator between structural regimes",
+   prediction:"Pluralist repairRatio >> Authoritarian repairRatio (p<0.01) — chain closure capacity differs fundamentally",
+   condA:{arch:"pluralist",    cfg:{},label:"Pluralist"},
+   condB:{arch:"authoritarian",cfg:{},label:"Authoritarian"},
+   metric:"repairRatio",direction:1},
+  {id:"h9",
+   label:"Authoritarian reaches high debt earlier than Rule of Law (early-phase)",
+   cite:"SOoL §4 — Authoritarian failure rate spike is front-loaded, not terminal",
+   prediction:"Authoritarian earlyDebt > Rule of Law earlyDebt (p<0.01) — structural signature is early saturation, not slope",
+   condA:{arch:"authoritarian",cfg:{},label:"Authoritarian"},
+   condB:{arch:"ruleOfLaw",   cfg:{},label:"Rule of Law"},
+   metric:"earlyDebt",direction:1},
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -436,13 +462,25 @@ const runOneSim=(cfg,arch,depth,seed)=>{
   const orig=Math.random; Math.random=mkRng(seed);
   try{
     const sim=new Simulation();
-    sim.applyCfg({...cfg,numAgents:40}); sim.architecture=arch;
+    sim.applyCfg({...cfg}); sim.architecture=arch;
     for(let i=0;i<depth*STEPS_PER_GEN;i++) sim.step();
     const s=sim.stats;
+    // Compute debt slope from history (linear regression over full run)
+    const dh=sim.fullHistory; const dn=dh.length;
+    let debtSlope=0;
+    if(dn>=4){const mx=(dn-1)/2,my=sMean(dh.map(r=>r.debt));
+      const num=dh.reduce((s,r,i)=>s+(i-mx)*(r.debt-my),0);
+      const den=dh.reduce((s,_,i)=>s+(i-mx)**2,0);
+      debtSlope=den>0?+(num/den).toFixed(6):0;}
+    // earlyDebt: mean debt over first 20% of run
+    const eq=Math.max(1,Math.floor(dn*0.20));
+    const earlyDebt=dn>0?+(sMean(dh.slice(0,eq).map(r=>r.debt))).toFixed(4):0;
+    // repairRatio: fulfilled/denied incremental
+    const rr=s.denied>0?+(s.fulfilled/s.denied).toFixed(4):0;
     return{coherence:+s.avgCoherence.toFixed(4),debt:+s.avgDebt.toFixed(4),
       trust:+s.avgTrust.toFixed(4),iri:+s.iriComposite.toFixed(4),
       iriDL:+s.iriDL.toFixed(4),iriRE:+s.iriRE.toFixed(4),iriCR:+s.iriCR.toFixed(4),
-      minCoherence:+s.minCoherence.toFixed(4),
+      minCoherence:+s.minCoherence.toFixed(4),debtSlope,earlyDebt,repairRatio:rr,
       fulfillRate:s.issued>0?+(s.fulfilled/s.issued).toFixed(4):0};
   }finally{Math.random=orig;}
 };
@@ -450,7 +488,7 @@ const runOneSimSeries=(cfg,arch,depth,seed)=>{
   const orig=Math.random; Math.random=mkRng(seed);
   try{
     const sim=new Simulation();
-    sim.applyCfg({...cfg,numAgents:40}); sim.architecture=arch;
+    sim.applyCfg({...cfg}); sim.architecture=arch;
     const series=[];
     for(let i=0;i<depth*STEPS_PER_GEN;i++){
       sim.step();
@@ -459,11 +497,11 @@ const runOneSimSeries=(cfg,arch,depth,seed)=>{
     return{series,...sim.stats};
   }finally{Math.random=orig;}
 };
-const runHypTest=async(hyp,nReps,depth,seed,onProg)=>{
+const runHypTest=async(hyp,nReps,depth,seed,onProg,numAgents=100)=>{
   if(hyp.type==="lag"){
     const orig=Math.random; Math.random=mkRng(seed);
     try{
-      const sim=new Simulation(); sim.applyCfg({...DEFAULT_CFG,numAgents:50}); sim.architecture=hyp.arch||"authoritarian";
+      const sim=new Simulation(); sim.applyCfg({...DEFAULT_CFG,numAgents}); sim.architecture=hyp.arch||"authoritarian";
       const debtS=[],coherS=[];
       for(let i=0;i<depth*5*STEPS_PER_GEN;i++){sim.step();if(i%STEPS_PER_GEN===0){debtS.push(sim.stats.avgDebt);coherS.push(sim.stats.avgCoherence);}}
       const negDelta=coherS.slice(0,-1).map((c,i)=>c-coherS[i+1]);
@@ -480,7 +518,7 @@ const runHypTest=async(hyp,nReps,depth,seed,onProg)=>{
       const byLevel=[];
       for(let li=0;li<levels.length;li++){
         const runs=[];
-        for(let ri=0;ri<4;ri++) runs.push(runOneSim({...DEFAULT_CFG,[pk]:levels[li]},"pluralist",depth,(seed+li*1000+ri*100)>>>0));
+        for(let ri=0;ri<8;ri++) runs.push(runOneSim({...DEFAULT_CFG,[pk]:levels[li],numAgents},"pluralist",depth,(seed+li*1000+ri*100)>>>0));
         byLevel.push({val:levels[li],label:(PARAM_SPACE[pk].fmt||String)(levels[li]),avg:sMean(runs.map(r=>r[hyp.metric]||r.coherence))});
       }
       const range=Math.max(...byLevel.map(e=>e.avg))-Math.min(...byLevel.map(e=>e.avg));
@@ -495,8 +533,8 @@ const runHypTest=async(hyp,nReps,depth,seed,onProg)=>{
   }
   const valsA=[],valsB=[];
   for(let i=0;i<nReps;i++){
-    const rA=runOneSim({...DEFAULT_CFG,...(hyp.condA.cfg||{})},hyp.condA.arch,depth,(seed*0x9e3779b9+i*111)>>>0);
-    const rB=runOneSim({...DEFAULT_CFG,...(hyp.condB.cfg||{})},hyp.condB.arch,depth,(seed*0x9e3779b9+i*222+1e6)>>>0);
+    const rA=runOneSim({...DEFAULT_CFG,...(hyp.condA.cfg||{}),numAgents},hyp.condA.arch,depth,(seed*0x9e3779b9+i*111)>>>0);
+    const rB=runOneSim({...DEFAULT_CFG,...(hyp.condB.cfg||{}),numAgents},hyp.condB.arch,depth,(seed*0x9e3779b9+i*222+1e6)>>>0);
     valsA.push(rA[hyp.metric]??rA.coherence); valsB.push(rB[hyp.metric]??rB.coherence);
     onProg&&onProg(i+1,nReps);
     if(i%3===2) await new Promise(r=>setTimeout(r,0));
@@ -685,7 +723,7 @@ function SimLex(){
   const[hypResults,setHypResults]=useState({});
   const[hypRunning,setHypRunning]=useState(null);
   const[sciProg,setSciProg]=useState({current:0,total:0});
-  const sciCfg=useRef({seed:42,nReps:12,depth:200});
+  const sciCfg=useRef({seed:42,nReps:50,depth:500});
 
   const handleArch=useCallback(a=>{archRef.current=a;simRef.current.architecture=a;setArch(a);},[]);
   const handlePause=useCallback(()=>{const np=!pausedRef.current;pausedRef.current=np;setPaused(np);},[]);
@@ -795,7 +833,7 @@ function SimLex(){
 
   const runHyp=useCallback(async hyp=>{
     setHypRunning(hyp.id); cancelRef.current=false;
-    const res=await runHypTest(hyp,sciCfg.current.nReps,sciCfg.current.depth,sciCfg.current.seed,(c,t)=>setSciProg({current:c,total:t}));
+    const res=await runHypTest(hyp,sciCfg.current.nReps||50,sciCfg.current.depth||500,sciCfg.current.seed||42,(c,t)=>setSciProg({current:c,total:t}),sciCfg.current.numAgents||100);
     setHypResults(r=>({...r,[hyp.id]:res}));
     setHypRunning(null);
   },[]);
@@ -979,10 +1017,31 @@ function SimLex(){
           )
         ),
 
+        h("div",{style:{marginBottom:14,padding:"10px 14px",background:"#0f0b05",border:"1px solid #2a1e0a",borderRadius:3,display:"flex",gap:16,alignItems:"center",flexWrap:"wrap"}},
+          h("div",null,
+            h("div",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#7a5810",letterSpacing:"0.10em",marginBottom:3}},"BATCH SETTINGS"),
+            h("div",{style:{display:"flex",gap:12,alignItems:"center"}},
+              ...[["nReps",50,10,200,5,"Replicates"],["depth",500,100,1000,100,"Depth (gens)"],["numAgents",100,40,300,20,"Agents/run"]].map(([key,def,min,max,step,label])=>
+                h("div",{key:key,style:{display:"flex",flexDirection:"column",alignItems:"center",gap:2}},
+                  h("div",{style:{fontSize:7.5,fontFamily:"'JetBrains Mono',monospace",color:"#5a4a30"}},label),
+                  h("div",{style:{display:"flex",alignItems:"center",gap:4}},
+                    h("button",{onClick:()=>{sciCfg.current[key]=Math.max(min,sciCfg.current[key]-step);},style:{background:"transparent",border:"1px solid #2a1e0a",color:"#7a5810",cursor:"pointer",padding:"1px 5px",fontFamily:"monospace",fontSize:10}},"−"),
+                    h("span",{style:{fontSize:10,fontFamily:"'JetBrains Mono',monospace",color:"#c49020",minWidth:32,textAlign:"center"}},sciCfg.current[key]||def),
+                    h("button",{onClick:()=>{sciCfg.current[key]=Math.min(max,sciCfg.current[key]+step);},style:{background:"transparent",border:"1px solid #2a1e0a",color:"#7a5810",cursor:"pointer",padding:"1px 5px",fontFamily:"monospace",fontSize:10}},"+")
+                  )
+                )
+              ),
+              h("div",{style:{marginLeft:8,padding:"4px 10px",background:"#1a1208",borderRadius:2,border:"1px solid #2a1e0a"}},
+                h("div",{style:{fontSize:7.5,fontFamily:"'JetBrains Mono',monospace",color:"#5a4a30",marginBottom:2}},"POWER (d=0.8)"),
+                h("div",{style:{fontSize:11,fontFamily:"'JetBrains Mono',monospace",color:powerColor(computePower(0.8,sciCfg.current.nReps||50))}},(computePower(0.8,sciCfg.current.nReps||50)*100).toFixed(0)+"%")
+              )
+            )
+          )
+        ),
         h("div",{style:{marginBottom:18,padding:"10px 14px",background:"#0f0b05",border:"1px solid #1a1208",borderRadius:3}},
           h("div",{style:{fontSize:9,fontFamily:"'JetBrains Mono',monospace",color:"#7a5810",letterSpacing:"0.1em",marginBottom:5}},"HOW TO READ RESULTS"),
           h("div",{style:{fontSize:9,fontFamily:"'Crimson Pro',serif",color:"#a89070",lineHeight:1.7}},
-            "Each hypothesis is run as an agent-based experiment — the two conditions simulated in parallel, with Welch t-test on the output metric. Lag analysis tests whether Contradiction Debt at time ",h("em",null,"t"),
+            "Each hypothesis is run as an agent-based experiment — the two conditions simulated in parallel, with Welch t-test on the output metric. Available metrics: coherence, debt, trust, iri, minCoherence (tail-risk), debtSlope (accumulation rate), earlyDebt (first 20% of run), repairRatio (fulfilled/denied). Lag analysis tests whether Contradiction Debt at time ",h("em",null,"t"),
             " predicts coherence decline at ",h("em",null,"t+k"),". Sensitivity tests rank which parameters drive the most IRI variance. ",
             h("strong",{style:{color:"#c49020"}},"SUPPORTED"),": p<0.05, correct direction. ",
             h("strong",{style:{color:"#cc8822"}},"WEAK"),": p<0.20. ",
@@ -1027,7 +1086,16 @@ function SimLex(){
                       h("div",{style:{fontSize:16,fontFamily:"'Cormorant Garamond',serif",fontWeight:300,color:"#c49020"}},(+v).toFixed(4))))
                 ),
                 h("div",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#5a4a30"}},
-                  `t = ${res.stats.t?res.stats.t.toFixed(3):"—"}  ·  p = ${res.stats.p?res.stats.p.toFixed(4):"—"}  ·  n = ${res.stats.n||""}  ·  sd(A) = ${res.stats.sdA?res.stats.sdA.toFixed(4):"—"}  sd(B) = ${res.stats.sdB?res.stats.sdB.toFixed(4):"—"}`)
+                  `t = ${res.stats.t?res.stats.t.toFixed(3):"—"}  ·  p = ${res.stats.p?res.stats.p.toFixed(4):"—"}  ·  n = ${res.stats.n||""}  ·  sd(A) = ${res.stats.sdA?res.stats.sdA.toFixed(4):"—"}  sd(B) = ${res.stats.sdB?res.stats.sdB.toFixed(4):"—"}`),
+              (()=>{
+                const d=res.stats.sdA&&res.stats.sdB?Math.abs((res.stats.meanA-res.stats.meanB)/Math.sqrt((res.stats.sdA**2+res.stats.sdB**2)/2)):null;
+                const pw=d!=null?computePower(d,Math.ceil((res.stats.n||24)/2)):null;
+                return pw!=null?h("div",{style:{marginTop:4,display:"flex",gap:8,alignItems:"center"}},
+                  h("span",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#5a4a30"}},"Cohen's d = "+d.toFixed(3)),
+                  h("span",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:powerColor(pw)}},"Power "+powerLabel(pw)+" ("+( pw*100).toFixed(0)+"%)"),
+                  pw<0.80?h("span",{style:{fontSize:7.5,fontFamily:"'JetBrains Mono',monospace",color:"#cc8822"}},"→ increase nReps for 80% power"):null
+                ):null;
+              })()
               )
             )
           );
