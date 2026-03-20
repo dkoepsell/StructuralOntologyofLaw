@@ -54,14 +54,14 @@ const THREE=window.THREE;
 const WORLD=150, MAX_LINES=280, STEPS_PER_GEN=8;
 
 const MLC_NODES=[
-  {i:0,short:"Auth",  label:"Source of Authority", cluster:"AUTHORITY"},
-  {i:1,short:"Norm",  label:"Norm",                cluster:"AUTHORITY"},
-  {i:2,short:"Actor", label:"Actor in Role",        cluster:"AUTHORITY"},
-  {i:3,short:"Trig",  label:"Triggering Facts",     cluster:"EFFECT"},
-  {i:4,short:"Act",   label:"Legal Act/Omission",   cluster:"EFFECT"},
-  {i:5,short:"Recog", label:"Target/Recognition",   cluster:"RECOGNITION"},
-  {i:6,short:"Eff",   label:"Legal Effect",         cluster:"RECOGNITION"},
-  {i:7,short:"Rem",   label:"Remedy",               cluster:"REPAIR"},
+  {i:0,short:"Auth",  label:"Source of Authority", cluster:"AUTHORITY",   tt:"mlcAuth"},
+  {i:1,short:"Norm",  label:"Norm",                cluster:"AUTHORITY",   tt:"mlcNorm"},
+  {i:2,short:"Actor", label:"Actor in Role",        cluster:"AUTHORITY",   tt:"mlcActor"},
+  {i:3,short:"Trig",  label:"Triggering Facts",     cluster:"EFFECT",      tt:"mlcTrig"},
+  {i:4,short:"Act",   label:"Legal Act/Omission",   cluster:"EFFECT",      tt:"mlcAct"},
+  {i:5,short:"Recog", label:"Target/Recognition",   cluster:"RECOGNITION", tt:"mlcRecog"},
+  {i:6,short:"Eff",   label:"Legal Effect",         cluster:"RECOGNITION", tt:"mlcEff"},
+  {i:7,short:"Rem",   label:"Remedy",               cluster:"REPAIR",      tt:"mlcRem"},
 ];
 
 const CT={ // Contradiction types — 13 total, indexed to MLC nodes
@@ -513,7 +513,8 @@ const runHypTest=async(hyp,nReps,depth,seed,onProg,numAgents=100)=>{
   }
   if(hyp.type==="sensitivity"){
     const ranges=[];
-    for(const pk of hyp.params){
+    const _params=hyp.params&&hyp.params.length?hyp.params:Object.keys(PARAM_SPACE);
+    for(const pk of _params){
       const levels=(PARAM_SPACE[pk]&&PARAM_SPACE[pk].levels)||[0.02,0.06,0.14];
       const byLevel=[];
       for(let li=0;li<levels.length;li++){
@@ -528,7 +529,7 @@ const runHypTest=async(hyp,nReps,depth,seed,onProg,numAgents=100)=>{
     }
     ranges.sort((a,b)=>b.range-a.range);
     // Verdict: check whether the FIRST listed param (the predicted dominant) actually wins
-    const predictedWins=ranges.length>=2&&ranges[0].pk===hyp.params[0]&&(ranges[0].range-ranges[1].range)>0.02;
+    const predictedWins=ranges.length>=2&&hyp.params&&hyp.params.length&&ranges[0].pk===hyp.params[0]&&(ranges[0].range-ranges[1].range)>0.02;
     return{hyp,ranges,verdict:predictedWins?"SUPPORTED":ranges.length>=2&&(ranges[0].range-ranges[1].range)>0.03?"REFUTED":"INCONCLUSIVE",stats:{dominant:ranges[0]&&ranges[0].label,dominantRange:ranges[0]&&ranges[0].range}};
   }
   const valsA=[],valsB=[];
@@ -588,6 +589,135 @@ const exportTimeSeries=(fullHistory,architecture)=>{
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
+// CUSTOM HYPOTHESIS BUILDER CONSTANTS
+// ─────────────────────────────────────────────────────────────────────────────
+const WELCH_METRICS=[
+  {value:"debt",        label:"Contradiction Debt"},
+  {value:"debtSlope",   label:"Debt Slope (rate)"},
+  {value:"earlyDebt",   label:"Early Debt (first 20%)"},
+  {value:"coherence",   label:"Legal Coherence"},
+  {value:"minCoherence",label:"Min Coherence (tail risk)"},
+  {value:"trust",       label:"Trust"},
+  {value:"iri",         label:"IRI Composite"},
+  {value:"iriDL",       label:"IRI — Detection Latency"},
+  {value:"iriRE",       label:"IRI — Repair Efficiency"},
+  {value:"repairRatio", label:"Repair Ratio"},
+];
+const ARCH_OPTIONS=Object.entries(ARCHITECTURES).map(([k,v])=>({value:k,label:v.label,col:v.col}));
+const CFG_KNOBS=[
+  {key:"externalPressure",label:"Ext. Pressure", min:0,    max:1,    step:0.1,   default:0},
+  {key:"repairRate",      label:"Repair Rate",   min:0.01, max:0.22, step:0.01,  default:0.06},
+  {key:"chainDecay",      label:"Chain Decay",   min:0.001,max:0.025,step:0.001, default:0.005},
+  {key:"iatThreshold",    label:"IAT Threshold", min:0.1,  max:0.9,  step:0.1,   default:0.5},
+  {key:"initialIATMean",  label:"IAT Mean",      min:0.1,  max:0.9,  step:0.1,   default:0.55},
+];
+const validateDraft=d=>{
+  const errs=[];
+  if(!d.label.trim()) errs.push("Hypothesis label is required");
+  if(d.type==="welch"&&d.condA.arch===d.condB.arch&&JSON.stringify(d.condA.cfg)===JSON.stringify(d.condB.cfg))
+    errs.push("Conditions A and B are identical — vary at least one parameter");
+  if(d.type==="welch"&&!d.metric) errs.push("Select a metric");
+  return errs;
+};
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TOOLTIP SYSTEM
+// ─────────────────────────────────────────────────────────────────────────────
+function Tooltip({text,children,width=220}){
+  const[show,setShow]=React.useState(false);
+  const[pos,setPos]=React.useState({x:0,y:0,above:true,alignLeft:false});
+  const onEnter=e=>{
+    const r=e.currentTarget.getBoundingClientRect();
+    const vw=window.innerWidth, vh=window.innerHeight;
+    const cx=r.left+r.width/2;
+    // Flip below if too close to top
+    const above=r.top>160;
+    // Shift left if tooltip would overflow right edge
+    const wouldOverflowRight=cx+width/2>vw-12;
+    const wouldOverflowLeft=cx-width/2<12;
+    let x=cx;
+    if(wouldOverflowRight) x=vw-width/2-12;
+    if(wouldOverflowLeft) x=width/2+12;
+    setPos({x, y:above?r.top-8:r.bottom+8, above});
+    setShow(true);
+  };
+  const arrowStyle=pos.above
+    ?{position:"absolute",bottom:-5,left:"50%",width:8,height:8,background:"rgba(6,4,2,0.97)",border:"1px solid #4a3810",borderTop:"none",borderLeft:"none",transform:"translateX(-50%) rotate(45deg)"}
+    :{position:"absolute",top:-5,left:"50%",width:8,height:8,background:"rgba(6,4,2,0.97)",border:"1px solid #4a3810",borderBottom:"none",borderRight:"none",transform:"translateX(-50%) rotate(45deg)"};
+  return h("span",{style:{position:"relative",display:"inline-block"},
+      onMouseEnter:onEnter,onMouseLeave:()=>setShow(false)},
+    children,
+    show&&h("div",{style:{
+      position:"fixed",left:pos.x,top:pos.above?pos.y:pos.y,
+      transform:pos.above?"translate(-50%,-100%)":"translate(-50%,0)",
+      background:"rgba(6,4,2,0.97)",border:"1px solid #4a3810",borderRadius:3,
+      padding:"7px 10px",width,pointerEvents:"none",zIndex:9999,
+      boxShadow:"0 4px 16px rgba(0,0,0,0.6)"}},
+      h("div",{style:{fontSize:10,fontFamily:"'Crimson Pro',serif",color:"#c8b090",lineHeight:1.55}},text),
+      h("div",{style:arrowStyle})
+    )
+  );
+}
+
+// Tooltip content library
+const TT={
+  // Architectures
+  ruleOfLaw:"Rule of Law — Low failure rate (fRate=0.007), high IAT sensitivity (0.65), strong repair bonus (1.40×). Normative agency is structurally decisive. Node weights are balanced across all 8 MLC positions.",
+  positivist:"Positivist — High authority-side weights (Nodes 1–2: 0.92, 0.90) but degraded recognition and remedy (0.60, 0.58, 0.40). Formally valid norms; structurally thin past issuance.",
+  naturalLaw:"Natural Law — Weaker authority weights but strong recognition and repair (Nodes 6–8: 0.82, 0.80, 0.80). Grounds obligations in agent capacity rather than formal authority.",
+  customary:"Customary — Strong Actor-in-Role node (0.88): agents bear norms effectively. Weaker formal authority (0.75) and low remedy weight (0.62). Works through social practice, not formal sanction.",
+  authoritarian:"Authoritarian — Near-maximum authority weights (0.95, 0.93) but collapsed recognition and repair (0.38, 0.40, 0.18). High failure rate (fRate=0.048), low IAT sensitivity (0.10). Agents are bound but structurally unacknowledged.",
+  pluralist:"Pluralist — Even node weight distribution (0.65–0.80 range). High IAT sensitivity (0.60) and repair bonus (1.15×). No cluster is dominant; resilience emerges from redundancy over time.",
+  theocratic:"Theocratic — Strong authority nodes, moderate norms, weak recognition/remedy. Low IAT sensitivity (0.20) and high CD multiplier (1.10×). Failures are costly; individual agency barely buffers them.",
+  collapsed:"Collapsed — All parameters degraded: fRate=0.095, cdMult=2.20, repBonus=0.15. Obligations form but almost nothing closes. Models post-breakdown structural residue, not an alternative legal order.",
+  // System metrics
+  legalCoherence:"Legal Coherence — Population mean of agent structural integrity scores (0–1). Measures how well agents participate in MLC chains. Floors near 0.27 in all architectures in v1.0 due to a known calibration issue.",
+  contradictionDebt:"Contradiction Debt (CD) — Accumulated unresolved contradiction load per agent, averaged across the population. SOoL's primary instability measure. An ontological metric, not a moral one: high CD means structural incoherence regardless of whether norms are just.",
+  trust:"Trust — Population mean of agent trust scores. Emergent signal of RECOGNITION cluster health (MLC Nodes 6–7). The most architecture-discriminating metric: ranges from 0.06 (Authoritarian) to 0.84 (Pluralist) at run end.",
+  avgIAT:"Avg IAT Score — Population mean of the Irreversible Accountability Test score, computed as mean(standing, repairCapacity, endurance, counterfactualCtrl). Indicates the normative agency capacity of the population.",
+  // IRI components
+  iriDL:"Detection Latency (DL) — How quickly the system identifies contradiction events. Computed as 1 − mean(detection lag) / 12, using a 60-generation rolling buffer. Higher = faster detection. Weight: 0.20 in IRI composite.",
+  iriRE:"Repair Efficiency (RE) — Ratio of successfully repaired chains to total chain attempts. Weight: 0.30. KNOWN ISSUE (v1.0): saturates to 1.0 by generation ~30 in all architectures due to cumulative tracking; does not distinguish architectures reliably.",
+  iriCR:"Coherence Retention (CR) — Population mean legal coherence. Directly tracks agent structural health. Weight: 0.30. KNOWN ISSUE (v1.0): floors near 0.27 in all architectures; limited discriminatory power.",
+  iriCDScore:"CD Stability — Inverse of mean Contradiction Debt (1 − avgDebt). The most reliably discriminating IRI component in v1.0. Weight: 0.20.",
+  iriComposite:"IRI Composite — Institutional Resilience Index: weighted sum 0.30·RE + 0.30·CR + 0.20·DL + 0.20·CDScore. Measures structural robustness. NOTE: loses diagnostic power in Authoritarian architecture (r with debt = −0.15 vs −0.96 elsewhere) due to RE saturation.",
+  // IAT conditions
+  standing:"Standing — IAT condition 1: the agent occupies a legally recognised role that grounds the obligation. Without standing, the agent cannot be a normative bearer and the obligation has no structural anchor.",
+  repairCapacity:"Repair Capacity — IAT condition 2 & 4 (combined): the agent has the capacity to participate in a repair mechanism and to fulfil the obligation. Low repair capacity means denials cannot be corrected.",
+  endurance:"Enduring Residue — IAT condition 3: the breach leaves a structural remainder that persists after the event. This is what makes accountability non-resettable — the breach cannot simply be undone.",
+  counterfactualCtrl:"Counterfactual Control — IAT condition 5: the agent had control over whether the breach occurred. Without this, the denial cannot be attributed as an exercise of agency.",
+  // MLC nodes
+  mlcAuth:"Node 1: Source of Authority — The institutional ground of norm-issuance. Without a legitimate authority source, the entire chain lacks foundational validity. High weight in Positivist (0.92) and Authoritarian (0.95).",
+  mlcNorm:"Node 2: Norm — The specific rule or standard being issued. A norm without coherent content or a legitimate issuer produces Conferral Failure or Jurisdictional Contradiction.",
+  mlcActor:"Node 3: Actor in Role — The agent bearing the norm-governed capacity. If this node fails, Role Vacancy is triggered: the obligation exists but no agent is structurally assigned to bear it.",
+  mlcTrig:"Node 4: Triggering Facts — The circumstances activating the norm. Failure here produces Triggering Ambiguity: the norm exists but it's unclear when it applies.",
+  mlcAct:"Node 5: Legal Act/Omission — The conduct that instantiates the trigger. Failure produces Act–Effect Mismatch: conduct occurred but did not engage the norm's operative conditions.",
+  mlcRecog:"Node 6: Target/Recognition — Acknowledgment of the obligation by its bearer. This and Node 7 form the RECOGNITION cluster. Failure = Recognition Failure. Key node in Authoritarian collapse (weight: 0.38).",
+  mlcEff:"Node 7: Legal Effect — The normative consequence that obtains. If recognition occurred but effect fails, Effect Nullification fires. Together with Node 6, drives trust dynamics.",
+  mlcRem:"Node 8: Remedy — The mechanism for restoring structural coherence on breach. The REPAIR cluster. Failure = Repair Failure. Weight ranges from 0.72 (Rule of Law) to 0.12 (Collapsed).",
+  // CT types
+  ctCF:"Conferral Failure (CF) — Nodes 0 & 1 fail. Authority cannot confer the norm; ground of issuance is broken. CD weight: 0.15.",
+  ctAI:"Authority Inflation (AI) — Node 0 fails. Authority claimed exceeds its legitimate scope. CD weight: 0.12.",
+  ctJC:"Jurisdictional Contradiction (JC) — Node 1 fails. Norm conflicts internally or with a co-existing norm. CD weight: 0.10.",
+  ctRV:"Role Vacancy (RV) — Node 2 fails. No agent occupies the role required to bear the norm. CD weight: 0.08.",
+  ctTA:"Triggering Ambiguity (TA) — Node 3 fails. Conditions of application are indeterminate. CD weight: 0.07.",
+  ctAE:"Act–Effect Mismatch (AE) — Node 4 fails. Conduct does not produce the stipulated legal effect. CD weight: 0.09.",
+  ctCC:"Correlativity Contradiction (CC) — Nodes 5 & 6 fail. Right/duty correlation is broken. CD weight: 0.14.",
+  ctRF:"Recognition Failure (RF) — Node 5 fails. Target cannot or does not recognise the obligation. CD weight: 0.11.",
+  ctEN:"Effect Nullification (EN) — Node 6 fails. Legal effect fails to obtain despite recognition. CD weight: 0.10.",
+  ctRPF:"Repair Failure (RPF) — Node 7 fails. Remedy mechanism is unavailable or fails. CD weight: 0.13.",
+  ctRC:"Retroactive Contradiction (RC) — Nodes 3 & 4 fail. Prior legal act retroactively rendered incoherent. CD weight: 0.11.",
+  ctRGR:"Recht/Gesetz Rupture (RGR) — Nodes 0, 5 & 6 fail simultaneously. Authority and recognition cluster severed together. SOoL's structural diagnosis of authoritarian law. CD weight: 0.18.",
+  ctCS:"Chain Severance (CS) — 6+ nodes fail. Wholesale chain collapse. CD weight: 0.25. The structural signature of complete legal breakdown.",
+  // Simulation controls
+  repairRate:"Repair Rate — Scales node closure probability per step. Primary determinant of fulfilment rate. Higher values mean obligations close more reliably. Default: 0.06. For publishable experiments: hold constant across conditions.",
+  chainDecay:"Chain Decay — Per-step coherence loss before architecture multiplier. Higher values accelerate structural erosion. Multiplied by architecture's decayMult (0.60× for Rule of Law, 4.50× for Collapsed). Default: 0.005.",
+  iatThreshold:"IAT Threshold — Minimum IAT score for an agent to be classified as a Normative Agent (rendered at 2× scale). Does not affect the failure rate calculation directly — use initialIATMean to seed population capacity. Default: 0.50.",
+  externalPressure:"External Pressure — Structural stress multiplier applied to both failure rate (×1.2) and coherence decay (×1.8). Models exogenous shocks to the legal system. At P=0.70, Authoritarian systems collapse within ~100 generations. Default: 0.",
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 // UI COMPONENTS
 // ─────────────────────────────────────────────────────────────────────────────
 const Btn=({onClick,label,color,small})=>h("button",{onClick,style:{
@@ -595,11 +725,12 @@ const Btn=({onClick,label,color,small})=>h("button",{onClick,style:{
   border:`1px solid ${color||"#2a1e0a"}`,borderRadius:2,color:color||"#5a4a30",fontSize:small?7.5:8.5,letterSpacing:"0.06em"}},label);
 
 const Pills=({options,val,onChange})=>h("div",{style:{display:"flex",flexWrap:"wrap",gap:3,marginTop:3}},
-  options.map(o=>h("button",{key:o.value,onClick:()=>onChange(o.value),style:{
+  options.map(o=>h(Tooltip,{key:o.value,text:TT[o.value]||o.label,width:260},
+    h("button",{onClick:()=>onChange(o.value),style:{
     padding:"2px 8px",borderRadius:10,fontSize:8,fontFamily:"'JetBrains Mono',monospace",cursor:"pointer",
     border:`1px solid ${val===o.value?(o.color||"#c49020"):"#2a1e0a"}`,
     background:val===o.value?`${o.color||"#c49020"}22`:"transparent",
-    color:val===o.value?(o.color||"#c49020"):"#5a4a30"}},o.label)));
+    color:val===o.value?(o.color||"#c49020"):"#5a4a30"}},o.label))));
 
 const MiniLine=({data,keys,colors,ht=50})=>{
   if(!data||data.length<2)return null;
@@ -662,6 +793,7 @@ const MLCChainDiagram=({nodeHealth=[],ctActive=[]})=>{
     MLC_NODES.map((nd,i)=>{
       const cx=startX+i*(nodeR*2+gap)+nodeR, nh=nodeHealth[i]||0.7, col=nodeCol(nh);
       return h("g",{key:`nd${i}`},
+        h("title",null,(TT[nd.tt]||nd.label)+" (Node "+(i+1)+") — Health: "+(nh*100).toFixed(0)+"%"),
         h("circle",{cx,cy,r:nodeR,fill:`${col}18`,stroke:col,strokeWidth:1.5}),
         h("text",{x:cx,y:cy-5,fontSize:8.5,fill:col,textAnchor:"middle",fontFamily:"'JetBrains Mono',monospace",fontWeight:"500"},nd.short),
         h("text",{x:cx,y:cy+7,fontSize:6.5,fill:"#5a4a30",textAnchor:"middle",fontFamily:"'JetBrains Mono',monospace"},(nh*100).toFixed(0)+"%"),
@@ -681,14 +813,14 @@ const IRIPanel=({stats})=>{
   const compCol=comp>0.65?"#c49020":comp>0.40?"#cc8822":"#cc4422";
   return h("div",{className:"panel"},
     h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:10}},
-      h("span",{className:"lbl",style:{marginBottom:0}},"Institutional Resilience Index"),
+      h(Tooltip,{text:TT.iriComposite,width:280},h("span",{className:"lbl",style:{marginBottom:0,cursor:"help",textDecoration:"underline dotted"}},"Institutional Resilience Index")),
       h("span",{style:{fontSize:22,fontFamily:"'Cormorant Garamond',serif",fontWeight:300,color:compCol}},
         (comp*100).toFixed(0))
     ),
     bars.map(b=>h("div",{key:b.key,style:{marginBottom:5}},
       h("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:2}},
-        h("span",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:b.col,fontSize:"8.5px"}},
-          b.label+" ",h("span",{style:{color:"#9a8060"}},b.desc)),
+        h(Tooltip,{text:b.tt||b.desc,width:260},h("span",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:b.col,fontSize:"8.5px",cursor:"help",textDecoration:"underline dotted"}},
+          b.label+" ",h("span",{style:{color:"#9a8060"}},b.desc))),
         h("span",{style:{fontSize:9.5,fontFamily:"'JetBrains Mono',monospace",color:b.col,fontWeight:"500"}},
           ((stats[b.key]||0)*100).toFixed(1)+"%")
       ),
@@ -719,11 +851,24 @@ function SimLex(){
   const[cfg,setCfg]=useState({...DEFAULT_CFG});
   const[showChain,setShowChain]=useState(true);
   const[showCharts,setShowCharts]=useState(true);
+  const[showAbout,setShowAbout]=useState(false);
   const[showScience,setShowScience]=useState(false);
   const[hypResults,setHypResults]=useState({});
   const[hypRunning,setHypRunning]=useState(null);
   const[sciProg,setSciProg]=useState({current:0,total:0});
   const sciCfg=useRef({seed:42,nReps:50,depth:500});
+  const[customHyps,setCustomHyps]=useState([]);
+  const[customResults,setCustomResults]=useState({});
+  const[showBuilder,setShowBuilder]=useState(false);
+  const[draftErrors,setDraftErrors]=useState([]);
+  const BLANK_CUSTOM={label:"",cite:"",prediction:"",type:"welch",
+    condA:{arch:"ruleOfLaw",cfg:{},label:"Condition A"},
+    condB:{arch:"authoritarian",cfg:{},label:"Condition B"},
+    archSingle:"authoritarian",metric:"debt",direction:1,params:[]};
+  const[draft,setDraft]=useState({label:"",cite:"",prediction:"",type:"welch",
+    condA:{arch:"ruleOfLaw",cfg:{},label:"Condition A"},
+    condB:{arch:"authoritarian",cfg:{},label:"Condition B"},
+    archSingle:"authoritarian",metric:"debt",direction:1,params:[]});
 
   const handleArch=useCallback(a=>{archRef.current=a;simRef.current.architecture=a;setArch(a);},[]);
   const handlePause=useCallback(()=>{const np=!pausedRef.current;pausedRef.current=np;setPaused(np);},[]);
@@ -831,6 +976,14 @@ function SimLex(){
     return()=>{cancelAnimationFrame(animId);window.removeEventListener("resize",onResize);renderer.dispose();if(el.contains(renderer.domElement))el.removeChild(renderer.domElement);};
   },[]);
 
+  const runCustomHyp=useCallback(async(hyp,hid)=>{
+    setHypRunning(hid);
+    try{
+      const res=await runHypTest(hyp,sciCfg.current.nReps||50,sciCfg.current.depth||500,sciCfg.current.seed||42,(cv,t)=>setSciProg({current:cv,total:t}),sciCfg.current.numAgents||100);
+      setCustomResults(r=>({...r,[hid]:res}));
+    }catch(e){console.error("runCustomHyp error:",e);}
+    setHypRunning(null);
+  },[]);
   const runHyp=useCallback(async hyp=>{
     setHypRunning(hyp.id); cancelRef.current=false;
     const res=await runHypTest(hyp,sciCfg.current.nReps||50,sciCfg.current.depth||500,sciCfg.current.seed||42,(c,t)=>setSciProg({current:c,total:t}),sciCfg.current.numAgents||100);
@@ -848,10 +1001,10 @@ function SimLex(){
 
   // ── PARAMS list
   const PARAMS=[
-    {k:"repairRate",      label:"Repair Rate",      min:0.01,max:0.20,step:0.01},
-    {k:"chainDecay",      label:"Chain Decay",       min:0.001,max:0.020,step:0.001},
-    {k:"iatThreshold",    label:"IAT Threshold",     min:0.10,max:0.90,step:0.05},
-    {k:"externalPressure",label:"Ext. Pressure",     min:0,max:1,step:0.05},
+    {k:"repairRate",      label:"Repair Rate",      min:0.01,max:0.20,step:0.01,    tt:TT.repairRate},
+    {k:"chainDecay",      label:"Chain Decay",       min:0.001,max:0.020,step:0.001, tt:TT.chainDecay},
+    {k:"iatThreshold",    label:"IAT Threshold",     min:0.10,max:0.90,step:0.05,   tt:TT.iatThreshold},
+    {k:"externalPressure",label:"Ext. Pressure",     min:0,max:1,step:0.05,         tt:TT.externalPressure},
   ];
 
   return h("div",{style:{position:"relative",width:"100%",height:"100vh",overflow:"hidden"}},
@@ -865,8 +1018,10 @@ function SimLex(){
       h("div",{style:{fontSize:7,fontFamily:"'JetBrains Mono',monospace",color:"#7a5810",letterSpacing:"0.3em",marginBottom:2}},"SIMLEX · v1"),
       h("div",{style:{fontSize:20,fontFamily:"'Cormorant Garamond',serif",fontWeight:300,color:"#f0e4c8",letterSpacing:"0.06em"}},
         "Structural Simulation ",h("em",{style:{fontStyle:"italic",color:"#c49020"}},"of Law")),
+      h("div",{style:{display:"flex",alignItems:"center",justifyContent:"center",gap:10}},
       h("div",{style:{fontSize:11,fontFamily:"'Crimson Pro',serif",fontStyle:"italic",color:"#a89070"}},"A Structural Ontology of the Law · Koepsell (Palgrave)"),
-    ),
+      h("button",{onClick:()=>setShowAbout(true),style:{background:"transparent",border:"1px solid #3a2e18",borderRadius:10,cursor:"pointer",padding:"1px 9px",fontFamily:"'JetBrains Mono',monospace",fontSize:7.5,color:"#7a5810",letterSpacing:"0.08em",pointerEvents:"auto"}},"? About")
+    )),
 
     // ── LEFT PANEL
     h("div",{style:{position:"absolute",top:14,left:14,width:238,display:"flex",flexDirection:"column",gap:7,maxHeight:"calc(100vh - 28px)",overflowY:"auto",zIndex:10}},
@@ -888,15 +1043,15 @@ function SimLex(){
         ),
         h("div",{style:{marginBottom:9}},
           h("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:2}},
-            h("span",{className:"lbl",style:{marginBottom:0}},"Speed"),
+            h(Tooltip,{text:"Simulation speed multiplier. Higher values run more steps per frame — useful for reaching equilibrium faster. Science Hub batch runs always use maximum speed regardless of this setting.",width:240},h("span",{className:"lbl",style:{marginBottom:0,cursor:"help",textDecoration:"underline dotted"}},"Speed")),
             h("span",{style:{fontSize:9,fontFamily:"'JetBrains Mono',monospace",color:"#c49020"}},speed+"×")),
           h("input",{type:"range",min:1,max:8,step:1,value:speed,onChange:e=>{const s=parseInt(e.target.value);speedRef.current=s;setSpeed(s);}})
         ),
-        PARAMS.map(({k,label,min,max,step})=>{
+        PARAMS.map(({k,label,min,max,step,tt})=>{
           const v=cfg[k]||DEFAULT_CFG[k];
           return h("div",{key:k,style:{marginBottom:6}},
             h("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:2}},
-              h("span",{className:"lbl",style:{marginBottom:0}},label),
+              h(Tooltip,{text:tt,width:260},h("span",{className:"lbl",style:{marginBottom:0,cursor:"help",textDecoration:"underline dotted"}},label)),
               h("span",{style:{fontSize:9,fontFamily:"'JetBrains Mono',monospace",color:"#e0b840"}},typeof v==="number"?v.toFixed(3):"")),
             h("input",{type:"range",min,max,step,value:v,onChange:e=>{const nv=parseFloat(e.target.value);setCfg(c=>({...c,[k]:nv}));simRef.current.cfg[k]=nv;}}));
         })
@@ -904,7 +1059,7 @@ function SimLex(){
 
       // IAT Panel
       h("div",{className:"panel"},
-        h("div",{className:"lbl",style:{marginBottom:5}},"IAT · Normative Agency Test"),
+        h(Tooltip,{text:"Irreversible Accountability Test — SOoL's formal test for normative agency. Four conditions must all hold: standing, enduring residue, repair capacity, and counterfactual control. Agents meeting the threshold are Normative Agents (rendered 2× larger).",width:280},h("div",{className:"lbl",style:{marginBottom:5,cursor:"help",textDecoration:"underline dotted"}},"IAT · Normative Agency Test")),
         h("div",{style:{fontSize:7.5,fontFamily:"'JetBrains Mono',monospace",color:"#3a2e18",marginBottom:8,lineHeight:1.6,fontStyle:"italic"}},
           "IAT(E): standing + attributable breach + enduring residue + repair capacity + counterfactual control"),
         [
@@ -961,11 +1116,11 @@ function SimLex(){
 
       // Active contradiction types
       ds.ctActive&&ds.ctActive.length>0&&h("div",{className:"panel"},
-        h("div",{className:"lbl",style:{marginBottom:6}},"Active Contradiction Types"),
+        h(Tooltip,{text:"Active Contradiction Types — The 5 most frequent MLC chain failure modes in the current run, ranked by count. Each type is classified from the pattern of failed nodes in a denied obligation. Hover the short codes for full definitions.",width:280},h("div",{className:"lbl",style:{marginBottom:6,cursor:"help",textDecoration:"underline dotted"}},"Active Contradiction Types")),
         (ds.ctActive||[]).slice(0,5).map(ct=>h("div",{key:ct.key,style:{
           display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4,
           padding:"3px 7px",background:"#0f0b0525",borderRadius:2,borderLeft:`2px solid ${ct.col}`}},
-          h("span",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:ct.col,minWidth:28}},ct.short),
+          h(Tooltip,{text:TT["ct"+(ct.short||"").replace("/","")]||ct.label,width:260},h("span",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:ct.col,minWidth:28,cursor:"help",textDecoration:"underline dotted"}},ct.short)),
           h("span",{style:{fontSize:7,fontFamily:"'JetBrains Mono',monospace",color:"#5a4a30",flex:1,marginLeft:6,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}},ct.label),
           h("span",{style:{fontSize:9,fontFamily:"'JetBrains Mono',monospace",color:"#a89070"}},ct.count)))
       )
@@ -1002,7 +1157,73 @@ function SimLex(){
       cursor:"pointer",fontFamily:"'JetBrains Mono',monospace",fontSize:8,color:"#7a5810",letterSpacing:"0.1em"
     }},"⊶ Show MLC Chain"),
 
-    // ── SCIENCE HUB OVERLAY
+    showAbout&&h("div",{style:{position:"fixed",inset:0,background:"rgba(3,2,1,0.98)",zIndex:60,overflowY:"auto",padding:"24px 16px",display:"flex",alignItems:"flex-start",justifyContent:"center"}},
+      h("div",{style:{maxWidth:660,width:"100%",paddingBottom:40}},
+
+        h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-end",marginBottom:22,borderBottom:"1px solid #2a1e0a",paddingBottom:14}},
+          h("div",null,
+            h("div",{style:{fontSize:9,fontFamily:"'JetBrains Mono',monospace",color:"#7a5810",letterSpacing:"0.22em",marginBottom:6}},"ABOUT SIMLEX"),
+            h("div",{style:{fontSize:26,fontFamily:"'Cormorant Garamond',serif",fontWeight:300,color:"#f0e4c8",lineHeight:1.2}},"What Is a Structural"),
+            h("div",{style:{fontSize:26,fontFamily:"'Cormorant Garamond',serif",fontWeight:300,color:"#c49020",lineHeight:1.2,marginBottom:4}},"Ontology of the Law?"),
+            h("div",{style:{fontSize:11,fontFamily:"'Crimson Pro',serif",fontStyle:"italic",color:"#5a4a30"}},
+              "David R. Koepsell · SEAL Lab, Texas A&M · ",
+              h("em",null,"A Structural Ontology of the Law")," (Palgrave, forthcoming)")
+          ),
+          h("button",{onClick:()=>setShowAbout(false),style:{background:"transparent",border:"1px solid #2a1e0a",borderRadius:2,cursor:"pointer",padding:"4px 12px",fontFamily:"'JetBrains Mono',monospace",fontSize:8,color:"#7a5810",flexShrink:0,marginLeft:16}},"✕ Close")
+        ),
+
+        h("div",{style:{fontSize:14,fontFamily:"'Crimson Pro',serif",color:"#c8b090",lineHeight:1.75,marginBottom:18,fontStyle:"italic",borderLeft:"3px solid #c49020",paddingLeft:16,paddingTop:4,paddingBottom:4}},
+          "Every legal system makes a promise: follow the rules and the rules will work. But sometimes they don't — not because the rules are unjust, but because the system itself is structurally broken. ",
+          h("em",null,"A Structural Ontology of the Law"),
+          " is a framework for diagnosing exactly that kind of failure."
+        ),
+
+        h("div",{style:{marginBottom:18}},
+          h("div",{style:{height:1,background:"#1a1208",marginBottom:14}}),
+          h("div",{style:{fontSize:13,fontFamily:"'Cormorant Garamond',serif",fontWeight:600,color:"#c49020",marginBottom:8}},"Law as Architecture"),
+          h("div",{style:{fontSize:12,fontFamily:"'Crimson Pro',serif",color:"#a89070",lineHeight:1.75,marginBottom:10}},"Think of a legal system the way you would a building. A building can be aesthetically beautiful and still be structurally unsound — the foundations cracked, the load-bearing walls missing, the connections between floors severed. It looks fine until it doesn't."),
+          h("div",{style:{fontSize:12,fontFamily:"'Crimson Pro',serif",color:"#a89070",lineHeight:1.75,marginBottom:0}},"Law works the same way. A legal norm can be formally correct — properly enacted, clearly worded, officially enforced — and still fail to do what law is supposed to do: create genuine obligations that people can recognise, fulfil, and seek remedy for when breached. Structural ontology is the study of whether the building actually stands, not whether it looks good from the outside.")
+        ),
+        h("div",{style:{marginBottom:18}},
+          h("div",{style:{height:1,background:"#1a1208",marginBottom:14}}),
+          h("div",{style:{fontSize:13,fontFamily:"'Cormorant Garamond',serif",fontWeight:600,color:"#c49020",marginBottom:8}},"The Chain from Authority to Remedy"),
+          h("div",{style:{fontSize:12,fontFamily:"'Crimson Pro',serif",color:"#a89070",lineHeight:1.75,marginBottom:10}},"The framework identifies eight things that must be in place for any legal obligation to be real and complete — the Minimum Legal Chain. Starting from a legitimate source of authority, through a clear norm, an actor who can bear it, the circumstances that trigger it, the act that fulfils it, recognition by the person it binds, the legal effect that results, and finally a remedy if anything goes wrong."),
+          h("div",{style:{fontSize:12,fontFamily:"'Crimson Pro',serif",color:"#a89070",lineHeight:1.75,marginBottom:0}},"If any link in that chain is broken — no legitimate authority, a contradictory norm, no identifiable responsible party, no remedy — the obligation exists on paper but not in structural reality. The building has a crack.")
+        ),
+        h("div",{style:{marginBottom:18}},
+          h("div",{style:{height:1,background:"#1a1208",marginBottom:14}}),
+          h("div",{style:{fontSize:13,fontFamily:"'Cormorant Garamond',serif",fontWeight:600,color:"#c49020",marginBottom:8}},"Contradiction Debt"),
+          h("div",{style:{fontSize:12,fontFamily:"'Crimson Pro',serif",color:"#a89070",lineHeight:1.75,marginBottom:10}},"When chains break and are not repaired, they leave a structural remainder — Contradiction Debt. This is not a moral judgement. A legal system can have high debt while producing outcomes people consider just, and low debt while producing outcomes they consider unjust. The debt measures whether the structure holds, not whether the outcomes are good."),
+          h("div",{style:{fontSize:12,fontFamily:"'Crimson Pro',serif",color:"#a89070",lineHeight:1.75,marginBottom:0}},"Think of the difference between a bridge that is beautiful and a bridge that is safe. This framework measures safety.")
+        ),
+        h("div",{style:{marginBottom:18}},
+          h("div",{style:{height:1,background:"#1a1208",marginBottom:14}}),
+          h("div",{style:{fontSize:13,fontFamily:"'Cormorant Garamond',serif",fontWeight:600,color:"#c49020",marginBottom:8}},"Why Different Systems Behave Differently"),
+          h("div",{style:{fontSize:12,fontFamily:"'Crimson Pro',serif",color:"#a89070",lineHeight:1.75,marginBottom:10}},"Not all legal systems are built the same way. Some put all their weight on formal authority — the rules are clear and backed by power, but the system doesn't care whether people actually recognise their obligations or can challenge them. Others ground obligations in shared social practice, or in principles that transcend formal law."),
+          h("div",{style:{fontSize:12,fontFamily:"'Crimson Pro',serif",color:"#a89070",lineHeight:1.75,marginBottom:0}},"Each choice creates a different structural profile: different strengths, different failure modes. A rule-of-law system is structurally good at repair; an authoritarian system is structurally bad at recognition. SimLex lets you watch those differences play out in real time.")
+        ),
+        h("div",{style:{marginBottom:18}},
+          h("div",{style:{height:1,background:"#1a1208",marginBottom:14}}),
+          h("div",{style:{fontSize:13,fontFamily:"'Cormorant Garamond',serif",fontWeight:600,color:"#c49020",marginBottom:8}},"What SimLex Is"),
+          h("div",{style:{fontSize:12,fontFamily:"'Crimson Pro',serif",color:"#a89070",lineHeight:1.75,marginBottom:10}},"SimLex is a simulation of these ideas. Each dot in the three-dimensional world is an agent — a person, an institution — forming and attempting to resolve obligations with others nearby. The architecture they live in determines how hard that is."),
+          h("div",{style:{fontSize:12,fontFamily:"'Crimson Pro',serif",color:"#a89070",lineHeight:1.75,marginBottom:10}},"The simulation does not model any specific legal system. It models the structure of legal systems in general — showing that the way a system is designed determines whether obligations can complete, whether contradictions accumulate, and whether the system can repair itself when things go wrong."),
+          h("div",{style:{fontSize:12,fontFamily:"'Crimson Pro',serif",color:"#a89070",lineHeight:1.75,marginBottom:0}},"The Science Hub lets you test specific hypotheses: does a rule-of-law architecture genuinely accumulate less contradiction than an authoritarian one? Does normative agency — people's genuine capacity to recognise and fulfil obligations — make a structural difference? The answers the simulation gives are not political. They are structural.")
+        )),
+
+        h("div",{style:{marginTop:4,height:1,background:"#1a1208",marginBottom:16}}),
+        h("div",{style:{padding:"13px 16px",background:"#0f0b05",border:"1px solid #2a1e0a",borderRadius:3}},
+          h("div",{style:{fontSize:9,fontFamily:"'JetBrains Mono',monospace",color:"#5a4a30",letterSpacing:"0.08em",marginBottom:5}},"REFERENCE"),
+          h("div",{style:{fontSize:11.5,fontFamily:"'Crimson Pro',serif",color:"#a89070",lineHeight:1.7}},
+            "Koepsell, David R. ",
+            h("em",{style:{color:"#c8b090"}},"A Structural Ontology of the Law"),
+            ". Palgrave Macmillan, forthcoming.",
+            h("br",null),
+            h("span",{style:{color:"#5a4a30"}},"SEAL Lab, Texas A&M University. SimLex is the companion simulation platform developed to operationalise and test the framework’s structural predictions.")
+          )
+        )
+      ),
+
+        // ── SCIENCE HUB OVERLAY
     showScience&&h("div",{style:{position:"fixed",inset:0,background:"rgba(3,2,1,0.97)",zIndex:50,overflowY:"auto",padding:24}},
       h("div",{style:{maxWidth:780,margin:"0 auto"}},
         h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-end",marginBottom:20,borderBottom:"1px solid #2a1e0a",paddingBottom:14}},
@@ -1055,7 +1276,7 @@ function SimLex(){
               h("div",{style:{flex:1}},
                 h("div",{style:{fontSize:12,fontFamily:"'Crimson Pro',serif",color:"#c8b090",marginBottom:4}},hyp.label),
                 h("div",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#7a5810",marginBottom:4}},hyp.cite),
-                h("div",{style:{fontSize:8.5,fontFamily:"'Crimson Pro',serif",fontStyle:"italic",color:"#5a4a30"}},hyp.prediction)),
+                h("div",{style:{fontSize:8.5,fontFamily:"'Crimson Pro',serif",fontStyle:"italic",color:"#9a8060"}},hyp.prediction)),
               h("div",{style:{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:6,marginLeft:14}},
                 res&&h(VerdictBadge,{v:res.verdict}),
                 h(Btn,{onClick:()=>!running&&runHyp(hyp),label:running?"Running…":"▶ Run",color:running?"#cc8822":"#c49020",small:true}))
@@ -1101,6 +1322,150 @@ function SimLex(){
           );
         }),
 
+        // ── CUSTOM HYPOTHESIS BUILDER ──────────────────────────────────────────
+        h("div",{className:"panel",style:{marginTop:16,marginBottom:12,border:"1px solid #2a1e0a"}},
+          h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:showBuilder?12:0}},
+            h("div",{style:{fontSize:13,fontFamily:"'Cormorant Garamond',serif",fontWeight:300,color:"#c49020"}},"⊕ Design Your Own Hypothesis"),
+            h("button",{onClick:()=>setShowBuilder(b=>!b),style:{background:"transparent",border:"1px solid #2a1e0a",borderRadius:2,cursor:"pointer",padding:"3px 10px",fontFamily:"'JetBrains Mono',monospace",fontSize:8,color:"#7a5810"}},showBuilder?"− Collapse":"+ Open Builder")
+          ),
+          showBuilder&&h("div",null,
+            h("div",{style:{display:"flex",gap:6,marginBottom:10}},
+              ["welch","lag","sensitivity"].map(t=>h("button",{key:t,onClick:()=>setDraft(d=>({...d,type:t})),style:{padding:"3px 10px",borderRadius:2,fontSize:8,fontFamily:"'JetBrains Mono',monospace",cursor:"pointer",border:"1px solid "+(draft.type===t?"#c49020":"#2a1e0a"),background:draft.type===t?"#c4902022":"transparent",color:draft.type===t?"#c49020":"#9a8060"}},t==="welch"?"A vs B (Welch t)":t==="lag"?"Lag Correlation":"Sensitivity"))
+            ),
+            ...[["Hypothesis label","label","e.g. Rule of Law produces lower debt than Positivist"],["SOoL citation / source","cite","e.g. SOoL §4"],["Prediction (plain language)","prediction","e.g. Rule of Law debt slope << Positivist"]].map(([lbl,key,ph])=>
+              h("div",{key,style:{marginBottom:8}},
+                h("div",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#a89070",marginBottom:3}},lbl),
+                h("input",{value:draft[key],placeholder:ph,onChange:e=>setDraft(d=>({...d,[key]:e.target.value})),style:{width:"100%",background:"#0f0b05",border:"1px solid #4a3a1a",borderRadius:2,padding:"5px 8px",color:"#e0cfa0",fontFamily:"'Crimson Pro',serif",fontSize:11,outline:"none"}})
+              )
+            ),
+            draft.type==="welch"&&h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:10}},
+              ["condA","condB"].map(ck=>h("div",{key:ck,style:{padding:"8px 10px",background:"#0f0b05",border:"1px solid #1a1208",borderRadius:2}},
+                h("div",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#c49020",marginBottom:5}},ck==="condA"?"CONDITION A":"CONDITION B"),
+                h("input",{value:draft[ck].label,placeholder:"Label",onChange:e=>setDraft(d=>({...d,[ck]:{...d[ck],label:e.target.value}})),style:{width:"100%",background:"#060402",border:"1px solid #1a1208",borderRadius:2,padding:"3px 6px",color:"#e0cfa0",fontFamily:"'Crimson Pro',serif",fontSize:11,marginBottom:5,outline:"none"}}),
+                h("select",{value:draft[ck].arch,onChange:e=>setDraft(d=>({...d,[ck]:{...d[ck],arch:e.target.value}})),style:{width:"100%",background:"#0f0b05",border:"1px solid #2a1e0a",borderRadius:2,padding:"3px 6px",color:ARCHITECTURES[draft[ck].arch]?.col||"#c49020",fontFamily:"'JetBrains Mono',monospace",fontSize:9,marginBottom:6,outline:"none"}},
+                  ARCH_OPTIONS.map(o=>h("option",{key:o.value,value:o.value},o.label))
+                ),
+                h("div",{style:{fontSize:7.5,fontFamily:"'JetBrains Mono',monospace",color:"#3a2e18",marginBottom:3}},"PARAMETER OVERRIDES (optional)"),
+                CFG_KNOBS.map(knob=>h("div",{key:knob.key,style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:3}},
+                  h("span",{style:{fontSize:7.5,fontFamily:"'JetBrains Mono',monospace",color:"#9a8060"}},knob.label),
+                  h("div",{style:{display:"flex",alignItems:"center",gap:3}},
+                    h("input",{type:"checkbox",checked:draft[ck].cfg[knob.key]!=null,onChange:e=>{const nc={...draft[ck].cfg};if(e.target.checked)nc[knob.key]=knob.default;else delete nc[knob.key];setDraft(d=>({...d,[ck]:{...d[ck],cfg:nc}}));},style:{cursor:"pointer",accentColor:"#c49020"}}),
+                    draft[ck].cfg[knob.key]!=null&&h("input",{type:"range",min:knob.min,max:knob.max,step:knob.step,value:draft[ck].cfg[knob.key],onChange:e=>{const nc={...draft[ck].cfg,[knob.key]:parseFloat(e.target.value)};setDraft(d=>({...d,[ck]:{...d[ck],cfg:nc}}));},style:{width:60,accentColor:"#c49020"}}),
+                    draft[ck].cfg[knob.key]!=null&&h("span",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#c49020",minWidth:28}},draft[ck].cfg[knob.key]?.toFixed(2))
+                  )
+                ))
+              ))
+            ),
+            draft.type==="lag"&&h("div",{style:{marginBottom:10}},
+              h("div",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#a89070",marginBottom:4}},"ARCHITECTURE"),
+              h("select",{value:draft.archSingle||"authoritarian",onChange:e=>setDraft(d=>({...d,archSingle:e.target.value})),style:{background:"#0f0b05",border:"1px solid #2a1e0a",borderRadius:2,padding:"4px 8px",color:"#c49020",fontFamily:"'JetBrains Mono',monospace",fontSize:8,outline:"none"}},
+                ARCH_OPTIONS.map(o=>h("option",{key:o.value,value:o.value},o.label))
+              )
+            ),
+            draft.type==="sensitivity"&&h("div",{style:{marginBottom:10}},
+              h("div",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#7a5810",marginBottom:5}},"PARAMETERS TO TEST (select 2+)"),
+              h("div",{style:{display:"flex",flexWrap:"wrap",gap:5,marginBottom:8}},
+                Object.entries(PARAM_SPACE).map(([pk,pv])=>{
+                  const checked=(draft.params||[]).includes(pk);
+                  return h("label",{key:pk,style:{display:"flex",alignItems:"center",gap:4,cursor:"pointer",padding:"3px 8px",borderRadius:2,border:"1px solid "+(checked?"#c49020":"#2a1e0a"),background:checked?"#c4902018":"transparent"}},
+                    h("input",{type:"checkbox",checked,onChange:e=>{const ps=[...(draft.params||[])];if(e.target.checked)ps.push(pk);else ps.splice(ps.indexOf(pk),1);setDraft(d=>({...d,params:ps}));},style:{accentColor:"#c49020",cursor:"pointer"}}),
+                    h("span",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:checked?"#c49020":"#5a4a30"}},pv.label)
+                  );
+                })
+              ),
+              h("div",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#a89070",marginBottom:3}},"OUTCOME METRIC"),
+              h("select",{value:draft.metric,onChange:e=>setDraft(d=>({...d,metric:e.target.value})),style:{background:"#0f0b05",border:"1px solid #2a1e0a",borderRadius:2,padding:"4px 8px",color:"#c49020",fontFamily:"'JetBrains Mono',monospace",fontSize:8,outline:"none",width:"100%"}},
+                WELCH_METRICS.map(m=>h("option",{key:m.value,value:m.value},m.label))
+              )
+            ),
+            draft.type==="welch"&&h("div",{style:{display:"flex",gap:10,marginBottom:10,alignItems:"flex-end"}},
+              h("div",{style:{flex:1}},
+                h("div",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#a89070",marginBottom:3}},"OUTCOME METRIC"),
+                h("select",{value:draft.metric,onChange:e=>setDraft(d=>({...d,metric:e.target.value})),style:{width:"100%",background:"#0f0b05",border:"1px solid #2a1e0a",borderRadius:2,padding:"4px 8px",color:"#c49020",fontFamily:"'JetBrains Mono',monospace",fontSize:8,outline:"none"}},
+                  WELCH_METRICS.map(m=>h("option",{key:m.value,value:m.value},m.label))
+                )
+              ),
+              h("div",null,
+                h("div",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#a89070",marginBottom:3}},"DIRECTION"),
+                h("div",{style:{display:"flex",gap:4}},
+                  [{v:1,l:"A > B"},{v:-1,l:"A < B"}].map(opt=>h("button",{key:opt.v,onClick:()=>setDraft(d=>({...d,direction:opt.v})),style:{padding:"4px 10px",borderRadius:2,fontSize:8,fontFamily:"'JetBrains Mono',monospace",cursor:"pointer",border:"1px solid "+(draft.direction===opt.v?"#c49020":"#2a1e0a"),background:draft.direction===opt.v?"#c4902022":"transparent",color:draft.direction===opt.v?"#c49020":"#5a4a30"}},opt.l))
+                )
+              )
+            ),
+            draftErrors.length>0&&h("div",{style:{marginBottom:8,padding:"6px 10px",background:"#1a0806",border:"1px solid #cc4422",borderRadius:2}},
+              draftErrors.map((e,i)=>h("div",{key:i,style:{fontSize:8.5,fontFamily:"'Crimson Pro',serif",color:"#cc6644"}},e))
+            ),
+            h("button",{
+              onClick:()=>{
+                const errs=validateDraft(draft);setDraftErrors(errs);
+                if(errs.length>0)return;
+                const hid="custom_"+Date.now();
+                const hyp={...draft,id:hid,condA:{...draft.condA},condB:{...draft.condB},arch:draft.archSingle||"authoritarian",params:draft.params&&draft.params.length?draft.params:Object.keys(PARAM_SPACE)};
+                setCustomHyps(hs=>[...hs,hyp]);
+                setDraft({...BLANK_CUSTOM});setDraftErrors([]);
+              },
+              style:{width:"100%",padding:"7px",background:"#0f0b05",border:"1px solid #c49020",borderRadius:2,cursor:"pointer",fontFamily:"'Cormorant Garamond',serif",fontSize:13,color:"#c49020",letterSpacing:"0.04em",marginTop:4}
+            },"Add Hypothesis →")
+          )
+        ),
+        ...customHyps.map(hyp=>{
+          const hid=hyp.id,res=customResults[hid],running=hypRunning===hid;
+          return h("div",{key:hid,className:"panel",style:{marginBottom:12,border:"1px solid #2a1e0a"}},
+            h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}},
+              h("div",{style:{flex:1}},
+                h("div",{style:{display:"flex",alignItems:"center",gap:6,marginBottom:4}},
+                  h("span",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#a89070",background:"#1a1208",padding:"1px 6px",borderRadius:10}},"CUSTOM"),
+                  h("div",{style:{fontSize:12,fontFamily:"'Crimson Pro',serif",color:"#c8b090"}},hyp.label||"Untitled")
+                ),
+                hyp.cite&&h("div",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#a89070",marginBottom:3}},hyp.cite),
+                hyp.prediction&&h("div",{style:{fontSize:8.5,fontFamily:"'Crimson Pro',serif",fontStyle:"italic",color:"#9a8060"}},hyp.prediction),
+                h("div",{style:{marginTop:4,fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#3a2e18"}},
+                  hyp.type==="welch"?`${hyp.condA.label} vs ${hyp.condB.label}  ·  ${hyp.metric}  ·  ${hyp.direction>0?"A > B":"A < B"}`:
+                  hyp.type==="lag"?`lag  ·  arch: ${hyp.arch||hyp.archSingle}`:`sensitivity  ·  ${hyp.metric}`)
+              ),
+              h("div",{style:{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:5,marginLeft:12}},
+                res&&h(VerdictBadge,{v:res.verdict}),
+                h("div",{style:{display:"flex",gap:4}},
+                  h(Btn,{onClick:()=>!running&&runCustomHyp(hyp,hid),label:running?"Running…":"▶ Run",color:running?"#cc8822":"#c49020",small:true}),
+                  h(Btn,{onClick:()=>{setCustomHyps(hs=>hs.filter(h=>h.id!==hid));setCustomResults(r=>{const nr={...r};delete nr[hid];return nr;});},label:"✕",color:"#3a2e18",small:true})
+                )
+              )
+            ),
+            running&&h("div",{style:{marginTop:8,fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#cc8822"}},"Simulating… "+sciProg.current+" / "+sciProg.total+" runs"),
+            res&&!running&&h("div",{style:{marginTop:10,paddingTop:8,borderTop:"1px solid #1a1208"}},
+              res.lagCorr&&h("div",null,
+                h("div",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#a89070",marginBottom:4}},`Peak r=${res.stats?.r?.toFixed(4)||"—"} at k=${res.stats?.lag||"—"} generations`),
+                h(LagChart,{lagCorr:res.lagCorr,peak:res.peak})
+              ),
+              res.ranges&&h("div",null,res.ranges.map(r=>h("div",{key:r.pk,style:{marginBottom:4}},
+                h("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:2}},
+                  h("span",{style:{fontSize:8.5,fontFamily:"'JetBrains Mono',monospace",color:"#c49020"}},r.label),
+                  h("span",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#a89070"}},"range: "+r.range.toFixed(4))),
+                h("div",{style:{height:3,background:"#1a1208",borderRadius:1.5}},
+                  h("div",{style:{height:"100%",width:(r.range/(res.ranges[0].range||0.01)*100)+"%",background:"#c49020",borderRadius:1.5}}))))),
+              !res.lagCorr&&!res.ranges&&res.stats&&h("div",null,
+                h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:8}},
+                  [{k:"A",v:res.stats.meanA,lbl:hyp.condA?.label||"A"},{k:"B",v:res.stats.meanB,lbl:hyp.condB?.label||"B"}].map(({k,v,lbl})=>
+                    h("div",{key:k,style:{padding:"6px 10px",background:"#0f0b05",border:"1px solid #1a1208",borderRadius:2}},
+                      h("div",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#5a4a30",marginBottom:2}},lbl),
+                      h("div",{style:{fontSize:16,fontFamily:"'Cormorant Garamond',serif",fontWeight:300,color:"#c49020"}},(+v).toFixed(4)))
+                  )
+                ),
+                h("div",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#5a4a30"}},
+                  `t = ${res.stats.t?.toFixed(3)||"—"}  ·  p = ${res.stats.p?.toFixed(4)||"—"}  ·  n = ${res.stats.n||""}  ·  sd(A) = ${res.stats.sdA?.toFixed(4)||"—"}  sd(B) = ${res.stats.sdB?.toFixed(4)||"—"}`),
+                (()=>{
+                  const d=res.stats.sdA&&res.stats.sdB?Math.abs((res.stats.meanA-res.stats.meanB)/Math.sqrt((res.stats.sdA**2+res.stats.sdB**2)/2)):null;
+                  const pw=d!=null?computePower(d,Math.ceil((res.stats.n||50)/2)):null;
+                  return pw!=null?h("div",{style:{marginTop:4,display:"flex",gap:8,alignItems:"center"}},
+                    h("span",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#5a4a30"}},"Cohen's d = "+d.toFixed(3)),
+                    h("span",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:powerColor(pw)}},"Power "+powerLabel(pw)+" ("+(pw*100).toFixed(0)+"%)"),
+                    pw<0.80?h("span",{style:{fontSize:7.5,fontFamily:"'JetBrains Mono',monospace",color:"#cc8822"}},"→ increase nReps for 80% power"):null
+                  ):null;
+                })()
+              )
+            )
+          );
+        }),
         h("div",{style:{marginTop:16,paddingTop:14,borderTop:"1px solid #1a1208",fontSize:9,fontFamily:"'JetBrains Mono',monospace",color:"#3a2e18",textAlign:"center"}},
           "SimLex v1 · SOoL framework · Koepsell (SEAL Lab, Texas A&M) · ",
           h("em",{style:{fontStyle:"italic"}},"A Structural Ontology of the Law"),
