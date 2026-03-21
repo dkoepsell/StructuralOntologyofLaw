@@ -592,16 +592,132 @@ const exportTimeSeries=(fullHistory,architecture)=>{
 // CUSTOM HYPOTHESIS BUILDER CONSTANTS
 // ─────────────────────────────────────────────────────────────────────────────
 const WELCH_METRICS=[
-  {value:"debt",        label:"Contradiction Debt"},
-  {value:"debtSlope",   label:"Debt Slope (rate)"},
-  {value:"earlyDebt",   label:"Early Debt (first 20%)"},
-  {value:"coherence",   label:"Legal Coherence"},
-  {value:"minCoherence",label:"Min Coherence (tail risk)"},
-  {value:"trust",       label:"Trust"},
-  {value:"iri",         label:"IRI Composite"},
-  {value:"iriDL",       label:"IRI — Detection Latency"},
-  {value:"iriRE",       label:"IRI — Repair Efficiency"},
-  {value:"repairRatio", label:"Repair Ratio"},
+  {value:"debt",        label:"Contradiction Debt",          plain:"how much structural debt accumulates"},
+  {value:"debtSlope",   label:"Debt Slope (rate)",           plain:"how fast structural debt builds up"},
+  {value:"earlyDebt",   label:"Early Debt (first 20%)",      plain:"how quickly debt appears early on"},
+  {value:"coherence",   label:"Legal Coherence",             plain:"how structurally coherent agents are"},
+  {value:"minCoherence",label:"Min Coherence (tail risk)",   plain:"how low coherence falls at its worst"},
+  {value:"trust",       label:"Trust",                       plain:"how much trust agents maintain"},
+  {value:"iri",         label:"IRI Composite",               plain:"overall institutional resilience"},
+  {value:"iriDL",       label:"IRI — Detection Latency",     plain:"how quickly contradictions are detected"},
+  {value:"iriRE",       label:"IRI — Repair Efficiency",     plain:"how efficiently the system repairs itself"},
+  {value:"repairRatio", label:"Repair Ratio",                plain:"ratio of completed to failed obligations"},
+];
+
+// Plain-language architecture descriptions for template builder
+const ARCH_PLAIN={
+  ruleOfLaw:    "Rule of Law",
+  positivist:   "Positivist",
+  naturalLaw:   "Natural Law",
+  customary:    "Customary",
+  authoritarian:"Authoritarian",
+  pluralist:    "Pluralist",
+  theocratic:   "Theocratic",
+  collapsed:    "Collapsed",
+};
+
+// Pre-written question library — each populates the full draft
+const QUESTION_LIBRARY=[
+  {
+    q:"Does an authoritarian legal system break down faster than rule of law?",
+    hint:"Compares the rate at which structural debt accumulates — debt slope is the most sensitive measure.",
+    draft:{label:"Authoritarian vs Rule of Law — rate of structural breakdown",
+      cite:"SOoL §4 — Architecture determines failure rate, not just failure type",
+      prediction:"Authoritarian accumulates Contradiction Debt faster than Rule of Law (p<0.01)",
+      type:"welch",condA:{arch:"authoritarian",cfg:{},label:"Authoritarian"},
+      condB:{arch:"ruleOfLaw",cfg:{},label:"Rule of Law"},
+      metric:"debtSlope",direction:1,params:[]},
+  },
+  {
+    q:"Does a collapsed legal system destroy trust more than rule of law?",
+    hint:"Trust is the recognition-layer metric — it measures whether agents acknowledge obligations.",
+    draft:{label:"Collapsed vs Rule of Law — trust erosion",
+      cite:"SOoL §11 — Structural collapse severs the recognition cluster",
+      prediction:"Collapsed systems produce lower trust than Rule of Law (p<0.01)",
+      type:"welch",condA:{arch:"collapsed",cfg:{},label:"Collapsed"},
+      condB:{arch:"ruleOfLaw",cfg:{},label:"Rule of Law"},
+      metric:"trust",direction:-1,params:[]},
+  },
+  {
+    q:"Is a pluralist system more resilient than a positivist one?",
+    hint:"IRI (Institutional Resilience Index) is the composite measure of structural robustness.",
+    draft:{label:"Pluralist vs Positivist — institutional resilience",
+      cite:"SOoL §5 — Pluralism as distributed structural capacity",
+      prediction:"Pluralist IRI exceeds Positivist IRI (p<0.05)",
+      type:"welch",condA:{arch:"pluralist",cfg:{},label:"Pluralist"},
+      condB:{arch:"positivist",cfg:{},label:"Positivist"},
+      metric:"iri",direction:1,params:[]},
+  },
+  {
+    q:"Does natural law produce better repair outcomes than theocratic law?",
+    hint:"Repair ratio measures how often obligations successfully complete vs. fail — the direct measure of structural repair.",
+    draft:{label:"Natural Law vs Theocratic — obligation completion rate",
+      cite:"SOoL §7 — Remedy node (Node 8) strength differentiates repair capacity",
+      prediction:"Natural Law repair ratio exceeds Theocratic repair ratio (p<0.05)",
+      type:"welch",condA:{arch:"naturalLaw",cfg:{},label:"Natural Law"},
+      condB:{arch:"theocratic",cfg:{},label:"Theocratic"},
+      metric:"repairRatio",direction:1,params:[]},
+  },
+  {
+    q:"Does external pressure cause authoritarian systems to collapse faster than pluralist ones?",
+    hint:"External pressure (set to 0.70) simulates shocks — war, crisis, invasion. Coherence measures structural survival.",
+    draft:{label:"Authoritarian vs Pluralist under external pressure",
+      cite:"SOoL §13 — Structural brittleness is architecture-dependent",
+      prediction:"Authoritarian coherence collapses faster than Pluralist under P=0.70 (p<0.01)",
+      type:"welch",condA:{arch:"authoritarian",cfg:{externalPressure:0.70},label:"Authoritarian (P=0.70)"},
+      condB:{arch:"pluralist",cfg:{externalPressure:0.70},label:"Pluralist (P=0.70)"},
+      metric:"coherence",direction:-1,params:[]},
+  },
+  {
+    q:"Do populations with stronger normative agency produce fewer structural failures?",
+    hint:"initialIATMean seeds the population's normative agency — their capacity to recognise and fulfil obligations.",
+    draft:{label:"High normative agency vs low — effect on structural debt",
+      cite:"SOoL §6 — IAT capacity reduces effective failure rate",
+      prediction:"High-agency populations (IAT mean 0.80) accumulate less debt than low-agency (0.25) (p<0.05)",
+      type:"welch",condA:{arch:"ruleOfLaw",cfg:{initialIATMean:0.80},label:"High agency (IAT 0.80)"},
+      condB:{arch:"ruleOfLaw",cfg:{initialIATMean:0.25},label:"Low agency (IAT 0.25)"},
+      metric:"debt",direction:-1,params:[]},
+  },
+  {
+    q:"Does Contradiction Debt rise before coherence collapses in authoritarian systems?",
+    hint:"Lag analysis tests whether debt at time T predicts coherence decline at T+k. If it does, debt is a leading indicator.",
+    draft:{label:"Debt as early warning of coherence collapse (lag analysis)",
+      cite:"SOoL §10 — Contradiction Debt as structural precursor",
+      prediction:"Debt rise predicts coherence decline at lag k > 0 (r > 0.35) in Authoritarian",
+      type:"lag",archSingle:"authoritarian",metric:"coherence",params:[],
+      condA:{arch:"authoritarian",cfg:{},label:"Authoritarian"},
+      condB:{arch:"authoritarian",cfg:{},label:"Authoritarian"}},
+  },
+  {
+    q:"Which system parameter most affects institutional resilience?",
+    hint:"Sensitivity analysis ranks which knobs (repair rate, decay, etc.) drive the most variance in IRI.",
+    draft:{label:"Parameter sensitivity — what drives institutional resilience most?",
+      cite:"SOoL §5 — IRI drivers: repair capacity vs. structural entropy",
+      prediction:"Repair rate accounts for more IRI variance than chain decay",
+      type:"sensitivity",metric:"iri",params:["repairRate","chainDecay"],
+      condA:{arch:"pluralist",cfg:{},label:"Pluralist"},
+      condB:{arch:"pluralist",cfg:{},label:"Pluralist"}},
+  },
+  {
+    q:"Does a customary legal system maintain trust better than a positivist one?",
+    hint:"Customary systems rely on Actor-in-Role capacity; positivist systems rely on formal authority. Trust tracks recognition health.",
+    draft:{label:"Customary vs Positivist — trust retention",
+      cite:"SOoL §2 — Actor-in-Role (Node 3) vs. authority-side emphasis",
+      prediction:"Customary trust endpoint exceeds Positivist trust endpoint (p<0.05)",
+      type:"welch",condA:{arch:"customary",cfg:{},label:"Customary"},
+      condB:{arch:"positivist",cfg:{},label:"Positivist"},
+      metric:"trust",direction:1,params:[]},
+  },
+  {
+    q:"How does the worst-case structural health compare between rule of law and authoritarian systems?",
+    hint:"Min coherence captures tail risk — the lowest point any agent reaches, not just the average.",
+    draft:{label:"Rule of Law vs Authoritarian — worst-case structural health",
+      cite:"SOoL §4 — Architecture shapes the distribution of structural health, not just the mean",
+      prediction:"Rule of Law minimum coherence exceeds Authoritarian minimum (p<0.05)",
+      type:"welch",condA:{arch:"ruleOfLaw",cfg:{},label:"Rule of Law"},
+      condB:{arch:"authoritarian",cfg:{},label:"Authoritarian"},
+      metric:"minCoherence",direction:1,params:[]},
+  },
 ];
 const ARCH_OPTIONS=Object.entries(ARCHITECTURES).map(([k,v])=>({value:k,label:v.label,col:v.col}));
 const CFG_KNOBS=[
@@ -1329,72 +1445,130 @@ function SimLex(){
             h("button",{onClick:()=>setShowBuilder(b=>!b),style:{background:"transparent",border:"1px solid #2a1e0a",borderRadius:2,cursor:"pointer",padding:"3px 10px",fontFamily:"'JetBrains Mono',monospace",fontSize:8,color:"#7a5810"}},showBuilder?"− Collapse":"+ Open Builder")
           ),
           showBuilder&&h("div",null,
-            h("div",{style:{display:"flex",gap:6,marginBottom:10}},
-              ["welch","lag","sensitivity"].map(t=>h("button",{key:t,onClick:()=>setDraft(d=>({...d,type:t})),style:{padding:"3px 10px",borderRadius:2,fontSize:8,fontFamily:"'JetBrains Mono',monospace",cursor:"pointer",border:"1px solid "+(draft.type===t?"#c49020":"#2a1e0a"),background:draft.type===t?"#c4902022":"transparent",color:draft.type===t?"#c49020":"#9a8060"}},t==="welch"?"A vs B (Welch t)":t==="lag"?"Lag Correlation":"Sensitivity"))
-            ),
-            ...[["Hypothesis label","label","e.g. Rule of Law produces lower debt than Positivist"],["SOoL citation / source","cite","e.g. SOoL §4"],["Prediction (plain language)","prediction","e.g. Rule of Law debt slope << Positivist"]].map(([lbl,key,ph])=>
-              h("div",{key,style:{marginBottom:8}},
-                h("div",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#a89070",marginBottom:3}},lbl),
-                h("input",{value:draft[key],placeholder:ph,onChange:e=>setDraft(d=>({...d,[key]:e.target.value})),style:{width:"100%",background:"#0f0b05",border:"1px solid #4a3a1a",borderRadius:2,padding:"5px 8px",color:"#e0cfa0",fontFamily:"'Crimson Pro',serif",fontSize:11,outline:"none"}})
-              )
-            ),
-            draft.type==="welch"&&h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:10}},
-              ["condA","condB"].map(ck=>h("div",{key:ck,style:{padding:"8px 10px",background:"#0f0b05",border:"1px solid #1a1208",borderRadius:2}},
-                h("div",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#c49020",marginBottom:5}},ck==="condA"?"CONDITION A":"CONDITION B"),
-                h("input",{value:draft[ck].label,placeholder:"Label",onChange:e=>setDraft(d=>({...d,[ck]:{...d[ck],label:e.target.value}})),style:{width:"100%",background:"#060402",border:"1px solid #1a1208",borderRadius:2,padding:"3px 6px",color:"#e0cfa0",fontFamily:"'Crimson Pro',serif",fontSize:11,marginBottom:5,outline:"none"}}),
-                h("select",{value:draft[ck].arch,onChange:e=>setDraft(d=>({...d,[ck]:{...d[ck],arch:e.target.value}})),style:{width:"100%",background:"#0f0b05",border:"1px solid #2a1e0a",borderRadius:2,padding:"3px 6px",color:ARCHITECTURES[draft[ck].arch]?.col||"#c49020",fontFamily:"'JetBrains Mono',monospace",fontSize:9,marginBottom:6,outline:"none"}},
-                  ARCH_OPTIONS.map(o=>h("option",{key:o.value,value:o.value},o.label))
-                ),
-                h("div",{style:{fontSize:7.5,fontFamily:"'JetBrains Mono',monospace",color:"#3a2e18",marginBottom:3}},"PARAMETER OVERRIDES (optional)"),
-                CFG_KNOBS.map(knob=>h("div",{key:knob.key,style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:3}},
-                  h("span",{style:{fontSize:7.5,fontFamily:"'JetBrains Mono',monospace",color:"#9a8060"}},knob.label),
-                  h("div",{style:{display:"flex",alignItems:"center",gap:3}},
-                    h("input",{type:"checkbox",checked:draft[ck].cfg[knob.key]!=null,onChange:e=>{const nc={...draft[ck].cfg};if(e.target.checked)nc[knob.key]=knob.default;else delete nc[knob.key];setDraft(d=>({...d,[ck]:{...d[ck],cfg:nc}}));},style:{cursor:"pointer",accentColor:"#c49020"}}),
-                    draft[ck].cfg[knob.key]!=null&&h("input",{type:"range",min:knob.min,max:knob.max,step:knob.step,value:draft[ck].cfg[knob.key],onChange:e=>{const nc={...draft[ck].cfg,[knob.key]:parseFloat(e.target.value)};setDraft(d=>({...d,[ck]:{...d[ck],cfg:nc}}));},style:{width:60,accentColor:"#c49020"}}),
-                    draft[ck].cfg[knob.key]!=null&&h("span",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#c49020",minWidth:28}},draft[ck].cfg[knob.key]?.toFixed(2))
-                  )
+
+            // ── QUESTION LIBRARY ──────────────────────────────────────────
+            h("div",{style:{marginBottom:14}},
+              h("div",{style:{fontSize:9,fontFamily:"'JetBrains Mono',monospace",color:"#a89070",letterSpacing:"0.10em",marginBottom:8}},"START FROM A QUESTION"),
+              h("div",{style:{display:"flex",flexDirection:"column",gap:4}},
+                QUESTION_LIBRARY.map((item,qi)=>h("div",{key:qi,
+                  onClick:()=>{setDraft({...item.draft});setDraftErrors([]);},
+                  style:{padding:"8px 11px",background:"#0f0b05",border:"1px solid #1a1208",borderRadius:2,
+                    cursor:"pointer",transition:"border-color 0.15s"},
+                  onMouseEnter:e=>{e.currentTarget.style.borderColor="#4a3810";},
+                  onMouseLeave:e=>{e.currentTarget.style.borderColor="#1a1208";}},
+                  h("div",{style:{fontSize:11.5,fontFamily:"'Crimson Pro',serif",color:"#c8b090",lineHeight:1.4,marginBottom:3}},item.q),
+                  h("div",{style:{fontSize:8.5,fontFamily:"'Crimson Pro',serif",fontStyle:"italic",color:"#5a4a30"}},item.hint)
                 ))
-              ))
-            ),
-            draft.type==="lag"&&h("div",{style:{marginBottom:10}},
-              h("div",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#a89070",marginBottom:4}},"ARCHITECTURE"),
-              h("select",{value:draft.archSingle||"authoritarian",onChange:e=>setDraft(d=>({...d,archSingle:e.target.value})),style:{background:"#0f0b05",border:"1px solid #2a1e0a",borderRadius:2,padding:"4px 8px",color:"#c49020",fontFamily:"'JetBrains Mono',monospace",fontSize:8,outline:"none"}},
-                ARCH_OPTIONS.map(o=>h("option",{key:o.value,value:o.value},o.label))
               )
             ),
-            draft.type==="sensitivity"&&h("div",{style:{marginBottom:10}},
-              h("div",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#7a5810",marginBottom:5}},"PARAMETERS TO TEST (select 2+)"),
-              h("div",{style:{display:"flex",flexWrap:"wrap",gap:5,marginBottom:8}},
-                Object.entries(PARAM_SPACE).map(([pk,pv])=>{
-                  const checked=(draft.params||[]).includes(pk);
-                  return h("label",{key:pk,style:{display:"flex",alignItems:"center",gap:4,cursor:"pointer",padding:"3px 8px",borderRadius:2,border:"1px solid "+(checked?"#c49020":"#2a1e0a"),background:checked?"#c4902018":"transparent"}},
-                    h("input",{type:"checkbox",checked,onChange:e=>{const ps=[...(draft.params||[])];if(e.target.checked)ps.push(pk);else ps.splice(ps.indexOf(pk),1);setDraft(d=>({...d,params:ps}));},style:{accentColor:"#c49020",cursor:"pointer"}}),
-                    h("span",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:checked?"#c49020":"#5a4a30"}},pv.label)
-                  );
-                })
-              ),
-              h("div",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#a89070",marginBottom:3}},"OUTCOME METRIC"),
-              h("select",{value:draft.metric,onChange:e=>setDraft(d=>({...d,metric:e.target.value})),style:{background:"#0f0b05",border:"1px solid #2a1e0a",borderRadius:2,padding:"4px 8px",color:"#c49020",fontFamily:"'JetBrains Mono',monospace",fontSize:8,outline:"none",width:"100%"}},
-                WELCH_METRICS.map(m=>h("option",{key:m.value,value:m.value},m.label))
-              )
-            ),
-            draft.type==="welch"&&h("div",{style:{display:"flex",gap:10,marginBottom:10,alignItems:"flex-end"}},
-              h("div",{style:{flex:1}},
-                h("div",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#a89070",marginBottom:3}},"OUTCOME METRIC"),
-                h("select",{value:draft.metric,onChange:e=>setDraft(d=>({...d,metric:e.target.value})),style:{width:"100%",background:"#0f0b05",border:"1px solid #2a1e0a",borderRadius:2,padding:"4px 8px",color:"#c49020",fontFamily:"'JetBrains Mono',monospace",fontSize:8,outline:"none"}},
-                  WELCH_METRICS.map(m=>h("option",{key:m.value,value:m.value},m.label))
+
+            // ── TEMPLATE SENTENCE BUILDER ─────────────────────────────────
+            h("div",{style:{marginBottom:14,padding:"11px 13px",background:"#0f0b05",border:"1px solid #2a1e0a",borderRadius:2}},
+              h("div",{style:{fontSize:9,fontFamily:"'JetBrains Mono',monospace",color:"#a89070",letterSpacing:"0.10em",marginBottom:10}},"OR BUILD FROM A TEMPLATE"),
+
+              // Welch template
+              draft.type==="welch"&&h("div",null,
+                h("div",{style:{display:"flex",flexWrap:"wrap",gap:6,alignItems:"center",marginBottom:10,fontSize:12,fontFamily:"'Crimson Pro',serif",color:"#c8b090",lineHeight:2}},
+                  h("span",null,"Does"),
+                  h("select",{value:draft.condA.arch,onChange:e=>setDraft(d=>({...d,condA:{...d.condA,arch:e.target.value,label:ARCH_PLAIN[e.target.value]||e.target.value},label:ARCH_PLAIN[e.target.value]+" vs "+ARCH_PLAIN[d.condB.arch]+" — "+((WELCH_METRICS.find(m=>m.value===d.metric)||{}).plain||d.metric)})),style:{background:"#1a1208",border:"1px solid #3a2e18",borderRadius:2,padding:"2px 6px",color:ARCHITECTURES[draft.condA.arch]?.col||"#c49020",fontFamily:"'Crimson Pro',serif",fontSize:12,cursor:"pointer",outline:"none"}},
+                    ARCH_OPTIONS.map(o=>h("option",{key:o.value,value:o.value},o.label))
+                  ),
+                  h("span",null,"produce"),
+                  h("select",{value:draft.direction===1?"more":"less",onChange:e=>{const dir=e.target.value==="more"?1:-1;setDraft(d=>({...d,direction:dir}));},style:{background:"#1a1208",border:"1px solid #3a2e18",borderRadius:2,padding:"2px 6px",color:"#c49020",fontFamily:"'Crimson Pro',serif",fontSize:12,cursor:"pointer",outline:"none"}},
+                    h("option",{value:"more"},"more"),
+                    h("option",{value:"less"},"less")
+                  ),
+                  h("select",{value:draft.metric,onChange:e=>{const m=WELCH_METRICS.find(x=>x.value===e.target.value)||{};setDraft(d=>({...d,metric:e.target.value,label:ARCH_PLAIN[d.condA.arch]+" vs "+ARCH_PLAIN[d.condB.arch]+" — "+(m.plain||e.target.value),prediction:ARCH_PLAIN[d.condA.arch]+" produces "+(d.direction>0?"higher":"lower")+" "+(m.label||e.target.value)+" than "+ARCH_PLAIN[d.condB.arch]+" (p<0.05)"}));},style:{background:"#1a1208",border:"1px solid #3a2e18",borderRadius:2,padding:"2px 6px",color:"#c49020",fontFamily:"'Crimson Pro',serif",fontSize:12,cursor:"pointer",outline:"none"}},
+                    WELCH_METRICS.map(m=>h("option",{key:m.value,value:m.value},m.plain||m.label))
+                  ),
+                  h("span",null,"than"),
+                  h("select",{value:draft.condB.arch,onChange:e=>setDraft(d=>({...d,condB:{...d.condB,arch:e.target.value,label:ARCH_PLAIN[e.target.value]||e.target.value},label:ARCH_PLAIN[d.condA.arch]+" vs "+ARCH_PLAIN[e.target.value]+" — "+((WELCH_METRICS.find(m=>m.value===d.metric)||{}).plain||d.metric)})),style:{background:"#1a1208",border:"1px solid #3a2e18",borderRadius:2,padding:"2px 6px",color:ARCHITECTURES[draft.condB.arch]?.col||"#c49020",fontFamily:"'Crimson Pro',serif",fontSize:12,cursor:"pointer",outline:"none"}},
+                    ARCH_OPTIONS.map(o=>h("option",{key:o.value,value:o.value},o.label))
+                  ),
+                  h("span",{style:{color:"#5a4a30"}},"?")
+                ),
+                // Show the auto-generated hypothesis label
+                draft.label&&h("div",{style:{fontSize:9,fontFamily:"'JetBrains Mono',monospace",color:"#5a4a30",marginBottom:6,padding:"4px 8px",background:"#060402",borderRadius:2,borderLeft:"2px solid #3a2e18"}},
+                  "→ ",draft.label
                 )
               ),
-              h("div",null,
-                h("div",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#a89070",marginBottom:3}},"DIRECTION"),
-                h("div",{style:{display:"flex",gap:4}},
-                  [{v:1,l:"A > B"},{v:-1,l:"A < B"}].map(opt=>h("button",{key:opt.v,onClick:()=>setDraft(d=>({...d,direction:opt.v})),style:{padding:"4px 10px",borderRadius:2,fontSize:8,fontFamily:"'JetBrains Mono',monospace",cursor:"pointer",border:"1px solid "+(draft.direction===opt.v?"#c49020":"#2a1e0a"),background:draft.direction===opt.v?"#c4902022":"transparent",color:draft.direction===opt.v?"#c49020":"#5a4a30"}},opt.l))
+
+              // Lag template
+              draft.type==="lag"&&h("div",null,
+                h("div",{style:{display:"flex",flexWrap:"wrap",gap:6,alignItems:"center",fontSize:12,fontFamily:"'Crimson Pro',serif",color:"#c8b090",lineHeight:2}},
+                  h("span",null,"Does Contradiction Debt rise before structural decline in"),
+                  h("select",{value:draft.archSingle||"authoritarian",onChange:e=>setDraft(d=>({...d,archSingle:e.target.value,label:"Debt as early warning of collapse — "+ARCH_PLAIN[e.target.value]})),style:{background:"#1a1208",border:"1px solid #3a2e18",borderRadius:2,padding:"2px 6px",color:"#c49020",fontFamily:"'Crimson Pro',serif",fontSize:12,cursor:"pointer",outline:"none"}},
+                    ARCH_OPTIONS.map(o=>h("option",{key:o.value,value:o.value},o.label))
+                  ),
+                  h("span",{style:{color:"#5a4a30"}},"?")
+                )
+              ),
+
+              // Sensitivity template
+              draft.type==="sensitivity"&&h("div",null,
+                h("div",{style:{fontSize:12,fontFamily:"'Crimson Pro',serif",color:"#c8b090",lineHeight:1.7,marginBottom:8}},
+                  "Which system settings have the biggest effect on ",
+                  h("select",{value:draft.metric,onChange:e=>setDraft(d=>({...d,metric:e.target.value,label:"What drives "+(WELCH_METRICS.find(m=>m.value===e.target.value)||{}).plain||e.target.value})),style:{background:"#1a1208",border:"1px solid #3a2e18",borderRadius:2,padding:"2px 6px",color:"#c49020",fontFamily:"'Crimson Pro',serif",fontSize:12,cursor:"pointer",outline:"none"}},
+                    WELCH_METRICS.map(m=>h("option",{key:m.value,value:m.value},m.plain||m.label))
+                  ),
+                  h("span",{style:{color:"#5a4a30"}},"?")
+                ),
+                h("div",{style:{fontSize:9,fontFamily:"'JetBrains Mono',monospace",color:"#5a4a30",marginBottom:6}},"CHECK PARAMETERS TO COMPARE:"),
+                h("div",{style:{display:"flex",flexWrap:"wrap",gap:5}},
+                  Object.entries(PARAM_SPACE).map(([pk,pv])=>{
+                    const checked=(draft.params||[]).includes(pk);
+                    return h("label",{key:pk,style:{display:"flex",alignItems:"center",gap:4,cursor:"pointer",padding:"3px 8px",borderRadius:2,border:"1px solid "+(checked?"#c49020":"#2a1e0a"),background:checked?"#c4902018":"transparent"}},
+                      h("input",{type:"checkbox",checked,onChange:e=>{const ps=[...(draft.params||[])];if(e.target.checked)ps.push(pk);else ps.splice(ps.indexOf(pk),1);setDraft(d=>({...d,params:ps}));},style:{accentColor:"#c49020",cursor:"pointer"}}),
+                      h("span",{style:{fontSize:9,fontFamily:"'Crimson Pro',serif",color:checked?"#c49020":"#7a6040"}},pv.label)
+                    );
+                  })
+                )
+              ),
+
+              // Type toggle (compact)
+              h("div",{style:{display:"flex",gap:5,marginTop:10}},
+                ["welch","lag","sensitivity"].map(t=>h("button",{key:t,onClick:()=>setDraft(d=>({...d,type:t})),style:{padding:"2px 8px",borderRadius:10,fontSize:8,fontFamily:"'JetBrains Mono',monospace",cursor:"pointer",border:"1px solid "+(draft.type===t?"#c49020":"#1a1208"),background:draft.type===t?"#c4902022":"transparent",color:draft.type===t?"#c49020":"#3a2e18"}},
+                  t==="welch"?"A vs B":t==="lag"?"Lag":"Sensitivity"
+                ))
+              )
+            ),
+
+            // ── ADVANCED FIELDS (cite, prediction, param overrides) ────────
+            h("div",{style:{marginBottom:10}},
+              h("div",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#5a4a30",marginBottom:6,cursor:"pointer",display:"flex",alignItems:"center",gap:5,userSelect:"none"},
+                onClick:()=>setDraft(d=>({...d,_showAdvanced:!d._showAdvanced}))},
+                h("span",{style:{fontSize:10}},draft._showAdvanced?"▾":"▸"),
+                "Advanced — citation, prediction text, parameter overrides"
+              ),
+              draft._showAdvanced&&h("div",null,
+                ...[["Hypothesis label (auto-filled above)","label",""],["SOoL citation / source","cite",""],["Prediction (plain language)","prediction",""]].map(([lbl,key,ph])=>
+                  h("div",{key,style:{marginBottom:8}},
+                    h("div",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#7a5810",marginBottom:3}},lbl),
+                    h("input",{value:draft[key]||"",placeholder:ph||lbl,onChange:e=>setDraft(d=>({...d,[key]:e.target.value})),style:{width:"100%",background:"#0f0b05",border:"1px solid #2a1e0a",borderRadius:2,padding:"5px 8px",color:"#e0cfa0",fontFamily:"'Crimson Pro',serif",fontSize:11,outline:"none"}})
+                  )
+                ),
+                draft.type==="welch"&&h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:6}},
+                  ["condA","condB"].map(ck=>h("div",{key:ck,style:{padding:"8px 10px",background:"#0f0b05",border:"1px solid #1a1208",borderRadius:2}},
+                    h("div",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#7a5810",marginBottom:4}},ck==="condA"?"CONDITION A — parameter overrides":"CONDITION B — parameter overrides"),
+                    CFG_KNOBS.map(knob=>h("div",{key:knob.key,style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:3}},
+                      h("span",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#5a4a30"}},knob.label),
+                      h("div",{style:{display:"flex",alignItems:"center",gap:3}},
+                        h("input",{type:"checkbox",checked:draft[ck].cfg[knob.key]!=null,onChange:e=>{const nc={...draft[ck].cfg};if(e.target.checked)nc[knob.key]=knob.default;else delete nc[knob.key];setDraft(d=>({...d,[ck]:{...d[ck],cfg:nc}}));},style:{cursor:"pointer",accentColor:"#c49020"}}),
+                        draft[ck].cfg[knob.key]!=null&&h("input",{type:"range",min:knob.min,max:knob.max,step:knob.step,value:draft[ck].cfg[knob.key],onChange:e=>{const nc={...draft[ck].cfg,[knob.key]:parseFloat(e.target.value)};setDraft(d=>({...d,[ck]:{...d[ck],cfg:nc}}));},style:{width:60,accentColor:"#c49020"}}),
+                        draft[ck].cfg[knob.key]!=null&&h("span",{style:{fontSize:8,fontFamily:"'JetBrains Mono',monospace",color:"#c49020",minWidth:28}},draft[ck].cfg[knob.key]?.toFixed(2))
+                      )
+                    ))
+                  ))
                 )
               )
             ),
+
+            // Validation errors
             draftErrors.length>0&&h("div",{style:{marginBottom:8,padding:"6px 10px",background:"#1a0806",border:"1px solid #cc4422",borderRadius:2}},
               draftErrors.map((e,i)=>h("div",{key:i,style:{fontSize:8.5,fontFamily:"'Crimson Pro',serif",color:"#cc6644"}},e))
             ),
+
+            // Add button
             h("button",{
               onClick:()=>{
                 const errs=validateDraft(draft);setDraftErrors(errs);
@@ -1402,10 +1576,16 @@ function SimLex(){
                 const hid="custom_"+Date.now();
                 const hyp={...draft,id:hid,condA:{...draft.condA},condB:{...draft.condB},arch:draft.archSingle||"authoritarian",params:draft.params&&draft.params.length?draft.params:Object.keys(PARAM_SPACE)};
                 setCustomHyps(hs=>[...hs,hyp]);
-                setDraft({...BLANK_CUSTOM});setDraftErrors([]);
+                setDraft({label:"",cite:"",prediction:"",type:"welch",
+                  condA:{arch:"ruleOfLaw",cfg:{},label:"Condition A"},
+                  condB:{arch:"authoritarian",cfg:{},label:"Condition B"},
+                  archSingle:"authoritarian",metric:"debt",direction:1,params:[]});
+                setDraftErrors([]);
               },
-              style:{width:"100%",padding:"7px",background:"#0f0b05",border:"1px solid #c49020",borderRadius:2,cursor:"pointer",fontFamily:"'Cormorant Garamond',serif",fontSize:13,color:"#c49020",letterSpacing:"0.04em",marginTop:4}
-            },"Add Hypothesis →")
+              style:{width:"100%",padding:"7px",background:"#0f0b05",border:"1px solid #c49020",borderRadius:2,
+                cursor:"pointer",fontFamily:"'Cormorant Garamond',serif",fontSize:13,color:"#c49020",
+                letterSpacing:"0.04em",marginTop:4}
+            },"→ Add Hypothesis")
           )
         ),
         ...customHyps.map(hyp=>{
