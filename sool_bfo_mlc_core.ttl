@@ -1,0 +1,903 @@
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+
+@prefix bfo:   <http://purl.obolibrary.org/obo/BFO_> .
+@prefix iao:   <http://purl.obolibrary.org/obo/IAO_> .
+
+@prefix sool:  <https://seal.tamu.edu/ontology/sool#> .
+@prefix mlc:   <https://seal.tamu.edu/ontology/sool/mlc#> .
+@prefix ct:    <https://seal.tamu.edu/ontology/sool/contradiction#> .
+
+# ════════════════════════════════════════════════════════════════════════════
+#  ONTOLOGY HEADER
+# ════════════════════════════════════════════════════════════════════════════
+
+<https://seal.tamu.edu/ontology/sool>
+    a owl:Ontology ;
+    owl:versionIRI <https://seal.tamu.edu/ontology/sool/1.0> ;
+    owl:versionInfo "1.0" ;
+    dc:title "Structural Ontology of the Law — BFO-Grounded Core" ;
+    dc:creator "David R. Koepsell" ;
+    dc:publisher "SEAL Lab, Texas A&M University" ;
+    dcterms:description """High-level OWL/Turtle ontology grounding the Structural 
+    Ontology of the Law (SOoL) in Basic Formal Ontology (BFO). Formalizes the 
+    Minimum Legal Chain (MLC), its eight structural nodes, the four cluster types, 
+    and the thirteen contradiction types indexed to MLC link failures. Intended as 
+    the computational kernel for the SOoL legal-kernel deployment at 
+    seal.tamu.edu/legal-kernel.""" ;
+    dcterms:source "Koepsell, D.R. (forthcoming). A Structural Ontology of the Law. Palgrave Macmillan." ;
+    rdfs:comment """
+    CORE THESIS: Law is the architecture of social being. Legal entities are 
+    specifically dependent continuants — they depend for their existence on bearer 
+    agents and institutional contexts. The MLC is the minimal ontological sequence 
+    from a legitimate authority source to an enforceable remedy. A failure at any 
+    node propagates as Contradiction Debt (CD).
+
+    BFO IMPORT NOTE: This ontology references BFO 2020 IRIs. For local use, 
+    import BFO from http://purl.obolibrary.org/obo/bfo.owl
+    """ .
+
+
+# ════════════════════════════════════════════════════════════════════════════
+#  BFO STUBS (for standalone use — replace with import in production)
+#  Full BFO: http://purl.obolibrary.org/obo/bfo.owl
+# ════════════════════════════════════════════════════════════════════════════
+
+bfo:0000001 a owl:Class ; rdfs:label "entity" .
+bfo:0000002 a owl:Class ; rdfs:label "continuant" ; rdfs:subClassOf bfo:0000001 .
+bfo:0000003 a owl:Class ; rdfs:label "occurrent"  ; rdfs:subClassOf bfo:0000001 .
+
+# Continuant branch
+bfo:0000004 a owl:Class ; rdfs:label "independent continuant"          ; rdfs:subClassOf bfo:0000002 .
+bfo:0000020 a owl:Class ; rdfs:label "specifically dependent continuant"; rdfs:subClassOf bfo:0000002 .
+bfo:0000031 a owl:Class ; rdfs:label "generically dependent continuant" ; rdfs:subClassOf bfo:0000002 .
+
+# Specifically dependent continuant branch
+bfo:0000017 a owl:Class ; rdfs:label "realizable entity"     ; rdfs:subClassOf bfo:0000020 .
+bfo:0000016 a owl:Class ; rdfs:label "disposition"           ; rdfs:subClassOf bfo:0000017 .
+bfo:0000023 a owl:Class ; rdfs:label "role"                  ; rdfs:subClassOf bfo:0000017 .
+bfo:0000019 a owl:Class ; rdfs:label "quality"               ; rdfs:subClassOf bfo:0000020 .
+bfo:0000145 a owl:Class ; rdfs:label "relational quality"    ; rdfs:subClassOf bfo:0000019 .
+
+# Independent continuant branch
+bfo:0000027 a owl:Class ; rdfs:label "object aggregate"      ; rdfs:subClassOf bfo:0000004 .
+bfo:0000040 a owl:Class ; rdfs:label "material entity"       ; rdfs:subClassOf bfo:0000004 .
+
+# Occurrent branch
+bfo:0000015 a owl:Class ; rdfs:label "process"               ; rdfs:subClassOf bfo:0000003 .
+bfo:0000035 a owl:Class ; rdfs:label "process boundary"      ; rdfs:subClassOf bfo:0000003 .
+bfo:0000011 a owl:Class ; rdfs:label "spatiotemporal region"  ; rdfs:subClassOf bfo:0000003 .
+
+# BFO Object Properties
+bfo:0000054 a owl:ObjectProperty ; rdfs:label "realized in" .
+bfo:0000055 a owl:ObjectProperty ; rdfs:label "realizes" ;      owl:inverseOf bfo:0000054 .
+bfo:0000080 a owl:ObjectProperty ; rdfs:label "has bearer" .
+bfo:0000084 a owl:ObjectProperty ; rdfs:label "generically depends on" .
+bfo:0000175 a owl:ObjectProperty ; rdfs:label "specifically depends on" .
+bfo:0000197 a owl:ObjectProperty ; rdfs:label "concretizes" .
+bfo:0000199 a owl:ObjectProperty ; rdfs:label "occupies temporal region" .
+bfo:0000066 a owl:ObjectProperty ; rdfs:label "occurs in" .
+bfo:0000056 a owl:ObjectProperty ; rdfs:label "participates in" .
+
+# IAO stubs
+iao:0000030 a owl:Class ; rdfs:label "information content entity" ; rdfs:subClassOf bfo:0000031 .
+iao:0000219 a owl:Class ; rdfs:label "information bearer"         ; rdfs:subClassOf bfo:0000004 .
+
+
+# ════════════════════════════════════════════════════════════════════════════
+#  SOOL CORE CLASSES
+# ════════════════════════════════════════════════════════════════════════════
+
+# ── Agents and Institutions ──────────────────────────────────────────────────
+
+sool:Agent a owl:Class ;
+    rdfs:subClassOf bfo:0000004 ;
+    rdfs:label "Agent" ;
+    rdfs:comment """An entity capable of bearing roles and performing legal acts.
+    In BFO terms, an independent continuant that can bear specifically dependent 
+    continuants (roles, obligations, rights).""" .
+
+sool:Institution a owl:Class ;
+    rdfs:subClassOf bfo:0000004 ;
+    rdfs:label "Institution" ;
+    rdfs:comment """An aggregate continuant composed of interrelated roles and norms.
+    Institutions are the primary bearers of authority structures (N1) and the 
+    loci of recognition processes (N6-N7).""" ;
+    skos:example "Legislature, Court, Administrative Agency, Constitutional Convention" .
+
+sool:LegalSystem a owl:Class ;
+    rdfs:subClassOf sool:Institution ;
+    rdfs:label "Legal System" ;
+    rdfs:comment "The totality of institutional structures, norms, and repair mechanisms comprising a jurisdiction." .
+
+# ── Core Legal Dependent Continuants ─────────────────────────────────────────
+
+sool:LegalEntity a owl:Class ;
+    rdfs:subClassOf bfo:0000020 ;
+    rdfs:label "Legal Entity" ;
+    rdfs:comment """Abstract superclass for all specifically dependent continuants 
+    in the legal domain. Legal entities exist only in virtue of institutional 
+    recognition — they are ontologically dependent on bearer agents and the 
+    institutional contexts that sustain them.""" .
+
+sool:AuthorityStructure a owl:Class ;
+    rdfs:subClassOf bfo:0000031 ;
+    rdfs:label "Authority Structure" ;
+    rdfs:comment """A generically dependent continuant that constitutes the 
+    institutional ground for norm-issuance. Corresponds to MLC Node 1.
+    Exists in virtue of recognition by relevant institutional actors — 
+    it is borne by the institutional framework, not any individual agent.""" ;
+    skos:example "Constitutional provision, Statutory grant, Common law precedent, Regulatory delegation" .
+
+sool:LegalNorm a owl:Class ;
+    rdfs:subClassOf bfo:0000017 ;
+    rdfs:label "Legal Norm" ;
+    rdfs:comment """A realizable entity — specifically a disposition — that prescribes, 
+    permits, or prohibits conduct. Corresponds to MLC Node 2.
+    A norm is realized when an Actor in Role performs (or fails to perform) the 
+    normatively required act under the triggering conditions.""" ;
+    skos:example "Pickering balance test, McDonnell Douglas burden-shifting, Arbitrary and capricious standard" .
+
+sool:LegalRole a owl:Class ;
+    rdfs:subClassOf bfo:0000023 ;
+    rdfs:label "Legal Role" ;
+    rdfs:comment """A role in the BFO sense — a realizable entity borne by an agent 
+    within an institutional context. Corresponds to the role-assignment dimension 
+    of MLC Node 3. The same agent may bear multiple legal roles simultaneously; 
+    when those roles generate incompatible obligations for the same act, 
+    Role Contradiction (RC3) fires.""" ;
+    skos:example "Public employee, Citizen-speaker, Police officer, Administrative agency, Regulated entity" .
+
+sool:ActorInRole a owl:Class ;
+    rdfs:subClassOf bfo:0000020 ;
+    rdfs:label "Actor in Role" ;
+    rdfs:comment """The specific complex of an agent bearing one or more legal roles 
+    within a normative context. Corresponds to MLC Node 3 as a whole.
+    This is the entity against whom the norm's obligations are measured.""" .
+
+sool:LegalRight a owl:Class ;
+    rdfs:subClassOf bfo:0000017 ;
+    rdfs:label "Legal Right" ;
+    rdfs:comment """A realizable entity conferring protected normative space on a 
+    rights-bearer. Hohfeldian rights are the primary form: claim-right (with 
+    correlative duty), privilege (with correlative no-right), power (with 
+    correlative liability), immunity (with correlative disability).""" .
+
+sool:LegalObligation a owl:Class ;
+    rdfs:subClassOf bfo:0000020 ;
+    rdfs:label "Legal Obligation" ;
+    rdfs:comment """A specifically dependent continuant that constrains an agent's 
+    possible actions. Inheres in the duty-bearer; correlates with a right 
+    in the right-bearer. When N7 fails (Recognition Failure), the obligation 
+    exists in the norm but fails to attach to the specific claimant.""" .
+
+sool:LegalEffect a owl:Class ;
+    rdfs:subClassOf bfo:0000017 ;
+    rdfs:label "Legal Effect" ;
+    rdfs:comment """The normative consequence — right, duty, power, or liability — 
+    that obtains when the MLC chain closes. Corresponds to MLC Node 7.
+    This is the pivotal node: Recognition Failure (RF) fires here when 
+    the court denies that the effect attaches.""" .
+
+sool:Remedy a owl:Class ;
+    rdfs:subClassOf bfo:0000016 ;
+    rdfs:label "Remedy" ;
+    rdfs:comment """A disposition of the legal system to restore structural coherence 
+    when an obligation is breached. Corresponds to MLC Node 8.
+    Realized through a repair process (adjudication, enforcement).
+    Repair Failure (RPF) fires when this disposition is structurally blocked.""" .
+
+# ── Occurrents ────────────────────────────────────────────────────────────────
+
+sool:TriggeringFacts a owl:Class ;
+    rdfs:subClassOf bfo:0000003 ;
+    rdfs:label "Triggering Facts" ;
+    rdfs:comment """The occurrent circumstances — events, states of affairs, 
+    or situations — that activate a legal norm. Corresponds to MLC Node 4.
+    In BFO terms: an occurrent that participates in activating the disposition 
+    constituted by the norm (N2). Fact Manipulation (FM) fires when these 
+    facts are fabricated, suppressed, or made indeterminate.""" .
+
+sool:LegalAct a owl:Class ;
+    rdfs:subClassOf bfo:0000015 ;
+    rdfs:label "Legal Act or Omission" ;
+    rdfs:comment """A process performed (or omitted) by an Actor in Role that 
+    instantiates the triggering facts and constitutes the legally relevant conduct.
+    Corresponds to MLC Node 5. Procedural Contradiction (PC) fires when the 
+    required act cannot be performed through the norm's own procedure.""" .
+
+sool:RepairProcess a owl:Class ;
+    rdfs:subClassOf bfo:0000015 ;
+    rdfs:label "Repair Process" ;
+    rdfs:comment """A process that realizes the remedy disposition (N8) and 
+    restores structural coherence. Adjudication is the paradigm case.
+    Realized repair closes the MLC chain; repair failure leaves it open.""" ;
+    skos:example "Adjudication, Administrative appeal, Legislative amendment, Constitutional amendment" .
+
+sool:RecognitionAct a owl:Class ;
+    rdfs:subClassOf bfo:0000015 ;
+    rdfs:label "Recognition Act" ;
+    rdfs:comment """A process through which an institution confers or acknowledges 
+    subject status, right-bearing capacity, or normative standing. 
+    Recognition Collapse (RCL) fires when this process strips subject status 
+    while obligations continue to be imposed.""" .
+
+# ── Structural Positions ───────────────────────────────────────────────────
+
+sool:MLCPosition a owl:Class ;
+    rdfs:label "MLC Position" ;
+    rdfs:comment "Abstract class representing a structural position in the Minimum Legal Chain." .
+
+sool:NodeClosure a owl:Class ;
+    rdfs:label "Node Closure Status" ;
+    rdfs:comment "The closure status of an MLC node in a given case: closed, failed, partial, or indeterminate." .
+
+sool:ClosedNode a sool:NodeClosure ; rdfs:label "closed" ;
+    rdfs:comment "Node functions as required — the structural condition is met." .
+sool:FailedNode  a sool:NodeClosure ; rdfs:label "failed" ;
+    rdfs:comment "Node does not function — the structural condition is unmet." .
+sool:PartialNode a sool:NodeClosure ; rdfs:label "partial" ;
+    rdfs:comment "Node partially functions — a graded failure." .
+sool:IndeterminateNode a sool:NodeClosure ; rdfs:label "indeterminate" ;
+    rdfs:comment "Node closure cannot be determined from available information." .
+
+
+# ════════════════════════════════════════════════════════════════════════════
+#  MINIMUM LEGAL CHAIN — 8 NODES
+# ════════════════════════════════════════════════════════════════════════════
+
+# Node 1 — Source of Authority
+mlc:Node1_SourceOfAuthority a owl:Class ;
+    rdfs:subClassOf sool:AuthorityStructure ;
+    rdfs:subClassOf sool:MLCPosition ;
+    rdfs:label "Node 1: Source of Authority" ;
+    rdfs:comment """MLC Node 1. CLUSTER: AUTHORITY.
+    BFO TYPE: Generically Dependent Continuant (iao:InformationContentEntity subtype).
+    The institutional or normative ground that authorizes the issuance of a norm.
+    Exists in virtue of recognition by relevant institutional actors across multiple 
+    bearer instances — a statute is the same statute whether instantiated in one 
+    code or many. Node 1 closes when a legitimate, constitutionally/legally valid 
+    authority source is invoked. 
+    FAILURE MODE: Conferral Failure (CF) — authority source fails to properly vest 
+    the actor in role. Authority Inflation (AI) — decision-maker's personal will 
+    displaces the norm-issuing authority.""" ;
+    skos:broader sool:AuthorityStructure ;
+    skos:example "U.S. Constitution Art. I §8, 42 U.S.C. §1983, Administrative Procedure Act §706" .
+
+# Node 2 — Norm
+mlc:Node2_Norm a owl:Class ;
+    rdfs:subClassOf sool:LegalNorm ;
+    rdfs:subClassOf sool:MLCPosition ;
+    rdfs:label "Node 2: Norm" ;
+    rdfs:comment """MLC Node 2. CLUSTER: AUTHORITY.
+    BFO TYPE: Realizable Dependent Continuant (disposition subtype).
+    The specific rule or standard derived from the authority source.
+    A norm is a disposition: it is realized when an actor in role performs the 
+    normatively required (or prohibited) act under triggering conditions. 
+    Node 2 closes when the governing rule is determinate — when the court can 
+    specify what standard applies, not merely how a standard applies.
+    FAILURE MODES: 
+      Norm Indeterminacy (NI) — the court cannot specify what rule governs 
+        (scope uncertainty, not application difficulty).
+      Jurisdictional Contradiction (JC) — two competing normative regimes 
+        claim authority over the same situation (N2→N6 link).
+      Procedural Contradiction (PC) — required act cannot be performed through 
+        the norm's own procedure (N2→N5 link).
+      Temporal Contradiction (TC) — norm/facts misaligned in time (N2↔N4).""" ;
+    skos:example "Pickering balance test, Chevron two-step, McDonnell Douglas framework, Probable cause standard" .
+
+# Node 3 — Actor in Role
+mlc:Node3_ActorInRole a owl:Class ;
+    rdfs:subClassOf sool:ActorInRole ;
+    rdfs:subClassOf sool:MLCPosition ;
+    rdfs:label "Node 3: Actor in Role" ;
+    rdfs:comment """MLC Node 3. CLUSTER: AUTHORITY.
+    BFO TYPE: Specifically Dependent Continuant — Role (bfo:Role).
+    The agent who bears the role-governed capacity required by the norm. 
+    An actor may bear multiple roles simultaneously; when two borne roles generate 
+    incompatible obligations for the same act, Role Contradiction fires.
+    Node 3 closes when the actor is properly vested in a single, coherent role 
+    relative to the governing norm.
+    FAILURE MODES:
+      Role Contradiction (RC3) — same bearer holds two roles generating 
+        incompatible obligations for the same act. The paradigm case is 
+        Garcetti v. Ceballos: Ceballos bears (1) citizen-speaker role and 
+        (2) official-duty public employee role for the same speech act.
+      Conferral Failure (CF) — authority source (N1) fails to properly vest 
+        the actor in the required role (N1→N3 link).""" ;
+    skos:example "Public employee / citizen-speaker (Garcetti), Police officer / warrant-constrained officer" .
+
+# Node 4 — Triggering Facts
+mlc:Node4_TriggeringFacts a owl:Class ;
+    rdfs:subClassOf sool:TriggeringFacts ;
+    rdfs:subClassOf sool:MLCPosition ;
+    rdfs:label "Node 4: Triggering Facts" ;
+    rdfs:comment """MLC Node 4. CLUSTER: EFFECT.
+    BFO TYPE: Occurrent (specific: a state of affairs or situational process boundary).
+    The circumstances that activate the norm. These are the facts whose obtaining 
+    causes the norm's disposition to become realizable — the triggering conditions 
+    that bridge the normative and factual orders.
+    Node 4 closes when the relevant facts are determinate and accurately represented.
+    FAILURE MODE: Fact Manipulation (FM) — triggering facts are fabricated 
+    (Brady violation), suppressed (exculpatory evidence withheld), or structurally 
+    indeterminate. Brady violations are the paradigm FM case.""" .
+
+# Node 5 — Legal Act or Omission
+mlc:Node5_LegalAct a owl:Class ;
+    rdfs:subClassOf sool:LegalAct ;
+    rdfs:subClassOf sool:MLCPosition ;
+    rdfs:label "Node 5: Legal Act or Omission" ;
+    rdfs:comment """MLC Node 5. CLUSTER: EFFECT.
+    BFO TYPE: Process (bfo:Process).
+    The conduct — act or omission — performed by the Actor in Role that 
+    instantiates the triggering facts and constitutes the legally relevant event.
+    This process is the ontological hinge between the AUTHORITY cluster 
+    (what the norm requires) and the RECOGNITION cluster (what the court acknowledges).
+    Node 5 closes when the relevant conduct is identified and falls within 
+    the scope of the triggering facts.
+    FAILURE MODE: Procedural Contradiction (PC) — the act required by the norm 
+    cannot be performed through the norm's own procedure.""" .
+
+# Node 6 — Target
+mlc:Node6_Target a owl:Class ;
+    rdfs:subClassOf bfo:0000145 ;
+    rdfs:subClassOf sool:MLCPosition ;
+    rdfs:label "Node 6: Target" ;
+    rdfs:comment """MLC Node 6. CLUSTER: RECOGNITION.
+    BFO TYPE: Relational Dependent Continuant (relational quality).
+    The specific entity against whom the legal obligation or protection runs.
+    In Hohfeldian terms: the duty-bearer opposite the right-holder.
+    Node 6 closes when there is an identifiable target who can bear jural relations.
+    FAILURE MODES:
+      Jurisdictional Contradiction (JC) — two competing regimes constitute 
+        different targets (N2→N6 link conflict).
+      Recognition Collapse (RCL) — subject's capacity to bear rights is stripped 
+        while obligations continue to be imposed (N6→N8 pathway collapse).
+        Paradigm case: removal proceedings where the person is regulated as an 
+        object rather than recognized as a rights-bearing subject.""" .
+
+# Node 7 — Legal Effect
+mlc:Node7_LegalEffect a owl:Class ;
+    rdfs:subClassOf sool:LegalEffect ;
+    rdfs:subClassOf sool:MLCPosition ;
+    rdfs:label "Node 7: Legal Effect" ;
+    rdfs:comment """MLC Node 7. CLUSTER: RECOGNITION. THE PIVOTAL NODE.
+    BFO TYPE: Realizable Dependent Continuant (disposition subtype).
+    The normative consequence — right, duty, power, or liability — that attaches 
+    when the chain closes. Node 7 is the pivotal node: its closure or failure 
+    determines whether the claimant's right is recognized.
+    Node 7 closes when the court recognizes that the claimed legal effect attaches.
+    FAILURE MODES (all fire at N7):
+      Recognition Failure (RF) — court denies the right exists or applies. 
+        The claimant's Node 7 fails because the legal effect is not recognized.
+      Correlativity Contradiction (CC) — right acknowledged but correlative duty 
+        refused through immunity, privilege, or structural bar. The violation is 
+        assumed but the actor is shielded (qualified immunity paradigm).
+      Self-Undermining Effect (SE) — legal effect, if given full force, would 
+        destabilize the conditions of its own validity.
+      Recognition Collapse (RCL) — subject status stripped; effect cannot attach.
+    MANDATORY CASCADE: If Node 7 fails, Node 8 MUST be failed or partial (RPF cascade).""" .
+
+# Node 8 — Remedy
+mlc:Node8_Remedy a owl:Class ;
+    rdfs:subClassOf sool:Remedy ;
+    rdfs:subClassOf sool:MLCPosition ;
+    rdfs:label "Node 8: Remedy" ;
+    rdfs:comment """MLC Node 8. CLUSTER: REPAIR.
+    BFO TYPE: Disposition (bfo:Disposition).
+    A disposition of the legal system to restore structural coherence when an 
+    obligation is breached. Realized through the repair process (adjudication, 
+    enforcement, legislative correction).
+    Node 8 closes when an effective remedy is accessible to the claimant.
+    Node 8 ALWAYS annotated from the CLAIMANT's perspective — the government's 
+    enforcement remedy does not close Node 8 for the claimant.
+    FAILURE MODE: Repair Failure (RPF) — remedy is structurally blocked or 
+    inaccessible. RPF ALWAYS cascades from Node 7 failure: if N7 fails, RPF fires.
+    CASCADE RULE: Node 7 failed → Node 8 must be failed or partial. 
+    Node 8 closed with Node 7 failed = mixed-perspective annotation error.""" .
+
+
+# ════════════════════════════════════════════════════════════════════════════
+#  MLC CLUSTER TYPES
+# ════════════════════════════════════════════════════════════════════════════
+
+sool:Cluster a owl:Class ;
+    rdfs:label "MLC Cluster" ;
+    rdfs:comment "One of four functional sub-systems in the Minimum Legal Chain." .
+
+sool:AuthorityCluster a sool:Cluster ;
+    rdfs:label "AUTHORITY Cluster (N1–N3)" ;
+    rdfs:comment "Generates the normative ground: authority → norm → role-bearing actor." ;
+    sool:containsNode mlc:Node1_SourceOfAuthority, mlc:Node2_Norm, mlc:Node3_ActorInRole .
+
+sool:EffectCluster a sool:Cluster ;
+    rdfs:label "EFFECT Cluster (N4–N5)" ;
+    rdfs:comment "Activates the norm through facts and conduct." ;
+    sool:containsNode mlc:Node4_TriggeringFacts, mlc:Node5_LegalAct .
+
+sool:RecognitionCluster a sool:Cluster ;
+    rdfs:label "RECOGNITION Cluster (N6–N7)" ;
+    rdfs:comment "Makes the obligation operative on specific parties." ;
+    sool:containsNode mlc:Node6_Target, mlc:Node7_LegalEffect .
+
+sool:RepairCluster a sool:Cluster ;
+    rdfs:label "REPAIR Cluster (N8)" ;
+    rdfs:comment "Restores structural coherence when a node fails." ;
+    sool:containsNode mlc:Node8_Remedy .
+
+
+# ════════════════════════════════════════════════════════════════════════════
+#  CONTRADICTION TYPOLOGY — 13 TYPES
+# ════════════════════════════════════════════════════════════════════════════
+
+sool:ContradictionType a owl:Class ;
+    rdfs:label "Contradiction Type" ;
+    rdfs:comment """Abstract superclass for the 13 structural failure modes of the MLC.
+    Contradiction types are indexed to specific MLC links and represent violations 
+    of BFO-typed constraints. They are not moral evaluations but structural diagnoses.
+    Contradiction Debt (CD) is computed as the sum of CD weights for all active 
+    contradiction types in a case.""" .
+
+sool:hasCDWeight a owl:DatatypeProperty ;
+    rdfs:domain sool:ContradictionType ;
+    rdfs:range xsd:decimal ;
+    rdfs:comment "Contradiction Debt weight for this type (used to compute total CD)." .
+
+sool:indexedToLink a owl:ObjectProperty ;
+    rdfs:domain sool:ContradictionType ;
+    rdfs:range sool:MLCPosition ;
+    rdfs:comment "The MLC node or link at which this contradiction type fires." .
+
+sool:bfoViolation a owl:DatatypeProperty ;
+    rdfs:domain sool:ContradictionType ;
+    rdfs:range xsd:string ;
+    rdfs:comment "The BFO constraint violated by this contradiction type." .
+
+# ── CF — Conferral Failure ────────────────────────────────────────────────
+
+ct:CF a owl:NamedIndividual, sool:ContradictionType ;
+    rdfs:label "CF — Conferral Failure" ;
+    rdfs:comment """LINK: N1→N3. CD WEIGHT: 0.15.
+    The authority source (N1) fails to properly vest the actor in the role (N3) 
+    required by the norm. The chain has no valid actor. 
+    BFO VIOLATION: The disposition constituting the norm cannot be borne by 
+    the putative actor because the conferral relation (bfo:realizes) from 
+    institution to role-bearer is broken.""" ;
+    sool:hasCDWeight "0.15"^^xsd:decimal ;
+    sool:indexedToLink mlc:Node1_SourceOfAuthority ;
+    sool:indexedToLink mlc:Node3_ActorInRole ;
+    sool:bfoViolation "Broken realization relation: authority fails to actualize role-bearing capacity in the agent" .
+
+# ── AI — Authority Inflation ──────────────────────────────────────────────
+
+ct:AI a owl:NamedIndividual, sool:ContradictionType ;
+    rdfs:label "AI — Authority Inflation" ;
+    rdfs:comment """LINK: N1→N2. CD WEIGHT: 0.12.
+    The decision-maker's personal will displaces the norm. Rule-governed action 
+    becomes personal fiat. The content of N2 is determined by the issuer's 
+    preferences rather than the authority structure of N1.
+    BFO VIOLATION: The generically dependent continuant (authority structure, N1) 
+    is parasitized by a specifically dependent continuant (the decision-maker's 
+    disposition) — the norm ceases to be institutionally grounded.
+    Paradigm case: judicial or executive action that substitutes personal judgment 
+    for statutory or constitutional mandate.""" ;
+    sool:hasCDWeight "0.12"^^xsd:decimal ;
+    sool:indexedToLink mlc:Node1_SourceOfAuthority ;
+    sool:indexedToLink mlc:Node2_Norm ;
+    sool:bfoViolation "Authority source (GDC) colonized by personal disposition of issuer — norm loses institutional dependence" .
+
+# ── JC — Jurisdictional Contradiction ────────────────────────────────────
+
+ct:JC a owl:NamedIndividual, sool:ContradictionType ;
+    rdfs:label "JC — Jurisdictional Contradiction" ;
+    rdfs:comment """LINK: N2→N6. CD WEIGHT: 0.10.
+    Two competing normative regimes claim authority over the same situation. 
+    No single norm can govern without displacing the other.
+    BFO VIOLATION: Two distinct realizable entities (norms from competing 
+    authority sources) have mutually exclusive realization conditions over 
+    the same occurrent facts — the relational quality at N6 (target) cannot 
+    be consistently specified.
+    Common patterns: federal/state conflict, civil/criminal regime overlap, 
+    administrative/constitutional jurisdiction conflict.""" ;
+    sool:hasCDWeight "0.10"^^xsd:decimal ;
+    sool:indexedToLink mlc:Node2_Norm ;
+    sool:indexedToLink mlc:Node6_Target ;
+    sool:bfoViolation "Two incompatible realizable entities (norms) claim concurrent realization over the same occurrent" .
+
+# ── RC3 — Role Contradiction ──────────────────────────────────────────────
+
+ct:RC3 a owl:NamedIndividual, sool:ContradictionType ;
+    rdfs:label "RC3 — Role Contradiction" ;
+    rdfs:comment """NODE: N3. CD WEIGHT: 0.14.
+    The same bearer holds two roles generating incompatible obligations for the 
+    same act. The prototypical public employee speech failure.
+    BFO VIOLATION: A single agent bears two bfo:Role instances whose realization 
+    conditions are mutually exclusive for the same process (the specific speech act 
+    or conduct at issue). The role system is internally inconsistent.
+    PARADIGM CASE: Garcetti v. Ceballos — Richard Ceballos bears 
+    (1) citizen-speaker role [First Amendment protection] and 
+    (2) deputy DA / official-duty role [obligation to perform duties as directed].
+    The memo-writing act instantiates both role-obligations with incompatible results.
+    PREVALENCE: RC3 appears in 19.5% of D1 (First Amendment) corpus cases vs 
+    2-6% in all other domains — the RC3 concentration is the strongest empirical 
+    signature of the Garcetti structural problem.""" ;
+    sool:hasCDWeight "0.14"^^xsd:decimal ;
+    sool:indexedToLink mlc:Node3_ActorInRole ;
+    sool:bfoViolation "Agent bears two bfo:Role instances with mutually exclusive realization conditions for same process" .
+
+# ── PC — Procedural Contradiction ────────────────────────────────────────
+
+ct:PC a owl:NamedIndividual, sool:ContradictionType ;
+    rdfs:label "PC — Procedural Contradiction" ;
+    rdfs:comment """LINK: N2→N5. CD WEIGHT: 0.09.
+    The act required by the norm cannot be performed through the norm's own 
+    procedure. The procedural mechanism defeats the substantive requirement.
+    BFO VIOLATION: The process (N5) required to realize the disposition (N2) 
+    cannot be instantiated through the procedures the norm itself specifies — 
+    the realization pathway is self-blocking.""" ;
+    sool:hasCDWeight "0.09"^^xsd:decimal ;
+    sool:indexedToLink mlc:Node2_Norm ;
+    sool:indexedToLink mlc:Node5_LegalAct ;
+    sool:bfoViolation "Realization pathway for norm-disposition is internally blocked — required process cannot instantiate through norm's own procedure" .
+
+# ── TC — Temporal Contradiction ───────────────────────────────────────────
+
+ct:TC a owl:NamedIndividual, sool:ContradictionType ;
+    rdfs:label "TC — Temporal Contradiction" ;
+    rdfs:comment """LINK: N2↔N4. CD WEIGHT: 0.08.
+    Bidirectional misalignment between norm and facts in time: either the norm 
+    was not yet in force when the triggering facts arose (retroactive application), 
+    or the facts predated the norm's existence (ex post facto problem).
+    BFO VIOLATION: The temporal region occupied by the norm-disposition (N2) and 
+    the temporal region occupied by the triggering occurrent (N4) do not properly 
+    overlap — the realization conditions cannot be jointly satisfied within a 
+    coherent temporal frame.""" ;
+    sool:hasCDWeight "0.08"^^xsd:decimal ;
+    sool:indexedToLink mlc:Node2_Norm ;
+    sool:indexedToLink mlc:Node4_TriggeringFacts ;
+    sool:bfoViolation "Temporal regions of norm-disposition (N2) and triggering occurrent (N4) are disjoint or inverted" .
+
+# ── FM — Fact Manipulation ────────────────────────────────────────────────
+
+ct:FM a owl:NamedIndividual, sool:ContradictionType ;
+    rdfs:label "FM — Fact Manipulation" ;
+    rdfs:comment """NODE: N4. CD WEIGHT: 0.11.
+    Triggering facts are fabricated, suppressed, or made structurally indeterminate.
+    The chain cannot close without determinate facts.
+    BFO VIOLATION: The occurrent at N4 that is required to participate in the 
+    realization of the norm-disposition is either (a) non-existent but asserted 
+    (fabrication), (b) existing but denied (suppression), or (c) indeterminate 
+    in its occurrence. In all cases the factual basis for norm-activation is corrupted.
+    PARADIGM CASE: Brady violation — prosecution withholds exculpatory evidence, 
+    making the triggering facts structurally indeterminate for the defense.""" ;
+    sool:hasCDWeight "0.11"^^xsd:decimal ;
+    sool:indexedToLink mlc:Node4_TriggeringFacts ;
+    sool:bfoViolation "Occurrent at N4 is fabricated, suppressed, or indeterminate — factual basis for norm-realization corrupted" .
+
+# ── NI — Norm Indeterminacy ───────────────────────────────────────────────
+
+ct:NI a owl:NamedIndividual, sool:ContradictionType ;
+    rdfs:label "NI — Norm Indeterminacy" ;
+    rdfs:comment """NODE: N2. CD WEIGHT: 0.07.
+    The court cannot specify what rule governs — not merely how a determinate 
+    rule applies. Scope uncertainty, not application difficulty.
+    BFO VIOLATION: The realizable entity at N2 lacks determinate realization 
+    conditions — it is a disposition without a specifiable trigger. The norm 
+    exists institutionally but its realization conditions are undefined, making 
+    the chain unactivatable.
+    CRITICAL DISTINCTION FROM RF: NI fires when the court cannot specify the 
+    governing rule (N2 fails). RF fires when the court knows the rule but finds 
+    it does not apply (N7 fails). 
+    PARADIGM CASE: The Garcetti reservation — no specified standard for whether 
+    academic speech by public university professors is protected, because the 
+    majority explicitly declined to decide the question.""" ;
+    sool:hasCDWeight "0.07"^^xsd:decimal ;
+    sool:indexedToLink mlc:Node2_Norm ;
+    sool:bfoViolation "Realizable entity (norm) lacks determinate realization conditions — disposition without specifiable trigger" .
+
+# ── RF — Recognition Failure ──────────────────────────────────────────────
+
+ct:RF a owl:NamedIndividual, sool:ContradictionType ;
+    rdfs:label "RF — Recognition Failure" ;
+    rdfs:comment """NODES: N6/N7. CD WEIGHT: 0.11.
+    The court denies the target or legal effect required recognition. 
+    The right is denied — not merely unenforceable, but held not to exist 
+    or not to apply in this case.
+    BFO VIOLATION: The realizable entity at N7 (legal effect) fails to be 
+    realized — the realization relation from process (N5) through target (N6) 
+    to legal effect (N7) is broken. The disposition exists in the norm but 
+    does not instantiate in the specific case.
+    PREVALENCE: RF is the most common contradiction type across all 8 domains — 
+    present in 60-75% of all corpus cases. RF + RPF together constitute the 
+    primary structural failure mode of federal appellate law.""" ;
+    sool:hasCDWeight "0.11"^^xsd:decimal ;
+    sool:indexedToLink mlc:Node6_Target ;
+    sool:indexedToLink mlc:Node7_LegalEffect ;
+    sool:bfoViolation "Realization relation from process (N5) to legal effect (N7) is broken — disposition not instantiated in case" .
+
+# ── RCL — Recognition Collapse ────────────────────────────────────────────
+
+ct:RCL a owl:NamedIndividual, sool:ContradictionType ;
+    rdfs:label "RCL — Recognition Collapse" ;
+    rdfs:comment """NODES: N6→N8. CD WEIGHT: 0.18 (highest).
+    The subject's capacity to bear rights is stripped while enforcement of 
+    obligations continues. The person is regulated as an object, not recognized 
+    as a subject. Governed without protection.
+    BFO VIOLATION: The relational quality at N6 (target's standing as a 
+    rights-bearing subject) is dissolved while the process-participation obligations 
+    continue — an asymmetric destruction of the bearer relationship. The agent 
+    retains the capacity to bear duties (obligation-bearing) but loses the capacity 
+    to bear rights (right-bearing), violating the Hohfeldian correlation.
+    PARADIGM CASE: Immigration removal cases where the removable person has no 
+    recognized rights to assert against the removal but remains subject to all 
+    enforcement obligations.""" ;
+    sool:hasCDWeight "0.18"^^xsd:decimal ;
+    sool:indexedToLink mlc:Node6_Target ;
+    sool:indexedToLink mlc:Node7_LegalEffect ;
+    sool:indexedToLink mlc:Node8_Remedy ;
+    sool:bfoViolation "Right-bearing capacity of relational quality (N6) dissolved while obligation-bearing retained — asymmetric bearer relation collapse" .
+
+# ── CC — Correlativity Contradiction ──────────────────────────────────────
+
+ct:CC a owl:NamedIndividual, sool:ContradictionType ;
+    rdfs:label "CC — Correlativity Contradiction" ;
+    rdfs:comment """NODE: N7. CD WEIGHT: 0.14.
+    The right is acknowledged to exist but the correlative duty is refused through 
+    immunity, privilege, or structural bar. The court assumes the violation occurred 
+    but shields the duty-bearer from the obligation to repair it.
+    BFO VIOLATION: The Hohfeldian correlation between right (N7, right-bearer) and 
+    duty (N7, duty-bearer) is severed while both jural positions nominally obtain. 
+    The realizable entity (legal effect) is partially realized — the right is 
+    acknowledged — but the correlative realization (the duty's instantiation) 
+    is blocked by a competing disposition (immunity).
+    PARADIGM CASE: Qualified immunity in §1983 cases — 'Assuming a constitutional 
+    violation occurred, the right was not clearly established, so the officer has 
+    qualified immunity.' The right is acknowledged; the duty is refused.
+    CRITICAL DISTINCTION FROM RF: RF = right denied. CC = right acknowledged, 
+    duty refused. If the court says 'no violation' → RF. If the court says 
+    'assuming violation, QI applies' → CC.""" ;
+    sool:hasCDWeight "0.14"^^xsd:decimal ;
+    sool:indexedToLink mlc:Node7_LegalEffect ;
+    sool:bfoViolation "Hohfeldian right-duty correlation severed: right-realization acknowledged but duty-realization blocked by competing disposition (immunity)" .
+
+# ── SE — Self-Undermining Effect ──────────────────────────────────────────
+
+ct:SE a owl:NamedIndividual, sool:ContradictionType ;
+    rdfs:label "SE — Self-Undermining Effect" ;
+    rdfs:comment """NODE: N7. CD WEIGHT: 0.10.
+    The legal effect, if given full force, would undermine the conditions for 
+    the system's own persistence. The norm defeats itself.
+    BFO VIOLATION: The realizable entity at N7 (legal effect), when realized, 
+    destroys or undermines the institutional continuants that ground its own 
+    authority source (N1) — a self-referential collapse of the dependence network.
+    The effect's realization generates conditions incompatible with the continuity 
+    of the authority structure that generates the effect.""" ;
+    sool:hasCDWeight "0.10"^^xsd:decimal ;
+    sool:indexedToLink mlc:Node7_LegalEffect ;
+    sool:bfoViolation "Legal effect realization destroys institutional continuants grounding its own authority source — self-referential dependence collapse" .
+
+# ── RPF — Repair Failure ──────────────────────────────────────────────────
+
+ct:RPF a owl:NamedIndividual, sool:ContradictionType ;
+    rdfs:label "RPF — Repair Failure" ;
+    rdfs:comment """NODE: N8. CD WEIGHT: 0.13.
+    Remedy disposition exists but is structurally blocked or inaccessible.
+    RPF ALWAYS cascades from Node 7 failure — if N7 fails, RPF fires.
+    N8 closed with N7 failed is a mixed-perspective annotation error.
+    BFO VIOLATION: The disposition at N8 (remedy) is present — the legal system 
+    has a repair mechanism — but its realization is blocked. The repair process 
+    (bfo:Process) that would realize the disposition cannot be instantiated because 
+    the conditions required for its initiation are absent (N7 failed, so there is 
+    no recognized right to repair).
+    CASCADE RULE: RF fires → RPF fires. RCL fires → RPF fires. CC fires → RPF fires.
+    PREVALENCE: RPF is the second most common CT in corpus (co-occurring with RF 
+    at phi ≈ 0.95 — near-perfect cascade).""" ;
+    sool:hasCDWeight "0.13"^^xsd:decimal ;
+    sool:indexedToLink mlc:Node8_Remedy ;
+    sool:bfoViolation "Repair disposition (N8) present but realization blocked — repair process cannot instantiate because N7 recognition condition is unmet" .
+
+
+# ════════════════════════════════════════════════════════════════════════════
+#  CONTRADICTION DEBT
+# ════════════════════════════════════════════════════════════════════════════
+
+sool:ContradictionDebt a owl:Class ;
+    rdfs:label "Contradiction Debt" ;
+    rdfs:comment """SOoL's quantitative measure of structural ontological instability 
+    in a legal chain. Computed as the sum of CD weights for all active contradiction 
+    types present in a case. CD is an ONTOLOGICAL measure, not a moral one — a 
+    structurally clean chain (low CD) can serve unjust ends; a structurally stressed 
+    chain (high CD) can pursue justice. CD measures whether the structural building 
+    will stand, not whether it is beautiful.
+    
+    CD RANGE: 0.0 (no contradictions) to ~0.60 (all major types present).
+    EMPIRICAL RATIO: In 4,931-case corpus: protection_denied mean CD = 0.251, 
+    protection_granted mean CD = 0.017. Ratio = 14.8:1.
+    This ratio has strengthened across three corpus sizes (Phase I: 15.5:1 at 
+    n=1,348; Phase II: 13.1:1 at n=2,781; Phase III: 14.8:1 at n=4,931).""" .
+
+sool:hasContradictionDebt a owl:DatatypeProperty ;
+    rdfs:domain sool:LegalChain ;
+    rdfs:range xsd:decimal ;
+    rdfs:comment "The computed Contradiction Debt score for this legal chain instance." .
+
+
+# ════════════════════════════════════════════════════════════════════════════
+#  MLC CHAIN — INSTANCE TEMPLATE
+# ════════════════════════════════════════════════════════════════════════════
+
+sool:LegalChain a owl:Class ;
+    rdfs:label "Legal Chain" ;
+    rdfs:comment """An instantiation of the Minimum Legal Chain for a specific 
+    legal case or claim. Each node has a closure status; the chain outcome 
+    reflects whether the claimant's legal effect was recognized.""" .
+
+sool:hasChainOutcome a owl:DatatypeProperty ;
+    rdfs:domain sool:LegalChain ;
+    rdfs:range xsd:string ;
+    rdfs:comment "protection_granted | protection_denied | partial | remanded | dismissed | moot" .
+
+sool:hasActiveContradiction a owl:ObjectProperty ;
+    rdfs:domain sool:LegalChain ;
+    rdfs:range sool:ContradictionType ;
+    rdfs:comment "Links a chain instance to each active contradiction type." .
+
+sool:hasNode a owl:ObjectProperty ;
+    rdfs:domain sool:LegalChain ;
+    rdfs:range sool:MLCPosition ;
+    rdfs:comment "Links a chain instance to its node instantiations." .
+
+
+# ════════════════════════════════════════════════════════════════════════════
+#  KEY OBJECT PROPERTIES
+# ════════════════════════════════════════════════════════════════════════════
+
+sool:confersAuthority a owl:ObjectProperty ;
+    rdfs:domain sool:Institution ;
+    rdfs:range mlc:Node1_SourceOfAuthority ;
+    rdfs:comment "Institution confers the authority structure that grounds norm-issuance." .
+
+sool:issuesNorm a owl:ObjectProperty ;
+    rdfs:domain mlc:Node1_SourceOfAuthority ;
+    rdfs:range mlc:Node2_Norm ;
+    rdfs:comment "Authority source issues the governing norm (N1→N2 link)." .
+
+sool:vestsActorInRole a owl:ObjectProperty ;
+    rdfs:domain mlc:Node2_Norm ;
+    rdfs:range mlc:Node3_ActorInRole ;
+    rdfs:comment "Norm vests the actor in the required role (N2→N3 link)." .
+
+sool:activatedBy a owl:ObjectProperty ;
+    rdfs:domain mlc:Node2_Norm ;
+    rdfs:range mlc:Node4_TriggeringFacts ;
+    rdfs:comment "Norm is activated by the triggering facts (N2/N4 activation link)." .
+
+sool:instantiatesFactsAs a owl:ObjectProperty ;
+    rdfs:domain mlc:Node4_TriggeringFacts ;
+    rdfs:range mlc:Node5_LegalAct ;
+    rdfs:comment "Triggering facts are instantiated through the legal act (N4→N5 link)." .
+
+sool:producesEffectOn a owl:ObjectProperty ;
+    rdfs:domain mlc:Node5_LegalAct ;
+    rdfs:range mlc:Node6_Target ;
+    rdfs:comment "Legal act produces a normative effect on the target (N5→N6 link)." .
+
+sool:attachesTo a owl:ObjectProperty ;
+    rdfs:domain mlc:Node6_Target ;
+    rdfs:range mlc:Node7_LegalEffect ;
+    rdfs:comment "Legal effect attaches to the target when recognized (N6→N7 link)." .
+
+sool:enablesRemedy a owl:ObjectProperty ;
+    rdfs:domain mlc:Node7_LegalEffect ;
+    rdfs:range mlc:Node8_Remedy ;
+    rdfs:comment "Recognized legal effect enables the remedy disposition (N7→N8 link). RPF cascade: N7 failure blocks N8." .
+
+sool:bearsRole a owl:ObjectProperty ;
+    rdfs:domain sool:Agent ;
+    rdfs:range sool:LegalRole ;
+    rdfs:subPropertyOf bfo:0000080 ;
+    rdfs:comment "Agent bears a legal role. An agent may bear multiple roles simultaneously; RC3 fires when two borne roles generate incompatible obligations for the same act." .
+
+sool:containsNode a owl:ObjectProperty ;
+    rdfs:domain sool:Cluster ;
+    rdfs:range sool:MLCPosition ;
+    rdfs:comment "Cluster contains this MLC node." .
+
+sool:indexedToLink a owl:ObjectProperty ;
+    rdfs:domain sool:ContradictionType ;
+    rdfs:range sool:MLCPosition ;
+    rdfs:comment "Contradiction type is indexed to this MLC node or link." .
+
+
+# ════════════════════════════════════════════════════════════════════════════
+#  ILLUSTRATIVE INDIVIDUALS — GARCETTI v. CEBALLOS (2006)
+#  Paradigm RC3 + NI + RF + RPF case. Maximum CD in corpus.
+# ════════════════════════════════════════════════════════════════════════════
+
+sool:GarcenttiChain a sool:LegalChain ;
+    rdfs:label "Garcetti v. Ceballos — MLC Chain" ;
+    rdfs:comment "Illustrative chain instantiation for Garcetti v. Ceballos, 547 U.S. 410 (2006)." ;
+
+    sool:hasChainOutcome "protection_denied" ;
+    sool:hasContradictionDebt "0.55"^^xsd:decimal ;
+    sool:hasActiveContradiction ct:RC3, ct:NI, ct:JC, ct:RF, ct:RPF .
+
+sool:Garcetti_N1 a mlc:Node1_SourceOfAuthority ;
+    rdfs:label "N1: U.S. Constitution (First/Fourteenth Amendment)" ;
+    sool:hasClosure sool:ClosedNode .
+
+sool:Garcetti_N2 a mlc:Node2_Norm ;
+    rdfs:label "N2: Pickering balance / Garcetti official-duties exception" ;
+    rdfs:comment "Partial — NI fires because the Garcetti reservation leaves academic speech standard undefined." ;
+    sool:hasClosure sool:PartialNode ;
+    sool:hasActiveContradiction ct:NI .
+
+sool:Garcetti_N3 a mlc:Node3_ActorInRole ;
+    rdfs:label "N3: Richard Ceballos — dual role: citizen-speaker + deputy DA official-duty" ;
+    rdfs:comment "RC3 fires — same act (writing memo) activates incompatible obligations from both roles." ;
+    sool:hasClosure sool:FailedNode ;
+    sool:hasActiveContradiction ct:RC3 .
+
+sool:Garcetti_N4 a mlc:Node4_TriggeringFacts ;
+    rdfs:label "N4: Ceballos wrote memo identifying officer misconduct; retaliation followed" ;
+    sool:hasClosure sool:ClosedNode .
+
+sool:Garcetti_N5 a mlc:Node5_LegalAct ;
+    rdfs:label "N5: Writing and submitting the prosecution memo" ;
+    sool:hasClosure sool:ClosedNode .
+
+sool:Garcetti_N6 a mlc:Node6_Target ;
+    rdfs:label "N6: Los Angeles County District Attorney's Office / Garcetti" ;
+    sool:hasClosure sool:ClosedNode .
+
+sool:Garcetti_N7 a mlc:Node7_LegalEffect ;
+    rdfs:label "N7: First Amendment protection denied — speech made pursuant to official duties not protected" ;
+    rdfs:comment "RF fires — court holds official-duty speech receives no First Amendment protection." ;
+    sool:hasClosure sool:FailedNode ;
+    sool:hasActiveContradiction ct:RF .
+
+sool:Garcetti_N8 a mlc:Node8_Remedy ;
+    rdfs:label "N8: No First Amendment remedy available — RPF cascade from N7 failure" ;
+    sool:hasClosure sool:FailedNode ;
+    sool:hasActiveContradiction ct:RPF .
+
+sool:hasClosure a owl:ObjectProperty ;
+    rdfs:domain sool:MLCPosition ;
+    rdfs:range sool:NodeClosure ;
+    rdfs:comment "The closure status of this node in a specific chain instantiation." .
+
+
+# ════════════════════════════════════════════════════════════════════════════
+#  CD WEIGHT SUMMARY (ANNOTATION REFERENCE)
+# ════════════════════════════════════════════════════════════════════════════
+#
+#  CT    NAME                        LINK        CD WEIGHT
+#  ────────────────────────────────────────────────────────
+#  CF    Conferral Failure           N1→N3       0.15
+#  AI    Authority Inflation         N1→N2       0.12
+#  JC    Jurisdictional Contr.       N2→N6       0.10
+#  RC3   Role Contradiction          N.3         0.14
+#  PC    Procedural Contradiction    N2→N5       0.09
+#  TC    Temporal Contradiction      N2↔N4       0.08
+#  FM    Fact Manipulation           N.4         0.11
+#  NI    Norm Indeterminacy          N.2         0.07
+#  RF    Recognition Failure         N6/7        0.11
+#  RCL   Recognition Collapse        N6→N8       0.18  ← highest
+#  CC    Correlativity Contr.        N.7         0.14
+#  SE    Self-Undermining Effect     N.7         0.10
+#  RPF   Repair Failure              N.8         0.13
+#
+#  MAX THEORETICAL CD: 0.15+0.12+0.10+0.14+0.09+0.08+0.11+0.07+0.11+0.18+0.14+0.10+0.13 = 1.42
+#  PRACTICAL MAX (corpus): 0.55 (Garcetti compound: RC3+NI+JC+RF+RPF)
+#  EMPIRICAL MEAN denied:  0.251 (n=3,265, Phase III)
+#  EMPIRICAL MEAN granted: 0.017 (n=1,027, Phase III)
+#  CD/OUTCOME RATIO:       14.8:1
+
+# ════════════════════════════════════════════════════════════════════════════
+#  END OF ONTOLOGY
+# ════════════════════════════════════════════════════════════════════════════
