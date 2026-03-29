@@ -1,0 +1,584 @@
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix bfo:   <http://purl.obolibrary.org/obo/BFO_> .
+@prefix sool:  <http://ontologyoflaw.org/structural#> .
+@prefix crim:  <http://ontologyoflaw.org/criminal#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+
+# ============================================================================
+# SOoL Criminal Norms Ontology Module
+# sool_criminal_norms.ttl
+# SEAL Lab, Texas A&M University
+# David R. Koepsell — A Structural Ontology of Criminal Norms (forthcoming)
+#
+# Extends: sool_bfo_mlc_core.ttl
+# Describes: The ontological architecture of criminal norms, offenses,
+#            defenses, and the criminalization legitimacy conditions
+#
+# Core thesis:
+#   A criminal norm is a legal chain in which a successful state prosecution
+#   produces an IRREVERSIBLE NORMATIVE RESIDUE in the defendant — a persistent
+#   specifically-dependent-continuant (criminal status) that cannot be reset
+#   by the passage of time or payment of obligation alone.
+# ============================================================================
+
+crim: a owl:Ontology ;
+    rdfs:label "SOoL Criminal Norms Ontology" ;
+    rdfs:comment """
+        Ontological module for the structural analysis of criminal norms.
+        Uses BFO as upper ontology and extends the SOoL MLC framework.
+        The key asymmetry with civil law: in criminal chains, the STATE
+        is the claimant asserting liability. The MLC perspective inverts:
+            protection_granted = state prevails (conviction)
+            protection_denied  = defendant prevails (acquittal/reversal)
+    """ ;
+    owl:imports <http://ontologyoflaw.org/structural#> ;
+    owl:versionInfo "1.0.0" .
+
+
+# ============================================================================
+# PART I — CRIMINAL NORM AS LEGAL ENTITY
+# ============================================================================
+
+# -- The Criminal Norm -------------------------------------------------------
+
+crim:CriminalNorm a owl:Class ;
+    rdfs:subClassOf sool:LegalNorm ;
+    rdfs:label "Criminal Norm" ;
+    rdfs:comment """
+        A legal norm whose breach generates an IRREVERSIBLE NORMATIVE RESIDUE
+        in the breaching actor. Distinguished from civil norms by three
+        structural properties:
+          1. State as exclusive claimant (no private prosecution at common law)
+          2. Proof beyond reasonable doubt (higher epistemic threshold at N4/N5)
+          3. Irreversible status function (criminal record persists after sentence)
+    """ .
+
+crim:CriminalProhibition a owl:Class ;
+    rdfs:subClassOf crim:CriminalNorm ;
+    rdfs:label "Criminal Prohibition" ;
+    rdfs:comment "A norm that prohibits specified conduct and attaches criminal liability to breach." .
+
+crim:CriminalObligation a owl:Class ;
+    rdfs:subClassOf crim:CriminalNorm ;
+    rdfs:label "Criminal Obligation" ;
+    rdfs:comment "A norm that requires specified conduct and attaches criminal liability to omission (failure to register, report, etc.)." .
+
+# -- The Criminal Status Function (the irreversible residue) -----------------
+
+crim:CriminalStatus a owl:Class ;
+    rdfs:subClassOf bfo:SpecificallyDependentContinuant ;
+    rdfs:label "Criminal Status" ;
+    rdfs:comment """
+        The persistent normative residue produced by successful criminal prosecution.
+        Inheres in the convicted person. Persists after sentence completion.
+        This is the ontological entity that distinguishes criminal from civil liability:
+        it is irreversible, non-resettable by payment, and generates new criminal
+        obligations (felon-in-possession, registration requirements) independently
+        of any new harmful act.
+
+        Criminal status is the realization of the IAT (Irreversible Accountability Test)
+        conditions: it IS the enduring non-resettable residue that grounds
+        ongoing accountability.
+    """ .
+
+crim:Conviction a owl:Class ;
+    rdfs:subClassOf crim:CriminalStatus ;
+    rdfs:label "Conviction" ;
+    rdfs:comment "The legal fact established by successful criminal prosecution. A specifically-dependent-continuant that inheres in the convicted person." .
+
+crim:FelonyStatus a owl:Class ;
+    rdfs:subClassOf crim:CriminalStatus ;
+    rdfs:label "Felony Status" ;
+    rdfs:comment "Criminal status generating ongoing disabilities: felon-in-possession prohibition, voting restrictions, occupational bars, deportability." .
+
+crim:SexOffenderStatus a owl:Class ;
+    rdfs:subClassOf crim:CriminalStatus ;
+    rdfs:label "Sex Offender Registration Status" ;
+    rdfs:comment """
+        Criminal status requiring ongoing registration obligations.
+        Paradigm case of Recognition Collapse (RCL): the actor has completed
+        their sentence (N8 closed) but continues bearing criminal obligations
+        derived solely from the persisting status function.
+    """ .
+
+
+# ============================================================================
+# PART II — ELEMENTS OF OFFENSE (N2 Structure)
+# ============================================================================
+
+crim:OffenseElement a owl:Class ;
+    rdfs:subClassOf bfo:RealizableDependentContinuant ;
+    rdfs:label "Element of Offense" ;
+    rdfs:comment """
+        A constituent condition of the criminal norm at N2. Each element
+        must be proved beyond reasonable doubt for the norm to activate.
+        Failure to prove any element is RF (Recognition Failure) at N7.
+    """ .
+
+crim:ActusReusElement a owl:Class ;
+    rdfs:subClassOf crim:OffenseElement ;
+    rdfs:label "Actus Reus Element" ;
+    rdfs:comment "The conduct element of the offense. Located at N4/N5 of the criminal MLC." .
+
+crim:MensReaElement a owl:Class ;
+    rdfs:subClassOf crim:OffenseElement ;
+    rdfs:label "Mens Rea Element" ;
+    rdfs:comment """
+        The mental state element of the offense.
+        KEY STRUCTURAL CLAIM: mens rea is a ROLE-CONSTITUTING CONDITION at N3,
+        not merely a triggering fact at N4. The intent requirement specifies
+        the kind of actor who can bear criminal liability for this offense.
+        Without the requisite mental state, the actor cannot structurally
+        occupy the criminal role — CF fires at N3.
+    """ .
+
+crim:CircumstanceElement a owl:Class ;
+    rdfs:subClassOf crim:OffenseElement ;
+    rdfs:label "Circumstance Element" ;
+    rdfs:comment "A factual circumstance required for the offense (victim's age, value threshold, official status of target). Located at N4." .
+
+crim:ResultElement a owl:Class ;
+    rdfs:subClassOf crim:OffenseElement ;
+    rdfs:label "Result Element" ;
+    rdfs:comment "A required consequence of the prohibited conduct (death, serious bodily harm, financial loss). Causation doctrine governs the N4->N5 link." .
+
+# -- Mens Rea Types ----------------------------------------------------------
+
+crim:MensReaType a owl:Class ;
+    rdfs:label "Mens Rea Type" ;
+    rdfs:comment "Classification of the mental state required for criminal role-bearing at N3." .
+
+crim:PurposefulMensRea a owl:Class ;
+    rdfs:subClassOf crim:MensReaType ;
+    rdfs:label "Purposeful (Specific Intent)" ;
+    rdfs:comment "Actor's conscious object is to cause the result or engage in the conduct. Highest role-bearing condition." .
+
+crim:KnowledgeMensRea a owl:Class ;
+    rdfs:subClassOf crim:MensReaType ;
+    rdfs:label "Knowing" ;
+    rdfs:comment "Actor is practically certain the conduct will cause the result." .
+
+crim:RecklessMensRea a owl:Class ;
+    rdfs:subClassOf crim:MensReaType ;
+    rdfs:label "Reckless" ;
+    rdfs:comment "Actor consciously disregards a substantial and unjustifiable risk." .
+
+crim:NegligentMensRea a owl:Class ;
+    rdfs:subClassOf crim:MensReaType ;
+    rdfs:label "Negligent" ;
+    rdfs:comment "Actor fails to perceive a substantial and unjustifiable risk." .
+
+crim:StrictLiabilityMensRea a owl:Class ;
+    rdfs:subClassOf crim:MensReaType ;
+    rdfs:label "Strict Liability (No Mens Rea)" ;
+    rdfs:comment """
+        No mental state required. Generates PC (Procedural Contradiction)
+        at N2->N5: the norm requires the act without the role-constituting
+        mental state condition. The actor cannot structure their conduct
+        to comply with a norm they may have no capacity to detect or avoid.
+        This is the managed structural incoherence at the heart of regulatory
+        criminal law.
+    """ .
+
+
+# ============================================================================
+# PART III — OFFENSE CATEGORIES (primary MLC node taxonomy)
+# ============================================================================
+
+crim:OffenseCategory a owl:Class ;
+    rdfs:label "Offense Category" ;
+    rdfs:comment "Structural classification of criminal offenses by primary MLC failure node." .
+
+crim:HomicideOffense a owl:Class ;
+    rdfs:subClassOf crim:OffenseCategory ;
+    sool:primaryFailureNode "N5" ;
+    rdfs:label "Homicide and Violent Offense" ;
+    rdfs:comment """
+        Primary structural question: act classification at N5.
+        Does the act constitute premeditated murder (N5 = specific role condition),
+        heat-of-passion manslaughter (N5 = reduced role condition), or
+        negligent homicide (N5 thin)?
+        The degree distinction is a N2/N5 question, not a N4 question.
+    """ .
+
+crim:InchoateOffense a owl:Class ;
+    rdfs:subClassOf crim:OffenseCategory ;
+    sool:primaryFailureNode "N4/N5" ;
+    rdfs:label "Inchoate Offense" ;
+    rdfs:comment """
+        The criminal chain never fully closes at N4/N5 by design.
+        Attempt, conspiracy, and solicitation criminalize chain-formation
+        rather than chain-completion. NI at N2 (substantial step standard)
+        and TC at N2<->N4 (norm applies before the facts it governs) are
+        the expected structural stress patterns.
+    """ .
+
+crim:PropertyFraudOffense a owl:Class ;
+    rdfs:subClassOf crim:OffenseCategory ;
+    sool:primaryFailureNode "N2" ;
+    rdfs:label "Property Crime and Fraud" ;
+    rdfs:comment """
+        Primary structural question: norm indeterminacy at N2.
+        Fraud norms are structurally open-textured (what is 'material'?
+        what constitutes 'deception'?). NI fires systematically.
+        JC fires where property, contract, and criminal regimes generate
+        competing norms over the same transaction.
+    """ .
+
+crim:StatusOffense a owl:Class ;
+    rdfs:subClassOf crim:OffenseCategory ;
+    sool:primaryFailureNode "N3" ;
+    rdfs:label "Status Offense and Regulatory Crime" ;
+    rdfs:comment """
+        Primary structural question: role-bearing at N3.
+        The prohibition attaches to the role itself rather than to conduct.
+        CF fires when the actor cannot bear the role. RCL fires when status
+        persists after sentence completion. AI fires for regulatory
+        criminalization without legislative authorization.
+    """ .
+
+crim:StrictLiabilityOffense a owl:Class ;
+    rdfs:subClassOf crim:OffenseCategory ;
+    sool:primaryFailureNode "N5" ;
+    rdfs:label "Strict Liability / Public Welfare Offense" ;
+    rdfs:comment """
+        N5 is thin: the act element is satisfied without the mens rea
+        role condition. PC fires at N2->N5. This is a managed structural
+        incoherence -- the system acknowledges the contradiction and
+        contains it through reduced penalties and regulatory justification.
+    """ .
+
+crim:AffirmativeDefenseCase a owl:Class ;
+    rdfs:subClassOf crim:OffenseCategory ;
+    sool:primaryFailureNode "N7" ;
+    rdfs:label "Affirmative Defense" ;
+    rdfs:comment """
+        N1-N6 are substantially closed; the analytical focus is N7.
+        The defense concedes or does not contest the elements but argues
+        that criminal liability should not attach.
+        Justifications = JC at N2->N6
+        Excuses = CF at N3
+        Duress = CC at N7
+    """ .
+
+
+# ============================================================================
+# PART IV — CRIMINAL DEFENSES (N7 intervention taxonomy)
+# ============================================================================
+
+crim:CriminalDefense a owl:Class ;
+    rdfs:label "Criminal Defense" ;
+    rdfs:comment "Structural classification of criminal defenses by MLC node and CT." .
+
+crim:Justification a owl:Class ;
+    rdfs:subClassOf crim:CriminalDefense ;
+    sool:targetNode "N7" ;
+    sool:contradictionType "JC" ;
+    rdfs:label "Justification" ;
+    rdfs:comment """
+        A competing norm permits or requires the otherwise prohibited act.
+        JC fires at N2->N6: two norms compete over the same conduct.
+        The justification argument is that the permissive norm is lexically
+        prior to the prohibitive norm in these circumstances.
+        Self-defense, necessity, consent, and law enforcement privilege
+        are all JC defenses. When a justification succeeds, it means the
+        state's chain was defective at N2 — the norm did not apply to
+        this conduct in these circumstances.
+    """ .
+
+crim:Excuse a owl:Class ;
+    rdfs:subClassOf crim:CriminalDefense ;
+    sool:targetNode "N3" ;
+    sool:contradictionType "CF" ;
+    rdfs:label "Excuse" ;
+    rdfs:comment """
+        The actor lacked the capacity to bear the criminal role.
+        CF fires at N3: the institutional conditions for role-bearing
+        (rational agency, minimum age, sufficient cognitive function)
+        were absent.
+        Insanity, infancy, involuntary intoxication, and automatism
+        are all CF defenses. When an excuse succeeds, it means the
+        actor was never a proper bearer of the criminal obligation —
+        the chain was structurally defective at N3 even though the
+        state's norm existed and the act occurred.
+        NOTE: Excuses do not declare the act right (that is justification).
+        They declare that this actor could not structurally bear
+        the obligation the act violated.
+    """ .
+
+crim:ProceduraliBarDefense a owl:Class ;
+    rdfs:subClassOf crim:CriminalDefense ;
+    sool:targetNode "N1" ;
+    sool:contradictionType "CF" ;
+    rdfs:label "Procedural Bar" ;
+    rdfs:comment """
+        The state's authority to prosecute is exhausted or void.
+        Double jeopardy = CF at N1 (prosecution authority exhausted)
+        Statute of limitations = TC at N2<->N4 (temporal misalignment)
+        Immunized testimony = CF at N1 (prosecution authority waived)
+    """ .
+
+crim:DuressDefense a owl:Class ;
+    rdfs:subClassOf crim:Excuse ;
+    sool:targetNode "N7" ;
+    sool:contradictionType "CC" ;
+    rdfs:label "Duress" ;
+    rdfs:comment """
+        Duress is structurally ambiguous: it is partly an excuse (the actor
+        lacked capacity to comply freely -- CF at N3) and partly a CC (the
+        liability is acknowledged but the effect is denied because compliance
+        was structurally impossible). The MLC places duress at CC/N7 because
+        the actor is held to HAVE had criminal intent but CANNOT be held to
+        the correlative duty to answer for it given the coercive circumstances.
+    """ .
+
+crim:SelfDefense a owl:Class ;
+    rdfs:subClassOf crim:Justification ;
+    rdfs:label "Self-Defense" ;
+    rdfs:comment "Justified use of force to prevent imminent unlawful harm. JC fires: the norm permitting self-preservation competes with the homicide/assault prohibition." .
+
+crim:Necessity a owl:Class ;
+    rdfs:subClassOf crim:Justification ;
+    rdfs:label "Necessity (Choice of Evils)" ;
+    rdfs:comment "JC fires: two legal norms impose incompatible obligations; compliance with the greater good norm required breach of the lesser norm." .
+
+crim:Insanity a owl:Class ;
+    rdfs:subClassOf crim:Excuse ;
+    rdfs:label "Insanity" ;
+    rdfs:comment "CF fires at N3: mental disease or defect prevented actor from bearing the criminal role (knowing wrongfulness or controlling conduct)." .
+
+crim:Infancy a owl:Class ;
+    rdfs:subClassOf crim:Excuse ;
+    rdfs:label "Infancy" ;
+    rdfs:comment "CF fires at N3: actor's age places them below the threshold of criminal role-bearing capacity." .
+
+crim:Entrapment a owl:Class ;
+    rdfs:subClassOf crim:CriminalDefense ;
+    sool:targetNode "N4" ;
+    sool:contradictionType "FM" ;
+    rdfs:label "Entrapment" ;
+    rdfs:comment """
+        FM fires at N4: the state manufactured the triggering facts.
+        The predisposition inquiry (subjective test) determines whether
+        N4 was genuinely state-constructed or merely state-facilitated.
+        Entrapment is an N4 defense that is adjudicated at N7: even with
+        FM at N4, the state can prevail if predisposition is proved.
+    """ .
+
+
+# ============================================================================
+# PART V — CRIMINALIZATION LEGITIMACY CONDITIONS
+# (Structural requirements for a valid criminal norm)
+# ============================================================================
+
+crim:CriminalizationLegitimacyTest a owl:Class ;
+    rdfs:label "Criminalization Legitimacy Test" ;
+    rdfs:comment """
+        The structural analog to the IAT for criminal norms.
+        A criminal norm is structurally legitimate only if it satisfies
+        all eight MLC conditions BEFORE any prosecution occurs.
+        A norm that fails any condition generates CD at the system level,
+        independent of any individual prosecution.
+
+        This is the ontological grounding of:
+          - Void-for-vagueness doctrine (N2 failure)
+          - Ex post facto prohibition (TC at N2<->N4)
+          - Bill of attainder prohibition (CF at N3 -- role = political target)
+          - Proportionality requirement (N8 structural limit)
+          - Legality principle (nullum crimen sine lege) (N1 failure)
+    """ .
+
+crim:LegalityCondition a owl:Class ;
+    rdfs:subClassOf crim:CriminalizationLegitimacyTest ;
+    sool:targetNode "N1" ;
+    rdfs:label "Legality (Nullum Crimen Sine Lege)" ;
+    rdfs:comment """
+        N1 condition: the criminal norm must exist in positive law
+        BEFORE the conduct occurs. No common law crimes (in most
+        modern jurisdictions). Ex post facto criminalization is a
+        N1 CF -- the authority source did not exist at the relevant time.
+        TC fires: temporal misalignment between norm existence and conduct.
+    """ .
+
+crim:DefinitenesscCondition a owl:Class ;
+    rdfs:subClassOf crim:CriminalizationLegitimacyTest ;
+    sool:targetNode "N2" ;
+    sool:contradictionType "NI" ;
+    rdfs:label "Definiteness (Void-for-Vagueness)" ;
+    rdfs:comment """
+        N2 condition: the criminal norm must provide fair notice of
+        prohibited conduct. NI fires when the norm is too vague for
+        a person of ordinary intelligence to know what is prohibited.
+        This is the structural foundation of the void-for-vagueness
+        doctrine: NI at N2 in criminal norms is constitutionally
+        impermissible because criminal liability requires determinate
+        behavioral standards.
+        STRUCTURAL NOTE: NI in civil norms generates CD but is legally
+        tolerable (courts can specify). NI in criminal norms is categorically
+        impermissible -- the due process requirement of fair notice is a
+        structural constraint that NI defeats.
+    """ .
+
+crim:CapacityCondition a owl:Class ;
+    rdfs:subClassOf crim:CriminalizationLegitimacyTest ;
+    sool:targetNode "N3" ;
+    rdfs:label "Capacity Condition" ;
+    rdfs:comment """
+        N3 condition: criminal norms may only apply to actors capable
+        of bearing the criminal role. Strict liability offenses that
+        criminalize conduct beyond the actor's capacity to perceive or
+        avoid violate this condition -- CF fires at N3 systematically.
+        The capacity condition is the structural basis of the mens rea
+        requirement: it is not merely a culpability threshold but a
+        role-constituting condition for criminal liability.
+    """ .
+
+crim:ProportionalityCondition a owl:Class ;
+    rdfs:subClassOf crim:CriminalizationLegitimacyTest ;
+    sool:targetNode "N8" ;
+    sool:contradictionType "RPF" ;
+    rdfs:label "Proportionality (N8 Structural Limit)" ;
+    rdfs:comment """
+        N8 condition: the remedy (sentence) must be proportionate to
+        the offense. The Eighth Amendment proportionality doctrine is
+        a structural constraint on N8: RPF fires when the sentence
+        exceeds the structural limit for this offense.
+        NOTE: This is an INDEPENDENT N8 failure, not a cascade from N7.
+        Unlike the civil corpus where RPF almost always follows RF,
+        criminal sentencing RPF fires when N7 is CLOSED (conviction valid)
+        but N8 exceeds constitutional limits. This is the structurally
+        distinctive feature of the sentencing domain.
+    """ .
+
+
+# ============================================================================
+# PART VI — ILLUSTRATIVE INSTANCES
+# ============================================================================
+
+# -- Garcetti of criminal law: Responsible Corporate Officer doctrine --------
+
+crim:ResponsibleCorporateOfficer a crim:StatusOffense ;
+    rdfs:label "Responsible Corporate Officer Doctrine" ;
+    rdfs:comment """
+        The criminal law RC3 paradigm. A corporate officer simultaneously bears:
+          Role A: Corporate officer (duty of supervision and compliance)
+          Role B: Personal legal actor (only personally liable for own conduct)
+        The same failure of a subordinate generates incompatible obligations:
+        the officer role requires criminal accountability for subordinate conduct;
+        the personal actor role limits liability to personal acts.
+        RC3 fires: the same regulatory event cannot simultaneously honor both roles.
+    """ ;
+    sool:activeContradictions "RC3" ;
+    sool:primaryNode "N3" .
+
+# -- Brady violation as criminal FM ------------------------------------------
+
+crim:BradyViolation a crim:OffenseElement ;
+    rdfs:label "Brady Violation" ;
+    rdfs:comment """
+        FM fires at N4 of the ORIGINAL PROSECUTION when the state suppresses
+        material exculpatory evidence. The triggering facts of the conviction
+        are structurally corrupted. N4=failed in the original chain.
+        In the subsequent habeas proceeding (D9 in the civil corpus),
+        RPF fires independently at N8: the prior repair mechanism was
+        constitutionally inadequate because it rested on FM-corrupted facts.
+        Brady violations thus generate FM in the criminal chain and RPF
+        in the subsequent civil/habeas chain -- cross-domain structural linkage.
+    """ ;
+    sool:activeContradictions "FM" ;
+    sool:targetNode "N4" .
+
+# -- Felony murder as structural stress case ---------------------------------
+
+crim:FelonyMurder a crim:HomicideOffense ;
+    rdfs:label "Felony Murder" ;
+    rdfs:comment """
+        Felony murder generates JC at N2->N6: the underlying felony norm and
+        the murder norm generate incompatible requirements over the same event.
+        The merger doctrine is a structural response to JC -- it bars felony
+        murder when the underlying felony IS the assault (the norms collapse
+        into a single chain). NI fires at N2 when the merger doctrine's scope
+        is genuinely contested.
+        The causation requirement (was the death in the res gestae of the felony?)
+        is a N4/N5 question: do the triggering facts of the murder norm occur
+        within the operative scope of the felony's MLC?
+    """ ;
+    sool:activeContradictions "JC NI" ;
+    sool:primaryNode "N2" .
+
+
+# ============================================================================
+# PART VII — OBJECT PROPERTIES
+# ============================================================================
+
+crim:generatesStatus a owl:ObjectProperty ;
+    rdfs:domain crim:Conviction ;
+    rdfs:range  crim:CriminalStatus ;
+    rdfs:label "generates status" ;
+    rdfs:comment "A conviction generates a criminal status function that persists as a specifically-dependent-continuant in the convicted person." .
+
+crim:groundsProhibition a owl:ObjectProperty ;
+    rdfs:domain crim:CriminalStatus ;
+    rdfs:range  crim:CriminalProhibition ;
+    rdfs:label "grounds prohibition" ;
+    rdfs:comment "A criminal status grounds further criminal prohibitions (felon-in-possession, registration requirements)." .
+
+crim:hasElement a owl:ObjectProperty ;
+    rdfs:domain sool:CriminalNorm ;
+    rdfs:range  crim:OffenseElement ;
+    rdfs:label "has element" ;
+    rdfs:comment "A criminal norm has constituent elements that must each be proved beyond reasonable doubt." .
+
+crim:requiresMensRea a owl:ObjectProperty ;
+    rdfs:domain crim:CriminalProhibition ;
+    rdfs:range  crim:MensReaType ;
+    rdfs:label "requires mens rea" ;
+    rdfs:comment "The mental state type required for criminal role-bearing. Absence generates CF at N3." .
+
+crim:contestsNode a owl:ObjectProperty ;
+    rdfs:domain crim:CriminalDefense ;
+    rdfs:range  sool:MLCNode ;
+    rdfs:label "contests node" ;
+    rdfs:comment "The MLC node that the defense targets." .
+
+crim:fires a owl:ObjectProperty ;
+    rdfs:domain crim:CriminalDefense ;
+    rdfs:range  sool:ContradictionType ;
+    rdfs:label "fires" ;
+    rdfs:comment "The contradiction type generated when this defense succeeds." .
+
+
+# ============================================================================
+# PART VIII — DATATYPE PROPERTIES
+# ============================================================================
+
+crim:contradictionDebt a owl:DatatypeProperty ;
+    rdfs:domain crim:CriminalNorm ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label "contradiction debt" ;
+    rdfs:comment "The CD score of the criminal norm or proceeding. Computed from active CTs using SOoL weights." .
+
+crim:primaryMensRea a owl:DatatypeProperty ;
+    rdfs:domain crim:OffenseCategory ;
+    rdfs:range  xsd:string ;
+    rdfs:label "primary mens rea" .
+
+crim:primaryFailureNode a owl:DatatypeProperty ;
+    rdfs:domain crim:OffenseCategory ;
+    rdfs:range  xsd:string ;
+    rdfs:label "primary failure node" ;
+    rdfs:comment "The MLC node at which this category most commonly generates structural stress." .
+
+crim:isIrreversible a owl:DatatypeProperty ;
+    rdfs:domain crim:CriminalStatus ;
+    rdfs:range  xsd:boolean ;
+    rdfs:label "is irreversible" ;
+    rdfs:comment "True for criminal status functions that persist after sentence completion (conviction record, sex offender status). False for civil liability (dischargeable by payment)." .
+
+
+# ============================================================================
+# END OF MODULE
+# ============================================================================
