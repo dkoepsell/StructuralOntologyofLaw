@@ -1,0 +1,1021 @@
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix bfo:   <http://purl.obolibrary.org/obo/BFO_> .
+@prefix sool:  <http://ontologyoflaw.org/structural#> .
+@prefix crim:  <http://ontologyoflaw.org/criminal#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+
+# ============================================================================
+# SOoL Criminal Norms Ontology Module
+# sool_criminal_norms.ttl  —  Version 2.0
+# SEAL Lab, Texas A&M University
+# David R. Koepsell — A Structural Ontology of Criminal Norms (forthcoming)
+#
+# Extends: sool_bfo_mlc_core.ttl
+# Describes: The ontological architecture of criminal norms, offenses,
+#            defenses, criminalization legitimacy conditions, and — new in
+#            v2.0 — the formal definitions of Crime as a legal occurrent
+#            and LegalHarm as a BFO process that grounds criminalization.
+#
+# Core thesis:
+#   A criminal norm is a legal chain in which a successful state prosecution
+#   produces an IRREVERSIBLE NORMATIVE RESIDUE in the defendant — a persistent
+#   specifically-dependent-continuant (criminal status) that cannot be reset
+#   by the passage of time or payment of obligation alone.
+#
+# v2.0 additions (Parts IX and X):
+#   crim:Crime      — the criminal act-event as BFO occurrent; the entity
+#                     whose prosecution drives the criminal MLC to closure
+#                     and produces CriminalStatus.
+#   crim:LegalHarm  — the harm-producing process that grounds criminalization;
+#                     formalises the harm principle as a sixth legitimacy
+#                     condition in the CriminalizationLegitimacyTest.
+# ============================================================================
+
+crim: a owl:Ontology ;
+    rdfs:label "SOoL Criminal Norms Ontology" ;
+    owl:versionInfo "2.0.0" ;
+    rdfs:comment """
+        Ontological module for the structural analysis of criminal norms.
+        Uses BFO as upper ontology and extends the SOoL MLC framework.
+        The key asymmetry with civil law: in criminal chains, the STATE
+        is the claimant asserting liability. The MLC perspective inverts:
+            protection_granted = state prevails (conviction)
+            protection_denied  = defendant prevails (acquittal/reversal)
+
+        v2.0 adds formal definitions of Crime and LegalHarm — entities
+        that were referenced in comments throughout v1.0 but never defined
+        as ontological classes. See Parts IX and X.
+    """ ;
+    owl:imports <http://ontologyoflaw.org/structural#> .
+
+
+# ============================================================================
+# PART I — CRIMINAL NORM AS LEGAL ENTITY
+# ============================================================================
+
+crim:CriminalNorm a owl:Class ;
+    rdfs:subClassOf sool:LegalNorm ;
+    rdfs:label "Criminal Norm" ;
+    rdfs:comment """
+        A legal norm whose breach generates an IRREVERSIBLE NORMATIVE RESIDUE
+        in the breaching actor. Distinguished from civil norms by three
+        structural properties:
+          1. State as exclusive claimant (no private prosecution at common law)
+          2. Proof beyond reasonable doubt (higher epistemic threshold at N4/N5)
+          3. Irreversible status function (criminal record persists after sentence)
+    """ .
+
+crim:CriminalProhibition a owl:Class ;
+    rdfs:subClassOf crim:CriminalNorm ;
+    rdfs:label "Criminal Prohibition" ;
+    rdfs:comment "A norm that prohibits specified conduct and attaches criminal liability to breach." .
+
+crim:CriminalObligation a owl:Class ;
+    rdfs:subClassOf crim:CriminalNorm ;
+    rdfs:label "Criminal Obligation" ;
+    rdfs:comment "A norm that requires specified conduct and attaches criminal liability to omission (failure to register, report, etc.)." .
+
+
+# ============================================================================
+# PART II — CRIMINAL STATUS (the irreversible residue)
+# ============================================================================
+
+crim:CriminalStatus a owl:Class ;
+    rdfs:subClassOf bfo:SpecificallyDependentContinuant ;
+    rdfs:label "Criminal Status" ;
+    rdfs:comment """
+        The persistent normative residue produced by successful criminal
+        prosecution. Inheres in the convicted person. Persists after
+        sentence completion. This is the ontological entity that
+        distinguishes criminal from civil liability: it is irreversible,
+        non-resettable by payment, and generates new criminal obligations
+        (felon-in-possession, registration requirements) independently
+        of any new harmful act.
+
+        Criminal status is the realisation of the IAT (Irreversible
+        Accountability Test) conditions: it IS the enduring non-resettable
+        residue that grounds ongoing accountability.
+    """ .
+
+crim:Conviction a owl:Class ;
+    rdfs:subClassOf crim:CriminalStatus ;
+    rdfs:label "Conviction" ;
+    rdfs:comment "The legal fact established by successful criminal prosecution. A specifically-dependent-continuant that inheres in the convicted person." .
+
+crim:FelonyStatus a owl:Class ;
+    rdfs:subClassOf crim:CriminalStatus ;
+    rdfs:label "Felony Status" ;
+    rdfs:comment "Criminal status generating ongoing disabilities: felon-in-possession prohibition, voting restrictions, occupational bars, deportability." .
+
+crim:SexOffenderStatus a owl:Class ;
+    rdfs:subClassOf crim:CriminalStatus ;
+    rdfs:label "Sex Offender Registration Status" ;
+    rdfs:comment """
+        Criminal status requiring ongoing registration obligations.
+        Paradigm case of Recognition Collapse (RCL): the actor has
+        completed their sentence (N8 closed) but continues bearing
+        criminal obligations derived solely from the persisting status
+        function.
+    """ .
+
+
+# ============================================================================
+# PART III — ELEMENTS OF OFFENSE (N2 Structure)
+# ============================================================================
+
+crim:OffenseElement a owl:Class ;
+    rdfs:subClassOf bfo:RealizableDependentContinuant ;
+    rdfs:label "Element of Offense" ;
+    rdfs:comment """
+        A constituent condition of the criminal norm at N2. Each element
+        must be proved beyond reasonable doubt for the norm to activate.
+        Failure to prove any element is RF (Recognition Failure) at N7.
+    """ .
+
+crim:ActusReusElement a owl:Class ;
+    rdfs:subClassOf crim:OffenseElement ;
+    rdfs:label "Actus Reus Element" ;
+    rdfs:comment "The conduct element of the offense. Located at N4/N5 of the criminal MLC." .
+
+crim:MensReaElement a owl:Class ;
+    rdfs:subClassOf crim:OffenseElement ;
+    rdfs:label "Mens Rea Element" ;
+    rdfs:comment """
+        The mental state element of the offense.
+        KEY STRUCTURAL CLAIM: mens rea is a ROLE-CONSTITUTING CONDITION at N3,
+        not merely a triggering fact at N4. The intent requirement specifies
+        the kind of actor who can bear criminal liability for this offense.
+        Without the requisite mental state, the actor cannot structurally
+        occupy the criminal role — CF fires at N3.
+    """ .
+
+crim:CircumstanceElement a owl:Class ;
+    rdfs:subClassOf crim:OffenseElement ;
+    rdfs:label "Circumstance Element" ;
+    rdfs:comment "A factual circumstance required for the offense (victim age, value threshold, official status of target). Located at N4." .
+
+crim:ResultElement a owl:Class ;
+    rdfs:subClassOf crim:OffenseElement ;
+    rdfs:label "Result Element" ;
+    rdfs:comment """
+        A required consequence of the prohibited conduct (death, serious
+        bodily harm, financial loss). Causation doctrine governs the N4→N5
+        link. The result element is the offense-level pointer to a
+        crim:LegalHarm instance — the ResultElement specifies what harm
+        must obtain; LegalHarm is the ontological entity that instantiates
+        it in a given case. See Part IX for the LegalHarm class.
+    """ .
+
+# -- Mens Rea Types ----------------------------------------------------------
+
+crim:MensReaType a owl:Class ;
+    rdfs:label "Mens Rea Type" ;
+    rdfs:comment "Classification of the mental state required for criminal role-bearing at N3." .
+
+crim:PurposefulMensRea a owl:Class ;
+    rdfs:subClassOf crim:MensReaType ;
+    rdfs:label "Purposeful (Specific Intent)" ;
+    rdfs:comment "Actor's conscious object is to cause the result or engage in the conduct. Highest role-bearing condition." .
+
+crim:KnowledgeMensRea a owl:Class ;
+    rdfs:subClassOf crim:MensReaType ;
+    rdfs:label "Knowing" ;
+    rdfs:comment "Actor is practically certain the conduct will cause the result." .
+
+crim:RecklessMensRea a owl:Class ;
+    rdfs:subClassOf crim:MensReaType ;
+    rdfs:label "Reckless" ;
+    rdfs:comment "Actor consciously disregards a substantial and unjustifiable risk." .
+
+crim:NegligentMensRea a owl:Class ;
+    rdfs:subClassOf crim:MensReaType ;
+    rdfs:label "Negligent" ;
+    rdfs:comment "Actor fails to perceive a substantial and unjustifiable risk." .
+
+crim:StrictLiabilityMensRea a owl:Class ;
+    rdfs:subClassOf crim:MensReaType ;
+    rdfs:label "Strict Liability (No Mens Rea)" ;
+    rdfs:comment """
+        No mental state required. Generates PC (Procedural Contradiction)
+        at N2→N5: the norm requires the act without the role-constituting
+        mental state condition. The actor cannot structure their conduct
+        to comply with a norm they may have no capacity to detect or avoid.
+        This is the managed structural incoherence at the heart of
+        regulatory criminal law.
+    """ .
+
+
+# ============================================================================
+# PART IV — OFFENSE CATEGORIES (primary MLC node taxonomy)
+# ============================================================================
+
+crim:OffenseCategory a owl:Class ;
+    rdfs:label "Offense Category" ;
+    rdfs:comment "Structural classification of criminal offenses by primary MLC failure node." .
+
+crim:HomicideOffense a owl:Class ;
+    rdfs:subClassOf crim:OffenseCategory ;
+    sool:primaryFailureNode "N5" ;
+    rdfs:label "Homicide and Violent Offense" ;
+    rdfs:comment """
+        Primary structural question: act classification at N5.
+        The degree distinction (murder/manslaughter/negligent homicide)
+        is a N2/N5 question, not a N4 question.
+        The LegalHarm here is crim:PhysicalHarm of severity DEATH.
+    """ .
+
+crim:InchoateOffense a owl:Class ;
+    rdfs:subClassOf crim:OffenseCategory ;
+    sool:primaryFailureNode "N4/N5" ;
+    rdfs:label "Inchoate Offense" ;
+    rdfs:comment """
+        The criminal chain never fully closes at N4/N5 by design.
+        Attempt, conspiracy, and solicitation criminalise chain-formation
+        rather than chain-completion. NI at N2 (substantial step standard)
+        and TC at N2↔N4 are the expected structural stress patterns.
+        NOTE: LegalHarm is prospective here — criminalization anticipates
+        a harm that has not yet materialised. The harm condition (Part X)
+        is satisfied by the risk of harm, not its actualisation.
+    """ .
+
+crim:PropertyFraudOffense a owl:Class ;
+    rdfs:subClassOf crim:OffenseCategory ;
+    sool:primaryFailureNode "N2" ;
+    rdfs:label "Property Crime and Fraud" ;
+    rdfs:comment """
+        Primary structural question: norm indeterminacy at N2.
+        The LegalHarm is crim:FinancialHarm or crim:ProprietaryHarm.
+        JC fires where property, contract, and criminal regimes generate
+        competing norms over the same transaction.
+    """ .
+
+crim:StatusOffense a owl:Class ;
+    rdfs:subClassOf crim:OffenseCategory ;
+    sool:primaryFailureNode "N3" ;
+    rdfs:label "Status Offense and Regulatory Crime" ;
+    rdfs:comment """
+        Primary structural question: role-bearing at N3.
+        HARM NOTE: Status offenses are the most structurally challenging
+        category for the harm condition: the prohibited conduct often
+        generates only diffuse or prospective societal harm (crim:SocietalHarm).
+        AI fires for regulatory criminalization without adequate harm
+        grounding at N2 — the norm is issued without a traceable
+        LegalHarm the norm is designed to prevent.
+    """ .
+
+crim:StrictLiabilityOffense a owl:Class ;
+    rdfs:subClassOf crim:OffenseCategory ;
+    sool:primaryFailureNode "N5" ;
+    rdfs:label "Strict Liability / Public Welfare Offense" ;
+    rdfs:comment """
+        N5 is thin: the act element is satisfied without the mens rea
+        role condition. PC fires at N2→N5. The LegalHarm is typically
+        crim:SocietalHarm or crim:PublicHealthHarm — diffuse, aggregate,
+        or statistical rather than targeted at a specific victim at N6.
+    """ .
+
+crim:AffirmativeDefenseCase a owl:Class ;
+    rdfs:subClassOf crim:OffenseCategory ;
+    sool:primaryFailureNode "N7" ;
+    rdfs:label "Affirmative Defense" ;
+    rdfs:comment """
+        N1–N6 are substantially closed; the analytical focus is N7.
+        The defense concedes or does not contest the elements but argues
+        that criminal liability should not attach.
+        Justifications = JC at N2→N6
+        Excuses = CF at N3
+        Duress = CC at N7
+    """ .
+
+
+# ============================================================================
+# PART V — CRIMINAL DEFENSES (N7 intervention taxonomy)
+# ============================================================================
+
+crim:CriminalDefense a owl:Class ;
+    rdfs:label "Criminal Defense" ;
+    rdfs:comment "Structural classification of criminal defenses by MLC node and CT." .
+
+crim:Justification a owl:Class ;
+    rdfs:subClassOf crim:CriminalDefense ;
+    sool:targetNode "N7" ;
+    sool:contradictionType "JC" ;
+    rdfs:label "Justification" ;
+    rdfs:comment """
+        A competing norm permits or requires the otherwise prohibited act.
+        JC fires at N2→N6. Self-defense, necessity, consent, and law
+        enforcement privilege are all JC defenses.
+        HARM LINK: A successful justification structurally recharacterises
+        the LegalHarm — the harm that would otherwise ground the
+        prosecution is itself a response to a prior or greater LegalHarm
+        that the justification norm was designed to prevent.
+    """ .
+
+crim:Excuse a owl:Class ;
+    rdfs:subClassOf crim:CriminalDefense ;
+    sool:targetNode "N3" ;
+    sool:contradictionType "CF" ;
+    rdfs:label "Excuse" ;
+    rdfs:comment """
+        The actor lacked the capacity to bear the criminal role.
+        CF fires at N3: the institutional conditions for role-bearing
+        were absent. Insanity, infancy, involuntary intoxication,
+        and automatism are all CF defenses.
+        NOTE: Excuses do not declare the act right (justification).
+        They declare that this actor could not structurally bear the
+        obligation the act violated. The LegalHarm may still have
+        occurred — it is the role-assignment at N3 that fails, not
+        the harm finding.
+    """ .
+
+crim:ProceduraliBarDefense a owl:Class ;
+    rdfs:subClassOf crim:CriminalDefense ;
+    sool:targetNode "N1" ;
+    sool:contradictionType "CF" ;
+    rdfs:label "Procedural Bar" ;
+    rdfs:comment """
+        The state's authority to prosecute is exhausted or void.
+        Double jeopardy = CF at N1
+        Statute of limitations = TC at N2↔N4
+        Immunized testimony = CF at N1
+    """ .
+
+crim:DuressDefense a owl:Class ;
+    rdfs:subClassOf crim:Excuse ;
+    sool:targetNode "N7" ;
+    sool:contradictionType "CC" ;
+    rdfs:label "Duress" ;
+    rdfs:comment """
+        Structurally ambiguous: partly CF at N3 (incapacity to comply
+        freely) and partly CC at N7 (compliance was structurally
+        impossible under coercion). The MLC places duress at CC/N7.
+    """ .
+
+crim:SelfDefense a owl:Class ;
+    rdfs:subClassOf crim:Justification ;
+    rdfs:label "Self-Defense" ;
+    rdfs:comment """
+        JC fires: the norm permitting self-preservation competes with the
+        homicide/assault prohibition.
+        HARM RECHARACTERISATION: The LegalHarm of the defensive act is
+        reweighed against the antecedent LegalHarm (the unlawful threat)
+        that triggered the defensive response.
+    """ .
+
+crim:Necessity a owl:Class ;
+    rdfs:subClassOf crim:Justification ;
+    rdfs:label "Necessity (Choice of Evils)" ;
+    rdfs:comment """
+        JC fires: two legal norms impose incompatible obligations.
+        HARM COMPARISON: Necessity structurally requires that the LegalHarm
+        avoided exceed the LegalHarm caused — this is an explicit harm-
+        magnitude comparison embedded in the defense's closing conditions.
+    """ .
+
+crim:Insanity a owl:Class ;
+    rdfs:subClassOf crim:Excuse ;
+    rdfs:label "Insanity" ;
+    rdfs:comment "CF fires at N3: mental disease or defect prevented actor from bearing the criminal role." .
+
+crim:Infancy a owl:Class ;
+    rdfs:subClassOf crim:Excuse ;
+    rdfs:label "Infancy" ;
+    rdfs:comment "CF fires at N3: actor's age places them below the threshold of criminal role-bearing capacity." .
+
+crim:Entrapment a owl:Class ;
+    rdfs:subClassOf crim:CriminalDefense ;
+    sool:targetNode "N4" ;
+    sool:contradictionType "FM" ;
+    rdfs:label "Entrapment" ;
+    rdfs:comment """
+        FM fires at N4: the state manufactured the triggering facts.
+        HARM NOTE: Entrapment cases are structurally ambiguous on the harm
+        condition — where the state manufactures the crime, the LegalHarm
+        may itself be state-constructed rather than the product of the
+        defendant's genuine criminogenic agency.
+    """ .
+
+
+# ============================================================================
+# PART VI — CRIMINALIZATION LEGITIMACY CONDITIONS (original five)
+# ============================================================================
+
+crim:CriminalizationLegitimacyTest a owl:Class ;
+    rdfs:label "Criminalization Legitimacy Test" ;
+    rdfs:comment """
+        The structural analog to the IAT for criminal norms.
+        A criminal norm is structurally legitimate only if it satisfies
+        all MLC conditions BEFORE any prosecution occurs.
+
+        v2.0 adds a sixth condition: crim:HarmCondition (Part X).
+        The five original conditions (legality, definiteness, capacity,
+        proportionality) are preserved unchanged.
+    """ .
+
+crim:LegalityCondition a owl:Class ;
+    rdfs:subClassOf crim:CriminalizationLegitimacyTest ;
+    sool:targetNode "N1" ;
+    rdfs:label "Legality (Nullum Crimen Sine Lege)" ;
+    rdfs:comment "N1 condition: criminal norm must exist in positive law before the conduct occurs. Ex post facto criminalization = N1 CF." .
+
+crim:DefinitenesscCondition a owl:Class ;
+    rdfs:subClassOf crim:CriminalizationLegitimacyTest ;
+    sool:targetNode "N2" ;
+    sool:contradictionType "NI" ;
+    rdfs:label "Definiteness (Void-for-Vagueness)" ;
+    rdfs:comment """
+        N2 condition: norm must provide fair notice of prohibited conduct.
+        NI in criminal norms is categorically impermissible — the due
+        process requirement of fair notice is a structural constraint that
+        NI defeats. (Unlike civil norms where NI generates CD but courts
+        can specify the open texture.)
+    """ .
+
+crim:CapacityCondition a owl:Class ;
+    rdfs:subClassOf crim:CriminalizationLegitimacyTest ;
+    sool:targetNode "N3" ;
+    rdfs:label "Capacity Condition" ;
+    rdfs:comment """
+        N3 condition: criminal norms may only apply to actors capable of
+        bearing the criminal role. This is the structural basis of the
+        mens rea requirement: not merely a culpability threshold but a
+        role-constituting condition for criminal liability.
+    """ .
+
+crim:ProportionalityCondition a owl:Class ;
+    rdfs:subClassOf crim:CriminalizationLegitimacyTest ;
+    sool:targetNode "N8" ;
+    sool:contradictionType "RPF" ;
+    rdfs:label "Proportionality (N8 Structural Limit)" ;
+    rdfs:comment """
+        N8 condition: the remedy (sentence) must be proportionate to the
+        offense. RPF fires when the sentence exceeds the structural limit
+        for this offense. Independent N8 failure — fires even when N7
+        is CLOSED (valid conviction).
+    """ .
+
+
+# ============================================================================
+# PART VII — ILLUSTRATIVE INSTANCES
+# ============================================================================
+
+crim:ResponsibleCorporateOfficer a crim:StatusOffense ;
+    rdfs:label "Responsible Corporate Officer Doctrine" ;
+    sool:activeContradictions "RC3" ;
+    sool:primaryNode "N3" ;
+    rdfs:comment """
+        RC3 paradigm: corporate officer simultaneously bears Role A
+        (duty of supervision) and Role B (personal liability for own acts
+        only). Same regulatory failure generates incompatible obligations.
+    """ .
+
+crim:BradyViolation a crim:OffenseElement ;
+    rdfs:label "Brady Violation" ;
+    sool:activeContradictions "FM" ;
+    sool:targetNode "N4" ;
+    rdfs:comment """
+        FM fires at N4 of the original prosecution when the state
+        suppresses material exculpatory evidence. In the subsequent habeas
+        proceeding, RPF fires independently at N8. Brady violations thus
+        generate FM in the criminal chain and RPF in the civil/habeas chain
+        — cross-domain structural linkage.
+    """ .
+
+crim:FelonyMurder a crim:HomicideOffense ;
+    rdfs:label "Felony Murder" ;
+    sool:activeContradictions "JC NI" ;
+    sool:primaryNode "N2" ;
+    rdfs:comment """
+        JC fires at N2→N6: underlying felony norm and murder norm generate
+        incompatible requirements over the same event. The merger doctrine
+        is a structural response to JC. NI fires when merger doctrine
+        scope is genuinely contested.
+        HARM NOTE: The LegalHarm in felony murder is the death — but its
+        causal connection to the felony is the N4/N5 question: does the
+        harm fall within the res gestae of the felony's MLC?
+    """ .
+
+
+# ============================================================================
+# PART VIII — OBJECT PROPERTIES (original)
+# ============================================================================
+
+crim:generatesStatus a owl:ObjectProperty ;
+    rdfs:domain crim:Conviction ;
+    rdfs:range  crim:CriminalStatus ;
+    rdfs:label "generates status" .
+
+crim:groundsProhibition a owl:ObjectProperty ;
+    rdfs:domain crim:CriminalStatus ;
+    rdfs:range  crim:CriminalProhibition ;
+    rdfs:label "grounds prohibition" .
+
+crim:hasElement a owl:ObjectProperty ;
+    rdfs:domain sool:CriminalNorm ;
+    rdfs:range  crim:OffenseElement ;
+    rdfs:label "has element" .
+
+crim:requiresMensRea a owl:ObjectProperty ;
+    rdfs:domain crim:CriminalProhibition ;
+    rdfs:range  crim:MensReaType ;
+    rdfs:label "requires mens rea" .
+
+crim:contestsNode a owl:ObjectProperty ;
+    rdfs:domain crim:CriminalDefense ;
+    rdfs:range  sool:MLCNode ;
+    rdfs:label "contests node" .
+
+crim:fires a owl:ObjectProperty ;
+    rdfs:domain crim:CriminalDefense ;
+    rdfs:range  sool:ContradictionType ;
+    rdfs:label "fires" .
+
+
+# ============================================================================
+# PART IX — CRIME AS LEGAL OCCURRENT    [NEW IN v2.0]
+# ============================================================================
+#
+# RATIONALE
+# ---------
+# The original TTL defined CriminalNorm (the rule at N2), CriminalStatus
+# (the post-conviction residue at N7/N8), and OffenseElements (the
+# structural components of N2). What it lacked was a class for the CRIME
+# ITSELF — the specific act-event that, when the state's MLC closes,
+# produces CriminalStatus.
+#
+# In BFO terms:
+#   CriminalNorm        → bfo:RealizableDependentContinuant (the type/norm)
+#   CriminalStatus      → bfo:SpecificallyDependentContinuant (the residue)
+#   Crime (new)         → bfo:Process (the specific act-event occurrent)
+#
+# A Crime is the token occurrence that instantiates a CriminalNorm type.
+# It is located in time (at N4/N5), committed by an actor (N3), directed
+# at a target (N6), and — when the state's prosecution succeeds — causes
+# a CriminalStatus to inhere in the actor and produces a LegalHarm in the
+# world.
+#
+# This class does NOT replace CriminalNorm. It is the token to
+# CriminalNorm's type — the same distinction BFO draws between a disease
+# type and a disease instance.
+#
+# NOTE ON "CRIME" AS TYPE VS. TOKEN:
+# Legal discourse uses "crime" in two senses:
+#   (a) TYPE sense: "Murder is a crime" → refers to crim:CriminalNorm
+#   (b) TOKEN sense: "Jones committed a crime on Tuesday" → crim:Crime
+# This class formalises sense (b). Sense (a) was already covered by
+# crim:CriminalNorm and its subclasses.
+# ============================================================================
+
+crim:Crime a owl:Class ;
+    rdfs:subClassOf bfo:Process ;
+    rdfs:label "Crime" ;
+    skos:altLabel "Criminal Act", "Criminal Event" ;
+    rdfs:comment """
+        The token occurrence of conduct that instantiates a CriminalNorm
+        type in a particular case. A Crime is the specific act-event that
+        occupies N4/N5 of the criminal MLC, committed by an actor at N3,
+        against a target at N6, producing a LegalHarm, and — if the
+        state's prosecution closes the chain at N7 — generating a
+        CriminalStatus that inheres in the actor.
+
+        KEY DISTINCTIONS:
+          Crime vs. CriminalNorm: norm is the type; Crime is the token
+          Crime vs. Conviction:   Crime is the act-event; Conviction is
+                                  the legal finding about that act-event
+          Crime vs. CriminalStatus: Crime is the occurrent process;
+                                  CriminalStatus is the continuant residue
+
+        STRUCTURAL LOCATION IN THE MLC:
+          N4: The triggering facts of the Crime (what happened)
+          N5: The legal act — the Crime instantiated as conduct
+          N6: The target of the Crime
+          N7: The legal effect — the Crime is characterized as a
+              violation of the CriminalNorm; CriminalStatus attaches
+              if the chain closes
+
+        The crime-as-process begins at the point of criminal conduct and
+        ends at the last act constituting the offense. It does not include
+        the prosecution (which is a separate bfo:Process). It is not
+        coextensive with the arrest, indictment, or conviction — those are
+        institutional processes that respond to the Crime.
+
+        ONTOLOGICAL STATUS IN UNPROVEN CASES:
+        A Crime may exist as a bfo:Process even if the actor is never
+        prosecuted or convicted. The CriminalStatus, however, only obtains
+        through successful prosecution. This asymmetry is intentional:
+        it preserves the distinction between the act (ontological fact)
+        and the legal finding (institutional determination).
+    """ .
+
+# -- Crime subclasses by harm type ------------------------------------------
+
+crim:ViolentCrime a owl:Class ;
+    rdfs:subClassOf crim:Crime ;
+    rdfs:label "Violent Crime" ;
+    rdfs:comment "A Crime whose LegalHarm is of type PhysicalHarm directed at a person. Primary node: N5." .
+
+crim:PropertyCrime a owl:Class ;
+    rdfs:subClassOf crim:Crime ;
+    rdfs:label "Property Crime" ;
+    rdfs:comment "A Crime whose LegalHarm is of type ProprietaryHarm or FinancialHarm. Primary node: N2 (norm scope)." .
+
+crim:RegulatoryViolation a owl:Class ;
+    rdfs:subClassOf crim:Crime ;
+    rdfs:label "Regulatory Violation" ;
+    rdfs:comment """
+        A Crime whose LegalHarm is of type SocietalHarm or PublicHealthHarm.
+        Typically corresponds to StrictLiabilityOffense or StatusOffense
+        categories. The harm is often diffuse, aggregate, or statistical.
+    """ .
+
+crim:InchoateCrime a owl:Class ;
+    rdfs:subClassOf crim:Crime ;
+    rdfs:label "Inchoate Crime" ;
+    rdfs:comment """
+        A Crime in which the criminal chain at N4/N5 has not closed to
+        completion — the harmful result has not obtained, but the
+        preparatory conduct is itself criminalised. The LegalHarm is
+        prospective (risk of harm). This class corresponds to the
+        InchoateOffense category at the norm level.
+    """ .
+
+# -- New object properties for Crime ----------------------------------------
+
+crim:instantiatesNorm a owl:ObjectProperty ;
+    rdfs:domain crim:Crime ;
+    rdfs:range  crim:CriminalNorm ;
+    rdfs:label "instantiates norm" ;
+    rdfs:comment """
+        Relates the Crime token (the specific act-event) to the
+        CriminalNorm type it instantiates. This is the token-to-type
+        relation: the crime of murder instantiates the norm prohibiting
+        murder.
+    """ .
+
+crim:committedBy a owl:ObjectProperty ;
+    rdfs:domain crim:Crime ;
+    rdfs:range  owl:Thing ;
+    rdfs:label "committed by" ;
+    rdfs:comment """
+        Relates the Crime to the actor at N3 who committed it. In cases
+        of acquittal or non-prosecution, the property still holds if
+        the Crime occurred as a bfo:Process — the legal determination
+        of culpability is a separate matter (the Conviction) from the
+        act-event itself.
+    """ .
+
+crim:directedAt a owl:ObjectProperty ;
+    rdfs:domain crim:Crime ;
+    rdfs:range  owl:Thing ;
+    rdfs:label "directed at" ;
+    rdfs:comment "Relates the Crime to its target at N6 — the person or entity against whom the criminal act is directed." .
+
+crim:producesHarm a owl:ObjectProperty ;
+    rdfs:domain crim:Crime ;
+    rdfs:range  crim:LegalHarm ;
+    rdfs:label "produces harm" ;
+    rdfs:comment """
+        Relates the Crime (occurrent) to the LegalHarm it produces or
+        risks producing. For completed crimes, this is an actualised harm.
+        For inchoate crimes, this is a prospective harm (risk). The
+        existence of a LegalHarm is required by the HarmCondition
+        legitimacy test (Part X).
+    """ .
+
+crim:resultsInConviction a owl:ObjectProperty ;
+    rdfs:domain crim:Crime ;
+    rdfs:range  crim:Conviction ;
+    rdfs:label "results in conviction" ;
+    rdfs:comment """
+        Relates the Crime to the Conviction that the state's prosecution
+        produces, when the criminal MLC closes at N7 in favour of the
+        state. This property is partial: many Crimes never result in
+        Conviction.
+    """ .
+
+
+# ============================================================================
+# PART X — LEGAL HARM    [NEW IN v2.0]
+# ============================================================================
+#
+# RATIONALE
+# ---------
+# "Harm" appeared throughout v1.0 only in natural-language comments:
+#   - ResultElement referenced "death, serious bodily harm, financial loss"
+#   - SelfDefense mentioned "imminent unlawful harm"
+#   - SexOffenderStatus mentioned "harm" obliquely
+#
+# These were informal references to the harm that criminal norms protect
+# against. LegalHarm formalises this concept as a BFO entity.
+#
+# BFO PLACEMENT:
+# LegalHarm is a bfo:Process subclass — it is a state-change or occurrence
+# in the world that affects a target. It is not a continuant (it unfolds
+# through time) and not a quality (it is a transformation, not an inherent
+# attribute). The closest BFO alignment is Process: a temporal entity in
+# which something changes, typically the welfare, rights, or legal status
+# of the target.
+#
+# RELATIONSHIP TO OFFENSE ELEMENTS:
+# LegalHarm is the ontological realisation of what ResultElement specifies
+# at the norm level. ResultElement says "a death must result"; LegalHarm
+# is the actual death-as-process in the specific case.
+#
+# RELATIONSHIP TO THE HARM PRINCIPLE:
+# The classical harm principle (J.S. Mill, Feinberg) holds that only
+# conduct that harms others can be legitimately criminalised. SOoL
+# formalises this as a sixth CriminalizationLegitimacyTest condition:
+# HarmCondition (see below). A criminal norm that cannot be linked to any
+# category of LegalHarm it prevents fails the HarmCondition, generating
+# AI (Authority Inflation) at N1 — the authority at N1 is claiming the
+# power to criminalise without the normative grounding that harm-prevention
+# provides.
+#
+# NOTE ON "HARM" VS. "WRONG":
+# LegalHarm captures setback-to-interests (Feinberg's formulation). It is
+# not coextensive with "wrong" — an act can be a wrong without producing
+# LegalHarm (a failed attempt with no risk created), and arguably can
+# produce LegalHarm without being a wrong (side-effects of justified acts).
+# This ontology tracks harm, not wrong. The wrong is the CriminalNorm's
+# judgment that the harm is prohibited; the LegalHarm is the harm itself.
+# ============================================================================
+
+crim:LegalHarm a owl:Class ;
+    rdfs:subClassOf bfo:Process ;
+    rdfs:label "Legal Harm" ;
+    skos:altLabel "Harm", "Legally Recognised Harm" ;
+    rdfs:comment """
+        A change in the world — a process — that sets back the legally
+        recognised interests of a target (N6) and grounds the criminalisation
+        of the conduct that produces it. LegalHarm is:
+
+          (1) The ontological realisation of what a ResultElement specifies
+              at the norm level (the norm says 'death must result';
+              LegalHarm is the actual death in the specific case).
+
+          (2) The empirical grounding of the CriminalNorm: the state's
+              claim to criminalise conduct is justified, structurally, by
+              its capacity to prevent or redress instances of LegalHarm.
+
+          (3) A BFO Process: it unfolds through time, beginning at the
+              moment of harm-onset and continuing through the period in
+              which the harm's effects persist (which may be indefinite
+              in cases of death, serious injury, or irreversible loss).
+
+        BFO alignment: bfo:Process (temporal entity in which something
+        changes). The subject of the change is the target at N6. The
+        change affects the target's welfare, legal status, bodily
+        integrity, financial position, or dignitary standing.
+
+        SEVERITY GRADIENT:
+        LegalHarm is not binary. Harm severity is a datatype property
+        (crim:harmSeverity) that ranges from negligible to catastrophic.
+        Severity modulates the proportionality condition at N8 and the
+        proof-threshold requirements at N4/N5.
+
+        PROSPECTIVE HARM (Inchoate Crimes):
+        For inchoate offenses, LegalHarm is prospective — the harm has
+        not yet occurred, but the actor's conduct has created a
+        substantial risk that it will. Prospective harm satisfies the
+        HarmCondition only if the risk is concrete, specific, and
+        non-trivial. The substantial step standard (attempt) and the
+        overt act requirement (conspiracy) are structural proxies for
+        the concreteness of prospective LegalHarm.
+    """ .
+
+# -- LegalHarm subclasses by type -------------------------------------------
+
+crim:PhysicalHarm a owl:Class ;
+    rdfs:subClassOf crim:LegalHarm ;
+    rdfs:label "Physical Harm" ;
+    rdfs:comment """
+        Setback to the target's bodily integrity: death, serious bodily
+        injury, disease, pain. The paradigm LegalHarm for violent crime
+        categories (C1 in the criminal corpus). ResultElement in homicide
+        offenses points to PhysicalHarm of severity DEATH.
+    """ .
+
+crim:FinancialHarm a owl:Class ;
+    rdfs:subClassOf crim:LegalHarm ;
+    rdfs:label "Financial Harm" ;
+    rdfs:comment "Setback to the target's financial interests: loss of money, assets, economic opportunity. Primary LegalHarm type for fraud and property offenses (C3)." .
+
+crim:ProprietaryHarm a owl:Class ;
+    rdfs:subClassOf crim:LegalHarm ;
+    rdfs:label "Proprietary Harm" ;
+    rdfs:comment "Setback to the target's property rights: theft, destruction, conversion of property. Overlaps with FinancialHarm but is structurally distinct — it concerns the deprivation of a specific property right, not merely a financial loss." .
+
+crim:DignitaryHarm a owl:Class ;
+    rdfs:subClassOf crim:LegalHarm ;
+    rdfs:label "Dignitary Harm" ;
+    rdfs:comment """
+        Setback to the target's dignity, autonomy, or personal integrity:
+        sexual offenses, harassment, stalking, defamation. Dignitary harm
+        is the most contested LegalHarm subtype for criminalization
+        purposes: there is ongoing debate about when dignitary setback
+        rises to the threshold that justifies criminal (as opposed to
+        civil) liability.
+    """ .
+
+crim:SocietalHarm a owl:Class ;
+    rdfs:subClassOf crim:LegalHarm ;
+    rdfs:label "Societal Harm" ;
+    rdfs:comment """
+        Setback to collective interests rather than a specific identifiable
+        target at N6: public order, institutional integrity, social trust.
+        Primary LegalHarm type for regulatory crimes (C4) and public
+        welfare offenses (C5). The diffuse nature of SocietalHarm creates
+        structural tension at N6: without an identifiable target, the
+        Recognition cluster is stressed.
+    """ .
+
+crim:PublicHealthHarm a owl:Class ;
+    rdfs:subClassOf crim:SocietalHarm ;
+    rdfs:label "Public Health Harm" ;
+    rdfs:comment "Setback to collective public health: food safety violations, drug offenses, environmental crimes. A subtype of SocietalHarm with a more specific causal pathway to physical harm in the population." .
+
+crim:InstitutionalHarm a owl:Class ;
+    rdfs:subClassOf crim:SocietalHarm ;
+    rdfs:label "Institutional Harm" ;
+    rdfs:comment "Setback to the structural integrity of legal institutions: bribery, obstruction of justice, perjury. Structurally significant: InstitutionalHarm is a harm TO the MLC itself — it degrades the infrastructure that the criminal norm depends on." .
+
+# -- New object properties for LegalHarm ------------------------------------
+
+crim:harmsTarget a owl:ObjectProperty ;
+    rdfs:domain crim:LegalHarm ;
+    rdfs:range  owl:Thing ;
+    rdfs:label "harms target" ;
+    rdfs:comment """
+        Relates the LegalHarm to its target — the person, entity, or
+        collective whose interests are set back. Corresponds to the N6
+        (Target) position in the criminal MLC. For SocietalHarm, the
+        target is a collective or the legal system itself.
+    """ .
+
+crim:groundsCriminalizationOf a owl:ObjectProperty ;
+    rdfs:domain crim:LegalHarm ;
+    rdfs:range  crim:CriminalNorm ;
+    rdfs:label "grounds criminalization of" ;
+    rdfs:comment """
+        The inverse of the HarmCondition's structural requirement: the
+        LegalHarm class is the ontological ground of the CriminalNorm
+        at N2. A CriminalNorm that cannot be linked to any LegalHarm
+        type it is designed to prevent fails the HarmCondition and
+        generates AI at N1.
+    """ .
+
+crim:causedBy a owl:ObjectProperty ;
+    rdfs:domain crim:LegalHarm ;
+    rdfs:range  crim:Crime ;
+    rdfs:label "caused by" ;
+    rdfs:comment "The Crime (act-event) that produces this LegalHarm. Inverse of crim:producesHarm." .
+
+crim:precededBy a owl:ObjectProperty ;
+    rdfs:domain crim:LegalHarm ;
+    rdfs:range  crim:LegalHarm ;
+    rdfs:label "preceded by" ;
+    rdfs:comment """
+        For justification defenses (self-defense, necessity): the LegalHarm
+        of the defensive act is preceded by a prior LegalHarm (the threat
+        or the lesser evil) that the defense is structured to respond to.
+        This property enables formal representation of the harm-comparison
+        logic embedded in necessity and proportionate self-defense.
+    """ .
+
+# -- New datatype properties for LegalHarm ----------------------------------
+
+crim:harmSeverity a owl:DatatypeProperty ;
+    rdfs:domain crim:LegalHarm ;
+    rdfs:range  xsd:string ;
+    rdfs:label "harm severity" ;
+    skos:scopeNote "Values: NEGLIGIBLE | MINOR | MODERATE | SERIOUS | SEVERE | CATASTROPHIC" ;
+    rdfs:comment """
+        A severity classification for the LegalHarm. Modulates the
+        proportionality condition at N8 and the structural weight of
+        the harm at N4/N5. Used in corpus annotation to capture
+        whether the harm magnitude supports the criminal charge.
+    """ .
+
+crim:isProspective a owl:DatatypeProperty ;
+    rdfs:domain crim:LegalHarm ;
+    rdfs:range  xsd:boolean ;
+    rdfs:label "is prospective" ;
+    rdfs:comment "True for LegalHarm instances in inchoate offenses where the harm has not yet occurred but the risk is concrete and non-trivial." .
+
+crim:harmIsTargetable a owl:DatatypeProperty ;
+    rdfs:domain crim:LegalHarm ;
+    rdfs:range  xsd:boolean ;
+    rdfs:label "harm is targetable" ;
+    rdfs:comment """
+        True when the LegalHarm has a specific, identifiable target at N6
+        (PhysicalHarm, FinancialHarm, DignitaryHarm). False for diffuse
+        harms (SocietalHarm) where the target is a collective or the
+        legal system. Non-targetable harms create structural stress at
+        N6 (Recognition cluster) because the MLC requires a determinate
+        target upon whom the legal effect operates.
+    """ .
+
+
+# ============================================================================
+# PART XI — HARM CONDITION AS SIXTH LEGITIMACY TEST    [NEW IN v2.0]
+# ============================================================================
+
+crim:HarmCondition a owl:Class ;
+    rdfs:subClassOf crim:CriminalizationLegitimacyTest ;
+    sool:targetNode "N2" ;
+    sool:contradictionType "AI" ;
+    rdfs:label "Harm Condition (Sixth Legitimacy Test)" ;
+    rdfs:comment """
+        The structural formalisation of the harm principle as a
+        CriminalizationLegitimacyTest condition.
+
+        CONTENT OF THE CONDITION:
+        A CriminalNorm at N2 is structurally legitimate only if it can
+        be linked to a type of LegalHarm it is designed to prevent or
+        redress. If no LegalHarm type grounds the norm, the norm's claim
+        to the coercive machinery of criminal law lacks structural
+        justification. This generates AI (Authority Inflation) at N1:
+        the authority claims the power to criminalise without the
+        normative grounding that harm-prevention provides.
+
+        NOTE: The HarmCondition is placed at N2 (Norm) rather than N1
+        because it is a constraint on what the norm may prohibit, not on
+        who may issue norms. The authority at N1 may have general power
+        to criminalise; the HarmCondition constrains the content of what
+        it may legitimately criminalise. AI fires at N1 as a consequence
+        of the N2 failure — the authority is inflating its power by
+        issuing norms without adequate LegalHarm grounding.
+
+        STRUCTURAL FAILURE MODES:
+          (a) NO HARM: The norm prohibits conduct that produces no LegalHarm
+              of any type — pure moralism or paternalism without harm.
+              AI fires directly. CD accumulates at N1→N2.
+
+          (b) REMOTE HARM: The norm prohibits conduct only very indirectly
+              connected to LegalHarm — many intervening autonomous acts
+              required before harm could occur. NI fires at N2 (the causal
+              connection is too indeterminate to generate a norm that
+              closes). AI fires as a consequence.
+
+          (c) SELF-ONLY HARM: The norm prohibits conduct that harms only
+              the actor themselves (e.g. drug possession for personal use).
+              Structurally contested: the HarmCondition is satisfied if
+              the harm to the actor is recognised as a LegalHarm, but
+              this requires the actor to count as a N6 target of their
+              own conduct — which generates CC at N7 (the actor is
+              simultaneously the bearer of the criminal obligation and the
+              target whose harm grounds it).
+
+          (d) PROSPECTIVE HARM ONLY (Inchoate): The norm criminalises
+              conduct that risks but does not actualise LegalHarm.
+              Satisfied when: (i) the risk is concrete, (ii) the prospective
+              harm type is a recognised LegalHarm subclass, and (iii) the
+              substantial-step or overt-act threshold is met.
+
+        RELATIONSHIP TO EXISTING CONDITIONS:
+        The HarmCondition interacts with but is independent of:
+          DefinitenesscCondition (N2): A norm can be definite but harm-free
+          CapacityCondition (N3): Capacity is about the actor, not the harm
+          ProportionalityCondition (N8): Proportionality presupposes that
+            a LegalHarm exists and asks whether the remedy is calibrated
+            to it. Without HarmCondition, ProportionalityCondition has no
+            anchor.
+
+        The HarmCondition thus functions as a structural prerequisite for
+        the ProportionalityCondition: you cannot assess whether N8 is
+        proportionate to the offense without knowing what LegalHarm the
+        offense produces.
+    """ .
+
+
+# ============================================================================
+# PART XII — UPDATED DATATYPE PROPERTIES
+# ============================================================================
+
+crim:contradictionDebt a owl:DatatypeProperty ;
+    rdfs:domain crim:CriminalNorm ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label "contradiction debt" .
+
+crim:primaryMensRea a owl:DatatypeProperty ;
+    rdfs:domain crim:OffenseCategory ;
+    rdfs:range  xsd:string ;
+    rdfs:label "primary mens rea" .
+
+crim:primaryFailureNode a owl:DatatypeProperty ;
+    rdfs:domain crim:OffenseCategory ;
+    rdfs:range  xsd:string ;
+    rdfs:label "primary failure node" .
+
+crim:isIrreversible a owl:DatatypeProperty ;
+    rdfs:domain crim:CriminalStatus ;
+    rdfs:range  xsd:boolean ;
+    rdfs:label "is irreversible" .
+
+
+# ============================================================================
+# END OF MODULE — v2.0
+# ============================================================================
