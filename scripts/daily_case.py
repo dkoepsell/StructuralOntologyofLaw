@@ -117,7 +117,7 @@ CF Conferral Failure, AI Authority Inflation, JC Jurisdictional Contradiction,
 RC3 Role Contradiction, PC Procedural Contradiction, TC Temporal Contradiction,
 FM Fact Manipulation, NI Norm Indeterminacy, RF Recognition Failure,
 RCL Recognition Collapse, CC Correlativity Contradiction,
-SE Self-Undermining Effect, RPF Repair Procedure Failure
+SE Self-Undermining Effect, RPF Repair Failure
 
 CD weights: RCL=0.18 CF=0.15 RC3=0.14 CC=0.14 RPF=0.13 AI=0.12 RF=0.11 FM=0.11 JC=0.10 SE=0.10 PC=0.09 TC=0.08 NI=0.07
 

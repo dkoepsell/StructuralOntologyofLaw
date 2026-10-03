@@ -127,3 +127,8 @@ in the git tree. See `ASSETS.md`.
   provisional.
 - The human gold standard (300 cases, two or more trained annotators) has not yet
   been built. It gates most inferential use of this corpus.
+- **`SOoL_QueryTool.html` and `sool_poster.html` are not in this release.** Both
+  still carried v1 predictive framing that this README withdraws, so shipping them
+  here would make the repository contradict itself. They are scheduled for rebuild
+  against generated figures, and the previous versions remain on the `archive/v1`
+  branch. See `web/README.md`.

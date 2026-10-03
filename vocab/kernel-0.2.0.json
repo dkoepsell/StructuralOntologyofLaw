@@ -1,0 +1,620 @@
+{
+  "$schema": "../spec/schema/kernel.schema.json",
+  "kernel_version": "0.2.0",
+  "source": "Koepsell, D. R., The Recognition Layer: A Generative Typology of Structural Contradiction for Recognition-Constituted Domains (working draft), §6-§8.",
+  "loci": [
+    {
+      "id": "artifact",
+      "label": "Artifact body",
+      "pseudo_locus": true,
+      "definition": "The definitional and assertional content of the artifact itself, considered apart from any chain link. Present in every system, including systems with no chain of their own.",
+      "rationale": "Implementation decision, not in the paper's seven-link chain. §8.3 row 1 requires Strata A, B and C to be able to fire in a reference ontology, which by hypothesis performs no link. Without a locus that is present unconditionally, the ungated strata would have nothing to be indexed to in an act-empty system and the A/B/C columns of Table 10 could not be constant. Every A/B/C primitive is well-formed here; no D primitive is."
+    },
+    {
+      "id": "authority",
+      "label": "Source of authority",
+      "pseudo_locus": false,
+      "definition": "The source entitled to fix the criteria."
+    },
+    {
+      "id": "criteria",
+      "label": "Criteria",
+      "pseudo_locus": false,
+      "definition": "The substantive standard applied in the recognition act."
+    },
+    {
+      "id": "assessor",
+      "label": "Assessor in role",
+      "pseudo_locus": false,
+      "definition": "The agent licensed by the authority to apply the criteria."
+    },
+    {
+      "id": "facts",
+      "label": "Presenting facts",
+      "pseudo_locus": false,
+      "definition": "The state of affairs to which the criteria are applied."
+    },
+    {
+      "id": "act",
+      "label": "Recognition act",
+      "pseudo_locus": false,
+      "definition": "The act in which criteria are applied to facts and a status is conferred."
+    },
+    {
+      "id": "effects",
+      "label": "Effects",
+      "pseudo_locus": false,
+      "definition": "The consequences following from the conferral."
+    },
+    {
+      "id": "remedy",
+      "label": "Remedy",
+      "pseudo_locus": false,
+      "definition": "The pathway, where the system provides one, by which a conferral can be revisited."
+    }
+  ],
+  "strata": [
+    {
+      "id": "A",
+      "label": "Model-theoretic",
+      "precondition": "a formal theory",
+      "gated": false,
+      "definition": "Failures of a theory relative to its models."
+    },
+    {
+      "id": "B",
+      "label": "Definitional",
+      "precondition": "a system of definitions",
+      "gated": false,
+      "definition": "Failures in how terms are defined and grounded, independent of domain content."
+    },
+    {
+      "id": "C",
+      "label": "Meta-ontological",
+      "precondition": "an upper ontology",
+      "gated": false,
+      "definition": "Failures of typing and grounding relative to an upper ontology."
+    },
+    {
+      "id": "D",
+      "label": "Pragmatic",
+      "precondition": "acts",
+      "gated": true,
+      "definition": "Failures available only where there are acts."
+    }
+  ],
+  "primitives": [
+    {
+      "id": "K-A1",
+      "stratum": "A",
+      "name": "Inconsistency",
+      "definition": "The theory admits no model; locally, a sentence and its negation are both derivable. Variants: assertional, deontic, analytic.",
+      "formal_signature": "O |= ⊥ globally; locally, jointly unsatisfiable assertions over one locus",
+      "instrument": "reasoner",
+      "well_formed_at": [
+        "artifact",
+        "authority",
+        "criteria",
+        "assessor",
+        "facts",
+        "act",
+        "effects",
+        "remedy"
+      ],
+      "excluded_at": [],
+      "well_formedness_rationale": "Jointly unsatisfiable assertions can be made about any locus, including presenting facts.",
+      "precedents": [
+        "Aristotle on non-contradiction",
+        "Schlobach and Cornet (2003)",
+        "Hohfeld (1917) for the analytic variant"
+      ]
+    },
+    {
+      "id": "K-A2",
+      "stratum": "A",
+      "name": "Term Incoherence",
+      "definition": "The theory is satisfiable but some term is not: a class equivalent to the empty class.",
+      "formal_signature": "O consistent, yet O |= C ⊑ ⊥",
+      "instrument": "reasoner",
+      "well_formed_at": [
+        "artifact",
+        "authority",
+        "criteria",
+        "assessor",
+        "act",
+        "effects",
+        "remedy"
+      ],
+      "excluded_at": [
+        "facts"
+      ],
+      "well_formedness_rationale": "Requires a defined term whose satisfaction conditions can empty out. Presenting facts are asserted, not defined.",
+      "precedents": [
+        "Schlobach and Cornet (2003)"
+      ]
+    },
+    {
+      "id": "K-A3",
+      "stratum": "A",
+      "name": "Indeterminacy",
+      "definition": "Underconstraint: unintended models admitted, or membership undecided where practice requires a decision.",
+      "formal_signature": "Intended and admitted models diverge; borderline membership underivable",
+      "instrument": "structural",
+      "well_formed_at": [
+        "artifact",
+        "authority",
+        "criteria",
+        "assessor",
+        "facts",
+        "act",
+        "effects",
+        "remedy"
+      ],
+      "excluded_at": [],
+      "well_formedness_rationale": "Underconstraint is available wherever anything is specified at all.",
+      "precedents": [
+        "Waismann (1945)",
+        "Hart (1961) on open texture"
+      ]
+    },
+    {
+      "id": "K-B1",
+      "stratum": "B",
+      "name": "Circularity",
+      "definition": "Non-wellfounded definition or grounding: a term's conditions depend transitively on the term itself, or a grounding order is inverted. The temporal case is inversion projected into time.",
+      "formal_signature": "A cycle in the definition dependency graph, or inversion of a required grounding order",
+      "instrument": "reasoner_partial",
+      "well_formed_at": [
+        "artifact",
+        "authority",
+        "criteria",
+        "assessor",
+        "act",
+        "effects",
+        "remedy"
+      ],
+      "excluded_at": [
+        "facts"
+      ],
+      "well_formedness_rationale": "Requires a definition or grounding order. Presenting facts supply neither.",
+      "precedents": []
+    },
+    {
+      "id": "K-B2",
+      "stratum": "B",
+      "name": "Equivocation",
+      "definition": "One item playing incompatible roles: a term, condition, or occupant doing double duty under conflicting demands.",
+      "formal_signature": "One element bound to two roles with conflicting satisfaction conditions",
+      "instrument": "structural",
+      "well_formed_at": [
+        "artifact",
+        "authority",
+        "criteria",
+        "assessor",
+        "facts",
+        "act",
+        "effects",
+        "remedy"
+      ],
+      "excluded_at": [],
+      "well_formedness_rationale": "Double duty is available at every locus, including facts, where one described state of affairs can be bound to two incompatible characterizations.",
+      "precedents": [
+        "Aristotle on equivocation"
+      ]
+    },
+    {
+      "id": "K-B3",
+      "stratum": "B",
+      "name": "Residual Definition",
+      "definition": "A term defined only by complement: membership fixed negatively, as what remains once the positive categories are exhausted.",
+      "formal_signature": "C ≡ ¬D₁ ⊓ ¬D₂ ⊓ … with no positive differentia",
+      "instrument": "structural",
+      "well_formed_at": [
+        "artifact",
+        "criteria",
+        "assessor",
+        "effects",
+        "remedy"
+      ],
+      "excluded_at": [
+        "authority",
+        "facts",
+        "act"
+      ],
+      "well_formedness_rationale": "Well-formed wherever a positive differentia is owed. An authority is designated rather than defined by complement; facts are asserted; the act is performed.",
+      "precedents": []
+    },
+    {
+      "id": "K-C1",
+      "stratum": "C",
+      "name": "Category Violation",
+      "definition": "An entity forced under disjoint upper-ontological categories: the formalized category mistake.",
+      "formal_signature": "a : C and a : D, C and D disjoint at the upper level",
+      "instrument": "reasoner",
+      "well_formed_at": [
+        "artifact",
+        "authority",
+        "criteria",
+        "assessor",
+        "facts",
+        "act",
+        "effects",
+        "remedy"
+      ],
+      "excluded_at": [],
+      "well_formedness_rationale": "Anything typed at all can be mistyped.",
+      "precedents": [
+        "Ryle (1949)",
+        "BFO disjointness axioms (Arp, Smith, and Spear 2015)"
+      ]
+    },
+    {
+      "id": "K-C2",
+      "stratum": "C",
+      "name": "Level Confusion",
+      "definition": "Representational levels conflated: a universal treated as a particular, a class as an instance, use as mention.",
+      "formal_signature": "One element occupying two levels whose disciplines conflict",
+      "instrument": "structural",
+      "well_formed_at": [
+        "artifact",
+        "authority",
+        "criteria",
+        "assessor",
+        "facts",
+        "act",
+        "effects",
+        "remedy"
+      ],
+      "excluded_at": [],
+      "well_formedness_rationale": "Level conflation is available wherever there is representation.",
+      "precedents": []
+    },
+    {
+      "id": "K-C3",
+      "stratum": "C",
+      "name": "Dependence Violation",
+      "definition": "A dependent entity posited without its bearer, or a grounding link severed, including where one direction of a mutual dependence is enforced and the other denied.",
+      "formal_signature": "A specifically dependent continuant without a bearer",
+      "instrument": "reasoner_partial",
+      "well_formed_at": [
+        "artifact",
+        "authority",
+        "criteria",
+        "assessor",
+        "act",
+        "effects",
+        "remedy"
+      ],
+      "excluded_at": [
+        "facts"
+      ],
+      "well_formedness_rationale": "Requires a dependent entity and a bearer relation. Presenting facts are the bearer side, not the dependent side.",
+      "precedents": [
+        "Husserl on foundation, as developed by Smith",
+        "BFO specific dependence"
+      ]
+    },
+    {
+      "id": "K-D1",
+      "stratum": "D",
+      "name": "Falsification",
+      "definition": "Assertion and world mismatched: triggering conditions fabricated, suppressed, or misrepresented. The artifact is coherent; its contact with reality is corrupted.",
+      "formal_signature": "An asserted triggering condition with no worldly truthmaker",
+      "instrument": "world_facing",
+      "well_formed_at": [
+        "facts",
+        "act",
+        "effects",
+        "remedy"
+      ],
+      "excluded_at": [
+        "artifact",
+        "authority",
+        "criteria",
+        "assessor"
+      ],
+      "well_formedness_rationale": "Requires something asserted about the world. Authority, criteria and role are conferred rather than asserted.",
+      "precedents": [
+        "the law of evidence as an institutionalized detection apparatus"
+      ],
+      "operationalized": false,
+      "operationalization_note": "Not operationalized and will not be (paper §13): detection requires world-facing ground truth about whether asserted triggering conditions obtained."
+    },
+    {
+      "id": "K-D2",
+      "stratum": "D",
+      "name": "Performative Self-Defeat",
+      "definition": "An act whose success conditions are undermined by its own performance: a norm whose compliance conditions preclude compliance.",
+      "formal_signature": "Satisfying the act's content entails failure of its success conditions",
+      "instrument": "process_or_text_internal",
+      "well_formed_at": [
+        "criteria",
+        "act",
+        "remedy"
+      ],
+      "excluded_at": [
+        "artifact",
+        "authority",
+        "assessor",
+        "facts",
+        "effects"
+      ],
+      "well_formedness_rationale": "Requires an act with success conditions, or a norm stating compliance conditions.",
+      "precedents": [
+        "Hintikka on the performative cogito",
+        "Apel and Habermas on performative contradiction"
+      ],
+      "operationalized": "partial",
+      "operationalization_note": "Low recall by construction (paper §13): only the text-internal case is implemented."
+    },
+    {
+      "id": "K-D3",
+      "stratum": "D",
+      "name": "Modal Clash",
+      "definition": "A capacity present in structure but blocked in practice: possible according to the artifact, unrealizable in the institution implementing it. (de jure / de facto)",
+      "formal_signature": "◇-in-structure with ¬◇-in-practice for the same capacity",
+      "instrument": "process_or_text_internal",
+      "well_formed_at": [
+        "authority",
+        "criteria",
+        "assessor",
+        "act",
+        "effects",
+        "remedy"
+      ],
+      "excluded_at": [
+        "artifact",
+        "facts"
+      ],
+      "well_formedness_rationale": "Requires a capacity. Presenting facts confer none.",
+      "precedents": [
+        "Pound (1910) on law in books versus law in action"
+      ],
+      "operationalized": true,
+      "operationalization_note": "Primary detector of the registered design (paper §10.1): a capacity conferred in the text with no procedural pathway specified for invoking it."
+    }
+  ],
+  "gating_rule": {
+    "statement": "Strata A, B and C are ungated: their preconditions are rules, definitions and top-level kinds, all of which live inside the artifact. Stratum D is gated three ways by the status of the link at which the crossing sits.",
+    "values": {
+      "internal": "fires",
+      "external": "rare",
+      "absent": "cannot_fire"
+    },
+    "ungated_values": {
+      "internal": "fires",
+      "external": "fires",
+      "absent": "no_locus"
+    },
+    "note": "For ungated strata, 'absent' yields no_locus rather than cannot_fire or not_applicable. Three facts are kept apart. not_applicable is a kernel-level fact: the crossing is not well-formed, so the coordinate does not exist in any system. no_locus is a system-level fact: the crossing is well-formed and this system simply has no link there, so the failure it names relocates to the artifact body rather than vanishing. cannot_fire says the link exists and the primitive is barred at it. The artifact pseudo-locus is always present, so A, B and C always have somewhere to fire."
+  },
+  "named_types": [
+    {
+      "key": "JC",
+      "label": "Jurisdictional Contradiction",
+      "primitive": "K-A1",
+      "locus": "effects",
+      "system_kind": "legal_order",
+      "source": "Structural Ontology of Law (Koepsell forthcoming), located at these coordinates in §7.2 Table 7."
+    },
+    {
+      "key": "TC",
+      "label": "Temporal Contradiction",
+      "primitive": "K-B1",
+      "locus": "criteria",
+      "system_kind": "legal_order",
+      "source": "Structural Ontology of Law (Koepsell forthcoming), located at these coordinates in §7.2 Table 7."
+    },
+    {
+      "key": "AI",
+      "label": "Authority Inflation",
+      "primitive": "K-B2",
+      "locus": "authority",
+      "system_kind": "legal_order",
+      "source": "Structural Ontology of Law (Koepsell forthcoming), located at these coordinates in §7.2 Table 7."
+    },
+    {
+      "key": "CF",
+      "label": "Conferral Failure",
+      "primitive": "K-C3",
+      "locus": "assessor",
+      "system_kind": "legal_order",
+      "source": "Structural Ontology of Law (Koepsell forthcoming), located at these coordinates in §7.2 Table 7."
+    },
+    {
+      "key": "RF",
+      "label": "Repair Failure",
+      "primitive": "K-D3",
+      "locus": "remedy",
+      "system_kind": "legal_order",
+      "source": "Structural Ontology of Law (Koepsell forthcoming), located at these coordinates in §7.2 Table 7."
+    },
+    {
+      "key": "CT-1",
+      "label": "Disjointness / Overlap Failure",
+      "primitive": "K-A1",
+      "locus": "criteria",
+      "system_kind": "classification",
+      "reading": "Criteria → Recognition: intended disjointness left unasserted, so jointly satisfiable models survive. The signature of artifactual comorbidity.",
+      "source": "Paper §7.3 Table 8."
+    },
+    {
+      "key": "CT-2",
+      "label": "Criterion Circularity",
+      "primitive": "K-B1",
+      "locus": "criteria",
+      "system_kind": "classification",
+      "reading": "A category's defining conditions depend transitively on the category itself.",
+      "source": "Paper §7.3 Table 8."
+    },
+    {
+      "key": "CT-3",
+      "label": "Threshold / Polythetic Incoherence",
+      "primitive": "K-A3",
+      "locus": "criteria",
+      "system_kind": "classification",
+      "reading": "A disjunctive family without shared essence; membership underconstrained.",
+      "source": "Paper §7.3 Table 8."
+    },
+    {
+      "key": "CT-4",
+      "label": "Criterion Double-Duty",
+      "primitive": "K-B2",
+      "locus": "criteria",
+      "system_kind": "classification",
+      "reading": "One condition bound to conflicting inclusion and exclusion roles.",
+      "source": "Paper §7.3 Table 8."
+    },
+    {
+      "key": "CT-5",
+      "label": "Residual Indeterminacy",
+      "primitive": "K-B3",
+      "locus": "criteria",
+      "system_kind": "classification",
+      "reading": "The 'other specified' and 'unspecified' pattern.",
+      "source": "Paper §7.3 Table 8."
+    },
+    {
+      "key": "CT-6",
+      "label": "Recognition Failure",
+      "primitive": "K-C3",
+      "locus": "criteria",
+      "system_kind": "classification",
+      "reading": "Criteria → Recognition: the diagnostic act cannot track the criteria; grounding severed.",
+      "source": "Paper §7.3 Table 8."
+    },
+    {
+      "key": "CT-7",
+      "label": "Type Contradiction",
+      "primitive": "K-C1",
+      "locus": "artifact",
+      "system_kind": "classification",
+      "reading": "Upper level: an entity forced under disjoint BFO categories.",
+      "source": "Paper §7.3 Table 8."
+    }
+  ],
+  "external_lists": {
+    "fuller_1964": {
+      "description": "Fuller's eight desiderata located in the product for a legal order (paper §7.4 Table 9). Included as a fixture: the generator does not use it, and the test suite checks that every PRIMARY coordinate below is a well-formed crossing of the generated legal grid. Where Table 9 writes an arrow ('Criteria -> Effects'), the first element is the locus of the crossing and the second is recorded here as `manifests_at`: where the failure shows up, not a second crossing. That reading is forced by the tables themselves. Table 9 places 'Possibility of compliance' at K-D2 with the arrow running to Effects, while Table 7 marks K-D2 as not well-formed at Effects. Read as a manifestation pointer the two tables agree; read as a second crossing they do not. The alternative resolution is to make K-D2 well-formed at Effects, which would change the legal grid from 70 to 71 well-formed cells. This is an open question for the author, recorded rather than silently resolved.",
+      "items": [
+        {
+          "desideratum": "Generality",
+          "failure": "decision ad hoc, no rules at all",
+          "primitive": "K-A3",
+          "locus": "criteria"
+        },
+        {
+          "desideratum": "Promulgation",
+          "failure": "rules not made known",
+          "primitive": "K-D3",
+          "locus": "criteria",
+          "manifests_at": "act"
+        },
+        {
+          "desideratum": "Non-retroactivity",
+          "failure": "rules applied backwards in time",
+          "primitive": "K-B1",
+          "locus": "criteria"
+        },
+        {
+          "desideratum": "Clarity",
+          "failure": "rules unintelligible",
+          "primitive": "K-A3",
+          "locus": "criteria"
+        },
+        {
+          "desideratum": "Non-contradiction",
+          "failure": "rules conflict",
+          "primitive": "K-A1",
+          "locus": "criteria"
+        },
+        {
+          "desideratum": "Possibility of compliance",
+          "failure": "rules require the impossible",
+          "primitive": "K-D2",
+          "locus": "criteria",
+          "manifests_at": "effects"
+        },
+        {
+          "desideratum": "Constancy through time",
+          "failure": "rules change faster than compliance",
+          "primitive": "K-A3",
+          "locus": "criteria"
+        },
+        {
+          "desideratum": "Congruence",
+          "failure": "official action diverges from declared rule",
+          "primitive": "K-D3",
+          "locus": "act"
+        }
+      ]
+    }
+  },
+  "admission_criteria": {
+    "description": "Conditions under which a candidate contradiction type is admitted to a domain typology (paper §7.2).",
+    "criteria": [
+      "locus_indexed: the type is stated at a determinate (primitive, locus) coordinate",
+      "distinguishable: model-theoretically distinguishable from every existing type in both directions",
+      "non_derivable: not derivable from existing types, except where a compound carries emergent diagnostic value",
+      "attested: attested in corpus data"
+    ]
+  },
+  "bfo": {
+    "conformance": "BFO 2020",
+    "note": "Every IRI below is verified against the upstream ontologies by tools/check_bfo.py. The label is part of the claim: referring to the right IRI under the wrong description is how a module ends up wired backwards while passing every structural check.",
+    "external_terms": {
+      "BFO_0000050": "part of",
+      "BFO_0000051": "has part",
+      "BFO_0000015": "process",
+      "BFO_0000023": "role",
+      "BFO_0000017": "realizable entity",
+      "BFO_0000003": "occurrent",
+      "BFO_0000004": "independent continuant",
+      "IAO_0000030": "information content entity",
+      "IAO_0000033": "directive information entity",
+      "IAO_0000115": "definition",
+      "IAO_0000119": "definition source",
+      "IAO_0000136": "is about",
+      "RO_0000052": "characteristic of"
+    },
+    "local_terms": {
+      "prescribes": "Relates a directive information entity to the occurrent or realizable entity whose occurrence it directs. IAO has no relation of this shape. If one is adopted upstream, replace it and regenerate.",
+      "conferredBy": "Relates a role to the process in which it came to be borne.",
+      "firingValue": "Annotation. A rate claim, not an axiom about the world.",
+      "detectionInstrument": "Annotation. Which instrument, if any, operationalises the primitive.",
+      "operationalized": "Annotation. Whether the primitive is operationalised in this release."
+    },
+    "decisions": [
+      {
+        "id": "universals-are-classes",
+        "decision": "The twelve primitives are classes, not individuals.",
+        "rationale": "Their instances are particular contradictions in particular artifacts. Each class carries an Aristotelian definition and a definition source."
+      },
+      {
+        "id": "contradiction-is-an-ice",
+        "decision": "A contradiction is an information content entity, a continuant part of the artifact bearing it.",
+        "rationale": "Not a quality: two printings of one code carry the same contradiction, so the entity is generically dependent rather than inhering in a material bearer."
+      },
+      {
+        "id": "locus-is-mereological",
+        "decision": "A contradiction at the criteria locus is one that is part of a criteria specification. No locus-indexing relation, no crossing individuals.",
+        "rationale": "BFO_0000050 already does the work. Minting a relation or an individual would add machinery the mereology supplies for free."
+      },
+      {
+        "id": "absence-is-absence-of-a-part",
+        "decision": "An artifact either has a specification part of a given kind or it does not. An absent link MUST NOT be represented by an individual carrying a status of 'absent'.",
+        "rationale": "Such an individual posits an entity in order to deny that it exists."
+      },
+      {
+        "id": "conferred-status-is-two-part",
+        "decision": "A conferred status is a role inhering in the bearer together with a declaration about it.",
+        "rationale": "The single-part alternatives are each expressively inadequate. A role alone asserts that something inheres in the bearer; a generically dependent continuant alone gives no bearer for the assertion to be made or withheld about. Only the two-part model can represent a system that records and mandates a status while declining to assert that anything inheres in anyone, which is WHO's stated position on ICD-11 Chapter 26."
+      },
+      {
+        "id": "firing-values-are-annotations",
+        "decision": "Firing values are annotations, not axioms.",
+        "rationale": "A rate is not something the world contains, and the middle value of the gate is an empirical claim that could turn out false without anything in the ontology being wrong."
+      }
+    ]
+  }
+}

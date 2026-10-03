@@ -1,7 +1,7 @@
 {
   "_meta": {
     "registry_version": "1.0.0",
-    "generated": "2026-10-03T21:26:44+00:00",
+    "generated": "2026-10-03T23:23:11+00:00",
     "generator": "build_registry.py",
     "canonical_namespace": "https://w3id.org/sool#",
     "deprecated_namespaces": [
@@ -19,10 +19,10 @@
     ],
     "default_measure": "ct_count",
     "sourceOntology": "sool_bfo_mlc_core.ttl",
-    "ontologyHash": "b8a0160a64afa0d59540c0aeefe39b7a4e0550258932f9463730c445fe11c5c6",
+    "ontologyHash": "9c4d00ecb888335449e87a3dacd109f6df9bd3bfe00bf2a45ede713bca9f7020",
     "kernel_present": true,
     "kernel_version": "0.2.0",
-    "kernel_path": "/home/drkoepsell/projects/recognition/recognition-kernel/data/kernel.json",
+    "kernel_path": "/home/drkoepsell/CaseLaw/vocab/kernel-0.2.0.json",
     "spec_authority_present": false,
     "spec_authority_note": "SOoLRev2.owl is declared canonical but the file bearing that name has ontology IRI http://davidkoepsell.com/bfo-agent/working and contains zero K-A1..K-D3 IRIs. The identity layer is therefore assembled from kernel.json and marked provisional.",
     "lof_conventions_enforced": [
@@ -389,10 +389,9 @@
       },
       "deprecatedCodes": [],
       "altLabels": [
-        "RPF",
-        "Repair Procedure Failure"
+        "RPF"
       ],
-      "ontologyLabel": "Repair Procedure Failure",
+      "ontologyLabel": "Repair Failure",
       "definition": "N8. Remedy structurally available but blocked. Criminal: proportionality constraint (independent of N7). Qualified immunity = RPF.",
       "cd_weight_core_v1": 0.13,
       "nodes_referenced": [
@@ -402,8 +401,7 @@
       "mlcLink_confirmed": true,
       "layer": "operational",
       "source_ontology": "sool_bfo_mlc_core.ttl",
-      "status": "pending_ontology_correction",
-      "a0_note": "Registry prefLabel 'Repair Failure' differs from the ontology of record 'Repair Procedure Failure'. Amendment A1. Correct in the OWL under A0; this registry does not route around it.",
+      "status": "active",
       "kernel": {
         "primitive": "K-D3",
         "stratum": "D",

@@ -212,10 +212,13 @@ sool:SelfUnderminingEffect a sool:ContradictionType, owl:NamedIndividual ;
     rdfs:comment "N7. Legal effect destabilizes conditions for system own persistence. Fuller inner morality of law basis." .
 
 sool:RepairProcedureFailure a sool:ContradictionType, owl:NamedIndividual ;
-    rdfs:label "Repair Procedure Failure (RPF)" ; skos:altLabel "RPF" ;
+    rdfs:label "Repair Failure (RPF)" ; skos:altLabel "RPF" ;
+    skos:hiddenLabel "Repair Procedure Failure (RPF)" ;
+    skos:hiddenLabel "Remedy failure" ;
     sool:cdWeight "0.13"^^xsd:decimal ;
     sool:indexedToNode sool:Node8_Remedy ;
-    rdfs:comment "N8. Remedy structurally available but blocked. Criminal: proportionality constraint (independent of N7). Qualified immunity = RPF." .
+    rdfs:comment "N8. Remedy structurally available but blocked. Criminal: proportionality constraint (independent of N7). Qualified immunity = RPF." ;
+    rdfs:comment "Amendment A1, applied 2026-10-03. prefLabel corrected from \"Repair Procedure Failure\" to \"Repair Failure\" to match the published record: the book, the Quick Reference card, the teaching package, and 83 occurrences across 24 authored files. \"Procedure\" imported PC's construct into the REPAIR cluster, which this term is not about: the remedy exists and is blocked, which is not a defect of procedure. Superseded forms are retained as skos:hiddenLabel so historical citations remain searchable without displaying. The IRI is deliberately unchanged: under LOF-P-005 an IRI is opaque and carries no meaning, so renaming it would break 6,165 keyed annotations and every published graph to no semantic gain. This term aligns to recognition-kernel K-D3 (locus: remedy) and to lof:ODP004_0001002 (remedial position); see docs/RF_DECISION.md." .
 
 # PART IV: Chain outcome classes
 

@@ -9,6 +9,6 @@ PC,Procedural Contradiction,Procedural Contradiction,,,,,,2->5,yes,0.09,,,,activ
 RC3,Role Contradiction,Role Contradiction,,,,,,N3,yes,0.14,,,,active
 RCL,Recognition Collapse,Recognition Collapse,,,,,,6->8,yes,0.18,,,,active
 RF,Recognition Failure,Recognition Failure,RF,,,,,6/7,yes,0.11,0.11,,,active
-RPF,Repair Failure,Repair Procedure Failure,RPF,RF,K-D3,remedy,Repair Failure,N8,yes,0.13,0.13,,,pending_ontology_correction
+RPF,Repair Failure,Repair Failure,RPF,RF,K-D3,remedy,Repair Failure,N8,yes,0.13,0.13,,,active
 SE,Self-Undermining Effect,Self-Undermining Effect,,,,,,N7,yes,0.1,,,,active
 TC,Temporal Contradiction,Temporal Contradiction,,TC,K-B1,criteria,Temporal Contradiction,2<->4,yes,0.08,,,,active

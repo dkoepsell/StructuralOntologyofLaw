@@ -1,8 +1,0 @@
-# Pending ontology corrections, prepared under amendment A0.
-# Claude Code does not edit the ontology. Review, then apply by hand.
-
-## RPF  (sool:RepairProcedureFailure)
--  rdfs:label "Repair Procedure Failure"@en ;
-+  rdfs:label "Repair Failure"@en ;
-+  skos:hiddenLabel "Repair Procedure Failure"@en ;   # deprecated
-   # Registry prefLabel 'Repair Failure' differs from the ontology of record 'Repair Procedure Failure'. Amendment A1. Correct in the OWL under A0; this registry does not route around it.
