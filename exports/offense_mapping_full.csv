@@ -1,0 +1,150 @@
+﻿Offense,Type,Structural violation class,Chain failures,Description
+Murder,Crime,Factual misalignment; Normative contradiction,(4); (2↔),Unlawful killing violates the norm against homicide and depends on the factual predicate of causing death.
+Manslaughter,Crime,Factual misalignment,(4),Killing without malice involves misaligned triggering facts affecting culpability.
+Assault,Crime,Factual misalignment,(4),Threatening or harming someone violates norms contingent on factual aggression.
+Battery,Crime,Factual misalignment,(4),Unlawful physical contact is a factual violation of personal security norms.
+Rape,Crime,Factual misalignment; Recognition failure,(4); 6/7,Non-consensual sexual act violates bodily autonomy and fails to recognize the victim's status.
+Kidnapping,Crime,Factual misalignment; Recognition failure,(4); 6/7,Unlawfully confining or transporting a person violates norms and denies recognition of their freedom.
+Robbery,Crime,Factual misalignment,(4),"Taking property by force combines theft and assault, violating property and personal security norms."
+Burglary,Crime,Factual misalignment,(4),Entering a building unlawfully to commit a crime violates property integrity norms.
+Theft/Larceny,Crime,Factual misalignment,(4),Taking another’s property without consent violates ownership rights.
+Embezzlement,Crime,Factual misalignment; Correlativity contradiction,(4); (7),Misappropriating property entrusted to one’s care breaches fiduciary obligations and misaligns rights.
+Fraud (criminal),Crime,Recognition failure; Correlativity contradiction,6/7; (7),Deceiving a victim to obtain something creates invalid recognition of facts and duties.
+Forgery,Crime,Recognition failure,6/7,Falsifying documents corrupts recognition of legal status and rights.
+Arson,Crime,Factual misalignment,(4),Intentional burning of property violates norms protecting property and safety.
+Bribery,Crime,Conferral failure; Role contradiction (authority),1→3; (3),Offering a benefit to influence an official corrupts authority and misaligns roles.
+Perjury,Crime,Procedural contradiction; Recognition failure,2→5; 6/7,Lying under oath disrupts procedures and produces false legal recognitions.
+Extortion,Crime,Role contradiction (authority); Factual misalignment,(3); (4),Coercing someone to obtain property or favors abuses role-based authority and violates norms.
+Drug Trafficking,Crime,Factual misalignment,(4),Producing or distributing illegal drugs contravenes regulated norms regarding controlled substances.
+Money Laundering,Crime,Recognition failure,6/7,Concealing the origins of illegal proceeds hides the legal status of property.
+Insider Trading,Crime,Recognition failure; Procedural contradiction,6/7; 2→5,Trading on non-public information misuses fiduciary duty and procedural rules for markets.
+Obstruction of Justice,Crime,Procedural contradiction,2→5,Interfering with legal proceedings undermines judicial processes.
+Terrorism,Crime,Factual misalignment; Recognition failure,(4); 6/7,Acts intended to intimidate populations or governments violate fundamental norms and deny recognition of victims.
+Tax Evasion,Crime,Recognition failure; Factual misalignment,6/7; (4),"Evading taxes misrepresents facts to authorities, leading to invalid recognition and duty violations."
+Money Laundering,Crime,Recognition failure,6/7,Concealing the source of funds corrupts recognition of legal ownership.
+Conspiracy,Crime,Factual misalignment,(4),"Agreement to commit a crime, even if not completed, breaks norms through coordinated intent."
+Obstruction of Justice,Crime,Procedural contradiction,2→5,Interfering with law enforcement or judicial functions contravenes procedural norms.
+Negligence,Tort,Factual misalignment; Recognition failure,(4); 6/7,Failure to exercise reasonable care causes harm; recognition of duty and harm is key.
+Defamation,Tort,Recognition failure,6/7,False statements harm reputation; they create false recognitions of someone’s character.
+Trespass to Land,Tort,Factual misalignment,(4),Unauthorized entry onto land violates the owner’s property right.
+Trespass to Chattels,Tort,Factual misalignment,(4),Interference with personal property violates possession norms.
+Conversion,Tort,Factual misalignment,(4),Wrongfully taking or controlling another’s property deprives the owner of their rights.
+Nuisance,Tort,Factual misalignment; Recognition failure,(4); 6/7,Substantial interference with enjoyment of property misaligns norms of coexistence.
+Battery (civil),Tort,Factual misalignment,(4),Intentional harmful contact infringes bodily integrity.
+Assault (civil),Tort,Factual misalignment,(4),Threat of harmful contact causes apprehension and violates personal security norms.
+False Imprisonment,Tort,Authority failure; Recognition failure,(1); 6/7,Unlawful restraint of another’s freedom lacks valid authority and misrecognizes their liberty.
+Intentional Infliction of Emotional Distress,Tort,Factual misalignment,(4),Extreme or outrageous conduct causing severe distress violates norms of personal autonomy.
+Negligent Misrepresentation,Tort,Recognition failure,6/7,False information provided without due care leads others to act on mistaken recognition.
+Strict Liability (products),Tort,Factual misalignment,(4),"Harm from defective products invokes liability regardless of intent, based on factual harm."
+Invasion of Privacy,Tort,Recognition failure; Factual misalignment,6/7; (4),Public disclosure of private facts or intrusion misrecognizes individual privacy rights.
+Malicious Prosecution,Tort,Role contradiction; Procedural contradiction,(3); 2→5,Initiating a legal action without probable cause misuses legal procedures and roles.
+Abuse of Process,Tort,Procedural contradiction,2→5,Misusing legal process for an ulterior purpose undermines procedural integrity.
+Wrongful Death,Tort,Factual misalignment,(4),Death caused by negligence or intentional act infringes the decedent’s life and rights.
+Fiduciary Breach,Tort,Conferral failure; Correlativity contradiction,1→3; (7),Breach of duty by a fiduciary misaligns delegated authority and rights of the beneficiary.
+Professional Malpractice,Tort,Role contradiction; Factual misalignment,(3); (4),Failure of a professional to meet the standard of care violates their role responsibilities and causes harm.
+Interference with Contractual Relations,Tort,Recognition failure; Correlativity contradiction,6/7; (7),Intentionally inducing breach of contract disrupts recognized contractual obligations and correlative rights.
+Unlawful Search and Seizure,Constitutional,Authority failure; Procedural contradiction,(1); 2→5,Government search without warrant or probable cause lacks authority and violates procedural safeguards.
+Unlawful Arrest,Constitutional,Authority failure; Recognition failure,(1); 6/7,Arrest without legal basis or warrant violates the individual’s right to liberty and proper recognition.
+Denial of Due Process,Constitutional,Procedural contradiction; Recognition failure,2→5; 6/7,Failure to provide notice and an opportunity to be heard undermines procedural fairness and recognition.
+Cruel and Unusual Punishment,Constitutional,Normative contradiction,(2↔),Punishment that is disproportionate or barbaric conflicts with constitutional norms.
+Violation of Free Speech,Constitutional,Normative contradiction; Recognition failure,(2↔); 6/7,Government restriction of speech conflicts with constitutional norms and misrecognizes expressive rights.
+Violation of Equal Protection,Constitutional,Recognition failure; Correlativity contradiction,6/7; (7),Discriminatory laws or practices fail to recognize equal legal status and disrupt correlated rights.
+Establishment Clause Violation,Constitutional,Normative contradiction,(2↔),Government endorsement of religion conflicts with constitutional separation of church and state.
+Free Exercise Clause Violation,Constitutional,Normative contradiction,(2↔),Government interference with religious practice conflicts with constitutional protection of free exercise.
+Taking without Just Compensation,Constitutional,Recognition failure; Correlativity contradiction,6/7; (7),Seizing private property without compensation misrecognizes property rights and disrupts duty to compensate.
+Denial of Right to Counsel,Constitutional,Recognition failure,6/7,Refusing legal representation infringes the accused’s right and misrecognizes procedural rights.
+Self-Incrimination,Constitutional,Procedural contradiction,2→5,Compelling a person to testify against themselves violates procedural norms protecting autonomy.
+Ex Post Facto Law,Constitutional,Temporal contradiction,2↔4,Imposing criminal liability retroactively conflicts with temporal conditions of legality.
+Double Jeopardy,Constitutional,Procedural contradiction; Recognition failure,2→5; 6/7,Trying someone twice for the same offense violates procedural justice and misrecognizes the finality of judgments.
+Denial of Voting Rights,Constitutional,Recognition failure,6/7,Restricting lawful voters undermines recognition of their status as citizens with participatory rights.
+Restriction of Assembly,Constitutional,Normative contradiction; Recognition failure,(2↔); 6/7,Limiting peaceful assembly conflicts with constitutional norms and misrecognizes collective rights.
+Quartering Soldiers,Constitutional,Normative contradiction,(2↔),Housing soldiers in private residences without consent contradicts constitutional norms protecting privacy.
+Unreasonable Bail,Constitutional,Normative contradiction,(2↔),Excessive bail infringes constitutional norms against disproportionate conditions for release.
+Unconstitutional Delegation,Constitutional,Conferral failure; Normative contradiction,1→3; (2↔),Legislative delegation of powers beyond constitutional bounds misconfers authority and conflicts with constitutional norms.
+Denial of Habeas Corpus,Constitutional,Recognition failure; Procedural contradiction,6/7; 2→5,Refusing judicial review of detention undermines recognition of individual liberty and procedural safeguards.
+Intrusion upon Seclusion,Tort,Recognition failure; Factual misalignment,6/7; (4),Intruding upon someone's private affairs violates their privacy and misaligns factual and recognized boundaries.
+Public Disclosure of Private Facts,Tort,Recognition failure,6/7,Publishing private information without consent misrecognizes the individual's privacy rights.
+False Light,Tort,Recognition failure,6/7,Portraying someone falsely to the public misrecognizes their reputation and status.
+Appropriation of Name or Likeness,Tort,Recognition failure; Correlativity contradiction,6/7; (7),Using someone's name or likeness for commercial gain without consent misrecognizes their personal rights and correlated obligations.
+Breach of Confidence,Tort,Recognition failure,6/7,Improperly disclosing confidential information violates the duty of confidence and misrecognizes the confider's rights.
+Negligent Infliction of Emotional Distress,Tort,Factual misalignment; Recognition failure,(4); 6/7,Causing emotional harm through negligence misaligns facts and fails to recognize the victim's emotional well-being.
+Intentional Interference with Prospective Economic Advantage,Tort,Recognition failure; Correlativity contradiction,6/7; (7),Disrupting another's prospective business expectancy misrecognizes economic rights and disrupts correlated obligations.
+Unfair Competition,Tort,Normative contradiction; Recognition failure,(2↔); 6/7,Engaging in deceptive or wrongful business practices conflicts with normative commercial standards and misrecognizes competitors' rights.
+Trade Libel,Tort,Recognition failure,6/7,Publishing false statements about a product causes economic harm and misrecognizes the maker's rights.
+Slander of Title,Tort,Recognition failure; Correlativity contradiction,6/7; (7),False statements casting doubt on a property title misrecognize ownership and disrupt correlated obligations.
+Injurious Falsehood,Tort,Recognition failure,6/7,False statements made to harm business interests misrecognize economic rights.
+Passing Off,Tort,Recognition failure; Correlativity contradiction,6/7; (7),Misrepresenting one's goods or services as those of another misrecognizes trademarks and disrupts correlated rights.
+Replevin,Tort,Recognition failure; Remedy failure,6/7; (8),An action to recover personal property wrongfully taken involves recognition of ownership and the remedy of return.
+Detinue,Tort,Recognition failure; Remedy failure,6/7; (8),A legal action for the wrongful detention of personal property highlights recognition of ownership and remedy requirements.
+Waste,Tort,Factual misalignment,(4),"Causing permanent injury to property (e.g., by a tenant) misaligns factual usage with property norms."
+Public Nuisance,Tort,Factual misalignment; Recognition failure,(4); 6/7,"Interference with a public right (e.g., blocking a highway) misaligns facts and misrecognizes community rights."
+Interference with Easement,Tort,Recognition failure; Correlativity contradiction,6/7; (7),Obstructing a rightful easement disrupts the recognized servitude and corresponding duties.
+Liability for Dangerous Animals,Tort,Factual misalignment,(4),Owning dangerous animals that cause harm constitutes strict liability due to misalignment of factual risk and duty.
+Ultrahazardous Activities,Tort,Factual misalignment,(4),"Engaging in inherently dangerous activities (e.g., blasting) imposes strict liability due to factual risk to others."
+Premises Liability,Tort,Factual misalignment; Recognition failure,(4); 6/7,Property owners' failure to maintain safe premises leads to harm and misrecognizes visitors' safety rights.
+Negligent Entrustment,Tort,Factual misalignment; Recognition failure,(4); 6/7,Entrusting a dangerous instrumentality to an incompetent person causes harm through misaligned facts and recognition of duty.
+Dram Shop Liability,Tort,Recognition failure; Factual misalignment,6/7; (4),Commercial sellers' provision of alcohol to an intoxicated person who causes harm violates statutory duties and misrecognizes third-party rights.
+Civil Conspiracy (tort),Tort,Role contradiction; Procedural contradiction,(3); 2→5,An agreement between two or more parties to commit a wrongful act misuses roles and undermines procedural integrity.
+Spoliation of Evidence,Tort,Procedural contradiction; Recognition failure,2→5; 6/7,Intentional destruction or alteration of evidence interferes with legal proceedings and misrecognizes litigants' rights.
+Bad Faith (Insurance),Tort,Recognition failure; Correlativity contradiction,6/7; (7),An insurer's unreasonable refusal to pay a valid claim misrecognizes the insured's rights and breaches correlated obligations.
+Misfeasance,Tort,Procedural contradiction,2→5,Improper performance of a lawful act violates procedure and causes harm.
+Nonfeasance,Tort,Recognition failure; Factual misalignment,6/7; (4),Failure to act when a duty exists misrecognizes the duty and misaligns facts and norms.
+Product Liability (Design Defect),Tort,Factual misalignment,(4),A defective product design causing injury misaligns the product's safety with normative expectations.
+Product Liability (Manufacturing Defect),Tort,Factual misalignment,(4),A defect in manufacturing leading to injury misaligns the product's factual condition with normative safety standards.
+Product Liability (Failure to Warn),Tort,Recognition failure,6/7,Failure to provide adequate warnings about a product's risks misrecognizes the consumer's right to informed choice.
+Breach of Warranty,Tort,Recognition failure; Correlativity contradiction,6/7; (7),Violation of an express or implied warranty misrecognizes contractual expectations and disrupts correlated obligations.
+Loss of Consortium,Tort,Recognition failure; Correlativity contradiction,6/7; (7),Deprivation of a family relationship due to injury misrecognizes relational rights and duties.
+Alienation of Affection,Tort,Recognition failure; Correlativity contradiction,6/7; (7),Interference with a marital relationship misrecognizes the relational obligations and duties of spouses.
+Tortious Interference with Inheritance,Tort,Recognition failure; Correlativity contradiction,6/7; (7),Interfering with an expected inheritance misrecognizes the beneficiary's expectancy and disrupts correlated duties.
+Violation of Freedom of the Press,Constitutional,Normative contradiction; Recognition failure,(2↔); 6/7,Government restriction of press freedom conflicts with constitutional norms and misrecognizes the press's role.
+Violation of Right to Petition,Constitutional,Normative contradiction; Recognition failure,(2↔); 6/7,Government interference with petitions for redress conflicts with constitutional norms and misrecognizes citizens' rights.
+Violation of Right to Bear Arms,Constitutional,Normative contradiction,(2↔),Government infringement on the right to keep and bear arms conflicts with constitutional norms.
+Violation of Grand Jury Right,Constitutional,Procedural contradiction; Recognition failure,2→5; 6/7,Prosecution without a grand jury indictment in serious cases violates procedural safeguards and misrecognizes the accused's rights.
+Violation of Speedy Trial Right,Constitutional,Procedural contradiction; Recognition failure,2→5; 6/7,Unreasonable delay in trial violates procedural norms and misrecognizes the accused's rights.
+Violation of Public Trial Right,Constitutional,Procedural contradiction,2→5,Conducting a trial in secret violates procedural norms requiring openness.
+Violation of Impartial Jury Right,Constitutional,Procedural contradiction; Recognition failure,2→5; 6/7,Trying a defendant before a biased jury violates procedural fairness and misrecognizes the right to an impartial tribunal.
+Violation of Right to Be Informed of Charges,Constitutional,Recognition failure,6/7,Failing to inform the accused of the nature and cause of the accusation misrecognizes their right to prepare a defense.
+Violation of Right to Confront Witnesses,Constitutional,Recognition failure; Procedural contradiction,6/7; 2→5,Preventing cross-examination of witnesses against a defendant misrecognizes confrontation rights and disrupts procedure.
+Violation of Compulsory Process Right,Constitutional,Procedural contradiction; Recognition failure,2→5; 6/7,Denying the defendant the ability to secure witnesses in their favor violates procedural norms and misrecognizes their rights.
+Violation of Civil Jury Right,Constitutional,Procedural contradiction,2→5,Denying a civil litigant the right to a jury trial violates procedural norms under the Seventh Amendment.
+Violation of Excessive Fines Clause,Constitutional,Normative contradiction,(2↔),Imposing excessive fines conflicts with constitutional norms under the Eighth Amendment.
+Violation of Ninth Amendment Privacy Right,Constitutional,Normative contradiction; Recognition failure,(2↔); 6/7,Government intrusion into intimate decision-making conflicts with unenumerated privacy rights and misrecognizes personal autonomy.
+Violation of Ninth Amendment Same-Sex Relationships Right,Constitutional,Normative contradiction; Recognition failure,(2↔); 6/7,Criminalizing consensual same-sex relationships conflicts with constitutional norms and misrecognizes personal rights.
+Violation of Tenth Amendment (States' Rights),Constitutional,Normative contradiction,(2↔),Federal usurpation of powers reserved to the states conflicts with the constitutional allocation of authority.
+Violation of Thirteenth Amendment,Constitutional,Normative contradiction,(2↔),Enforcing slavery or involuntary servitude conflicts with constitutional prohibitions.
+Violation of Privileges or Immunities Clause,Constitutional,Normative contradiction,(2↔),State infringement of fundamental rights of citizens conflicts with the Fourteenth Amendment.
+Violation of 15th Amendment Voting Rights,Constitutional,Recognition failure; Normative contradiction,6/7; (2↔),Denying the right to vote based on race or color conflicts with constitutional norms and misrecognizes citizens' rights.
+Violation of 19th Amendment Voting Rights,Constitutional,Recognition failure; Normative contradiction,6/7; (2↔),Denying the right to vote based on sex conflicts with constitutional norms and misrecognizes citizens' rights.
+Violation of 24th Amendment (Poll Tax),Constitutional,Normative contradiction; Recognition failure,(2↔); 6/7,Imposing a poll tax as a condition for voting conflicts with constitutional norms and misrecognizes citizens' rights.
+Violation of 26th Amendment Voting Rights,Constitutional,Normative contradiction; Recognition failure,(2↔); 6/7,Denying citizens 18 years or older the right to vote conflicts with constitutional norms and misrecognizes their rights.
+Violation of Right to Travel,Constitutional,Normative contradiction,(2↔),Restrictions on interstate travel conflict with constitutional norms protecting freedom of movement.
+Violation of Right to Marry,Constitutional,Normative contradiction; Recognition failure,(2↔); 6/7,Prohibiting marriage between consenting adults conflicts with constitutional norms and misrecognizes relational rights.
+Violation of Right to Procreate,Constitutional,Normative contradiction; Recognition failure,(2↔); 6/7,State interference with procreation conflicts with constitutional norms and misrecognizes personal autonomy.
+Violation of Bodily Integrity,Constitutional,Normative contradiction; Recognition failure,(2↔); 6/7,State-imposed medical procedures without consent conflict with constitutional norms and misrecognize personal autonomy.
+Section 1983 Deprivation of Rights,Constitutional,Conferral failure; Recognition failure,1→3; 6/7,State officials' actions under color of law that deprive individuals of rights misconfers authority and misrecognizes rights.
+Violation of Equal Access to Education,Constitutional,Normative contradiction; Recognition failure,(2↔); 6/7,State actions denying equal educational opportunities conflict with constitutional norms and misrecognize students' rights.
+Fraud (civil),Tort,Recognition failure; Factual misalignment,6/7; (4),Intentional or negligent misrepresentation of material fact causing reliance and damages in civil context
+Medical Malpractice,Tort,Procedural contradiction; Recognition failure,2→5; 6/7,Negligent act or omission by a healthcare professional deviating from standard of care and causing injury
+Legal Malpractice,Tort,Procedural contradiction; Recognition failure,2→5; 6/7,"Negligence, breach of fiduciary duty or contract by an attorney causing harm to a client"
+Wrongful Birth,Tort,Normative contradiction; Recognition failure,2↔6; 6/7,"Parents claim a physician failed to warn of genetic risks, resulting in birth of a child with defects"
+Wrongful Life,Tort,Normative contradiction; Recognition failure,2↔6; 6/7,Action by or on behalf of a disabled child alleging failure to prevent the child's birth
+Wrongful Conception,Tort,Procedural contradiction; Recognition failure,2→5; 6/7,Parents suffer damages due to negligent sterilization or contraceptive procedure resulting in unwanted birth
+Wrongful Adoption,Tort,Recognition failure; Factual misalignment,6/7; (4),Adoption agency or birth parent misrepresents or fails to disclose health or background information in adoption
+Negligent Hiring,Tort,Conferral failure; Recognition failure,1→3; 6/7,"Employer hires an individual with known dangerous propensities without due diligence, leading to harm"
+Negligent Supervision or Retention,Tort,Procedural contradiction; Recognition failure,2→5; 6/7,"Employer fails to monitor, control or terminate an employee whose misconduct causes injury"
+Wrongful Termination (Public Policy),Tort,Normative contradiction; Recognition failure,2↔6; 6/7,"Employee is fired for reasons that violate public policy, giving rise to a wrongful discharge claim"
+Toxic Tort (Environmental Contamination),Tort,Normative contradiction; Factual misalignment,2↔4; 6/7,Exposure to toxic chemicals or substances due to negligent or hazardous conduct causing personal or property injury
+Misappropriation of Trade Secrets,Tort,Normative contradiction; Recognition failure,2↔6; 6/7,Wrongful acquisition or use of another's trade secret constituting unfair competition
+Restraint of Trade,Tort,Normative contradiction; Recognition failure,2↔6; 6/7,Unlawful interference with free competition or attempts to monopolize markets
+Non-natural Use of Land (Rylands),Tort,Normative contradiction; Factual misalignment,2↔4; 6/7,Strict liability for harm caused by hazardous use of land or escape of dangerous substances
+Vicarious Liability (Respondeat Superior),Tort,Conferral failure; Recognition failure,1→3; 6/7,Imposition of liability on employers for wrongful acts committed by employees within the scope of employment
+Attractive Nuisance,Tort,Normative contradiction; Recognition failure,2↔4; 6/7,Liability of property owners for dangerous conditions that lure children and result in injury
+Criminal Conversation,Tort,Normative contradiction; Recognition failure,2↔6; 6/7,Civil action by a spouse against a third party for wrongful sexual relations with the claimant's spouse
+Seduction,Tort,Normative contradiction; Recognition failure,2↔6; 6/7,Cause of action arising from deception to engage in sexual relations resulting in harm or societal damage
+Breach of Promise to Marry,Tort,Normative contradiction; Recognition failure,2↔6; 6/7,Legal claim based on unjustified refusal to fulfill a promise to marry causing economic or emotional harm
+Wrongful Eviction,Tort,Normative contradiction; Recognition failure,2→5; 6/7,Landlord unlawfully expels tenant without legal process or violates tenancy rights
+Wrongful Foreclosure,Tort,Normative contradiction; Recognition failure,2→5; 6/7,"Foreclosing on property without proper notice, authority or justification"
+Unjust Enrichment,Tort,Normative contradiction; Recognition failure,2↔7; 6/7,One party unfairly retains a benefit at another’s expense without lawful justification
+Wrongful Repossession,Tort,Normative contradiction; Recognition failure,1→3; 6/7,"Repossession of property without proper legal authority, notice or process"
+Civil RICO (Racketeering),Tort,Normative contradiction; Recognition failure,2↔6; 6/7,Civil cause of action under the Racketeer Influenced and Corrupt Organizations Act for participating in an enterprise through a pattern of racketeering activity
+Data Breach (Privacy),Tort,Recognition failure; Factual misalignment,6/7; (4),Unauthorized disclosure of personal data due to negligent security or breach of privacy obligations

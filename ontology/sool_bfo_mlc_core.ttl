@@ -1,0 +1,395 @@
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix bfo:   <http://purl.obolibrary.org/obo/BFO_> .
+@prefix sool:  <http://ontologyoflaw.org/structural#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+
+# ============================================================================
+# sool_bfo_mlc_core.ttl v2.0
+# SOoL Core Ontology — BFO/MLC Foundation
+# SEAL Lab, Texas A&M University
+# David R. Koepsell
+# A Structural Ontology of the Law (Palgrave Macmillan, forthcoming)
+# ============================================================================
+
+sool: a owl:Ontology ;
+    rdfs:label "SOoL Core Ontology" ;
+    dc:creator "David R. Koepsell" ;
+    dc:publisher "SEAL Lab, Texas A&M University" ;
+    owl:versionInfo "2.0.0" .
+
+# PART I: BFO-grounded legal entities
+
+sool:LegalEntity a owl:Class ;
+    rdfs:subClassOf bfo:SpecificallyDependentContinuant ;
+    rdfs:label "Legal Entity" ;
+    rdfs:comment "Root class. Legal entities are BFO specifically-dependent-continuants: real, persistent, bearer-dependent." .
+
+sool:LegalOccurrent a owl:Class ;
+    rdfs:subClassOf bfo:Process ;
+    rdfs:label "Legal Occurrent" ;
+    rdfs:comment "A legal process that unfolds through time: trial, legislative act, contract formation, appeal." .
+
+sool:LegalObligation a owl:Class ;
+    rdfs:subClassOf sool:LegalEntity ;
+    rdfs:label "Legal Obligation" ;
+    rdfs:comment "A one-sided SDC inhering in a norm-bearer (N3) directed toward a target (N6). Extinguished by fulfillment or collapse." .
+
+sool:LegalRight a owl:Class ;
+    rdfs:subClassOf sool:LegalEntity ;
+    rdfs:label "Legal Right" ;
+    rdfs:comment "The Hohfeldian correlative of a legal obligation. Four types: claim-rights, liberties, powers, immunities." .
+
+sool:LegalNorm a owl:Class ;
+    rdfs:subClassOf sool:LegalEntity ;
+    rdfs:label "Legal Norm" ;
+    rdfs:comment "Specifies required, permitted, or prohibited conduct. Corresponds to N2. Rule of Law requires N2 independence from N1." .
+
+sool:LegalStatus a owl:Class ;
+    rdfs:subClassOf sool:LegalEntity ;
+    rdfs:label "Legal Status" ;
+    rdfs:comment "Persistent SDC marking position in legal system. RCL fires when status is stripped while obligations continue." .
+
+sool:LegalRole a owl:Class ;
+    rdfs:subClassOf sool:LegalEntity ;
+    rdfs:label "Legal Role" ;
+    rdfs:comment "Structural position through which norms are instantiated. Corresponds to N3." .
+
+sool:LegalFact a owl:Class ;
+    rdfs:subClassOf sool:LegalEntity ;
+    rdfs:label "Legal Fact" ;
+    rdfs:comment "Recognized fact triggering or constituting part of a legal chain. Corresponds to N4. FM fires on manipulation." .
+
+# PART II: MLC Nodes and Clusters
+
+sool:MLCNode a owl:Class ; rdfs:label "MLC Node" .
+sool:MLCCluster a owl:Class ; rdfs:label "MLC Cluster" .
+
+sool:AuthorityCluster a sool:MLCCluster, owl:NamedIndividual ;
+    rdfs:label "Authority Cluster (N1-N3)" ;
+    rdfs:comment "Norm-issuance conditions. N1=source, N2=norm, N3=actor-in-role." .
+
+sool:EffectCluster a sool:MLCCluster, owl:NamedIndividual ;
+    rdfs:label "Effect Cluster (N4-N5)" ;
+    rdfs:comment "Norm-activation conditions. N4=triggering facts, N5=legal act." .
+
+sool:RecognitionCluster a sool:MLCCluster, owl:NamedIndividual ;
+    rdfs:label "Recognition Cluster (N6-N7)" ;
+    rdfs:comment "Norm-recognition conditions. N6=target, N7=legal effect (PIVOTAL)." .
+
+sool:RepairCluster a sool:MLCCluster, owl:NamedIndividual ;
+    rdfs:label "Repair Cluster (N8)" ;
+    rdfs:comment "Norm-repair conditions. N8=remedy." .
+
+sool:Node1_SourceOfAuthority a sool:MLCNode, owl:NamedIndividual ;
+    rdfs:label "N1 - Source of Authority" ;
+    sool:inCluster sool:AuthorityCluster ;
+    sool:nodeIndex "1"^^xsd:integer ;
+    rdfs:comment "The institutional ground of norm-issuance. CTs: CF, AI. Rule of Law: N1 must be constrained by N2." .
+
+sool:Node2_Norm a sool:MLCNode, owl:NamedIndividual ;
+    rdfs:label "N2 - Norm" ;
+    sool:inCluster sool:AuthorityCluster ;
+    sool:nodeIndex "2"^^xsd:integer ;
+    rdfs:comment "Specific rule or standard. CTs: NI, AI, JC. Rule of Law requires N2 independence from N1." .
+
+sool:Node3_ActorInRole a sool:MLCNode, owl:NamedIndividual ;
+    rdfs:label "N3 - Actor in Role" ;
+    sool:inCluster sool:AuthorityCluster ;
+    sool:nodeIndex "3"^^xsd:integer ;
+    rdfs:comment "Agent bearing norm-governed capacity. CTs: CF, RC3. IAT: conditions 2 and 5 located here." .
+
+sool:Node4_TriggeringFacts a sool:MLCNode, owl:NamedIndividual ;
+    rdfs:label "N4 - Triggering Facts" ;
+    sool:inCluster sool:EffectCluster ;
+    sool:nodeIndex "4"^^xsd:integer ;
+    rdfs:comment "Circumstances activating the norm. CTs: FM, TC. Brady violations = FM at N4." .
+
+sool:Node5_LegalAct a sool:MLCNode, owl:NamedIndividual ;
+    rdfs:label "N5 - Legal Act or Omission" ;
+    sool:inCluster sool:EffectCluster ;
+    sool:nodeIndex "5"^^xsd:integer ;
+    rdfs:comment "Conduct instantiating norm operative conditions. CTs: PC. Strict liability = PC at N2->N5." .
+
+sool:Node6_Target a sool:MLCNode, owl:NamedIndividual ;
+    rdfs:label "N6 - Target" ;
+    sool:inCluster sool:RecognitionCluster ;
+    sool:nodeIndex "6"^^xsd:integer ;
+    rdfs:comment "Party against whom obligation runs. CTs: RF, RCL. RCL = obligations without rights." .
+
+sool:Node7_LegalEffect a sool:MLCNode, owl:NamedIndividual ;
+    rdfs:label "N7 - Legal Effect (PIVOTAL)" ;
+    sool:inCluster sool:RecognitionCluster ;
+    sool:nodeIndex "7"^^xsd:integer ;
+    sool:isPivotal "true"^^xsd:boolean ;
+    rdfs:comment "Where claims succeed or fail. In the current corpus this node is derived from the court's disposition by annotation RULE 0, so any association between it and the derived outcome variable is definitional rather than empirical. CTs: CC, SE, RF." .
+
+sool:Node8_Remedy a sool:MLCNode, owl:NamedIndividual ;
+    rdfs:label "N8 - Remedy" ;
+    sool:inCluster sool:RepairCluster ;
+    sool:nodeIndex "8"^^xsd:integer ;
+    rdfs:comment "Repair mechanism. Without accessible remedy, CD accumulates without discharge. CTs: RPF. Criminal: proportionality constraint." .
+
+# PART III: 13 Contradiction Types
+
+sool:ContradictionType a owl:Class ;
+    rdfs:label "Contradiction Type" ;
+    rdfs:comment "13 structural failure modes. CD = sum of cdWeights of active CTs. Empirical max ~0.55." .
+
+sool:ConferralFailure a sool:ContradictionType, owl:NamedIndividual ;
+    rdfs:label "Conferral Failure (CF)" ; skos:altLabel "CF" ;
+    sool:cdWeight "0.15"^^xsd:decimal ;
+    sool:indexedToNode sool:Node1_SourceOfAuthority, sool:Node3_ActorInRole ;
+    rdfs:comment "N1->N3. Authority fails to vest actor in role. Most common flaw in constitutional challenges." .
+
+sool:AuthorityInflation a sool:ContradictionType, owl:NamedIndividual ;
+    rdfs:label "Authority Inflation (AI)" ; skos:altLabel "AI" ;
+    sool:cdWeight "0.12"^^xsd:decimal ;
+    sool:indexedToNode sool:Node1_SourceOfAuthority, sool:Node2_Norm ;
+    rdfs:comment "N1->N2. Will displaces norm. Primary structural marker of authoritarian legal pathology. Rule of Law violation." .
+
+sool:JurisdictionalContradiction a sool:ContradictionType, owl:NamedIndividual ;
+    rdfs:label "Jurisdictional Contradiction (JC)" ; skos:altLabel "JC" ;
+    sool:cdWeight "0.10"^^xsd:decimal ;
+    sool:indexedToNode sool:Node2_Norm, sool:Node6_Target ;
+    rdfs:comment "N2->N6. Competing normative regimes over same situation. Basis of justification defenses in criminal law." .
+
+sool:RoleContradiction a sool:ContradictionType, owl:NamedIndividual ;
+    rdfs:label "Role Contradiction (RC3)" ; skos:altLabel "RC3" ;
+    sool:cdWeight "0.14"^^xsd:decimal ;
+    sool:indexedToNode sool:Node3_ActorInRole ;
+    rdfs:comment "N3. Role simultaneously authorizes and prohibits same conduct. Paradigm: Garcetti v. Ceballos." .
+
+sool:ProceduralContradiction a sool:ContradictionType, owl:NamedIndividual ;
+    rdfs:label "Procedural Contradiction (PC)" ; skos:altLabel "PC" ;
+    sool:cdWeight "0.09"^^xsd:decimal ;
+    sool:indexedToNode sool:Node2_Norm, sool:Node5_LegalAct ;
+    rdfs:comment "N2->N5. Act required by norm cannot be performed through norm own procedures. Strict liability generates PC systematically." .
+
+sool:TemporalContradiction a sool:ContradictionType, owl:NamedIndividual ;
+    rdfs:label "Temporal Contradiction (TC)" ; skos:altLabel "TC" ;
+    sool:cdWeight "0.08"^^xsd:decimal ;
+    sool:indexedToNode sool:Node2_Norm, sool:Node4_TriggeringFacts ;
+    rdfs:comment "N2<->N4 (bidirectional). Temporal misalignment between norm and triggering facts. Ex post facto, statutes of limitations." .
+
+sool:FactManipulation a sool:ContradictionType, owl:NamedIndividual ;
+    rdfs:label "Fact Manipulation (FM)" ; skos:altLabel "FM" ;
+    sool:cdWeight "0.11"^^xsd:decimal ;
+    sool:indexedToNode sool:Node4_TriggeringFacts ;
+    rdfs:comment "N4. Triggering facts fabricated, suppressed, or indeterminate. Brady violations, entrapment, planted evidence." .
+
+sool:NormIndeterminacy a sool:ContradictionType, owl:NamedIndividual ;
+    rdfs:label "Norm Indeterminacy (NI)" ; skos:altLabel "NI" ;
+    sool:cdWeight "0.07"^^xsd:decimal ;
+    sool:indexedToNode sool:Node2_Norm ;
+    rdfs:comment "N2. Norm too vague for determinate chain closure. Void for vagueness in criminal context is categorically impermissible." .
+
+sool:RecognitionFailure a sool:ContradictionType, owl:NamedIndividual ;
+    rdfs:label "Recognition Failure (RF)" ; skos:altLabel "RF" ;
+    sool:cdWeight "0.11"^^xsd:decimal ;
+    sool:indexedToNode sool:Node6_Target, sool:Node7_LegalEffect ;
+    rdfs:comment "N6/N7. Target or legal effect fails recognition. Frequency figures against the derived outcome variable are not reported here: the outcome is derived from these nodes, so the association is definitional." .
+
+sool:RecognitionCollapse a sool:ContradictionType, owl:NamedIndividual ;
+    rdfs:label "Recognition Collapse (RCL)" ; skos:altLabel "RCL" ;
+    sool:cdWeight "0.18"^^xsd:decimal ;
+    sool:indexedToNode sool:Node6_Target, sool:Node8_Remedy ;
+    rdfs:comment "N6->N8. Subjecthood stripped while obligations enforced. Highest CD weight. Nazi Germany paradigm case." .
+
+sool:CorrelativityContradiction a sool:ContradictionType, owl:NamedIndividual ;
+    rdfs:label "Correlativity Contradiction (CC)" ; skos:altLabel "CC" ;
+    sool:cdWeight "0.14"^^xsd:decimal ;
+    sool:indexedToNode sool:Node7_LegalEffect ;
+    rdfs:comment "N7. Rights claimed without Hohfeldian correlative duties honored. Most structurally irreducible CT." .
+
+sool:SelfUnderminingEffect a sool:ContradictionType, owl:NamedIndividual ;
+    rdfs:label "Self-Undermining Effect (SE)" ; skos:altLabel "SE" ;
+    sool:cdWeight "0.10"^^xsd:decimal ;
+    sool:indexedToNode sool:Node7_LegalEffect ;
+    rdfs:comment "N7. Legal effect destabilizes conditions for system own persistence. Fuller inner morality of law basis." .
+
+sool:RepairProcedureFailure a sool:ContradictionType, owl:NamedIndividual ;
+    rdfs:label "Repair Procedure Failure (RPF)" ; skos:altLabel "RPF" ;
+    sool:cdWeight "0.13"^^xsd:decimal ;
+    sool:indexedToNode sool:Node8_Remedy ;
+    rdfs:comment "N8. Remedy structurally available but blocked. Criminal: proportionality constraint (independent of N7). Qualified immunity = RPF." .
+
+# PART IV: Chain outcome classes
+
+sool:LegalChain a owl:Class ;
+    rdfs:subClassOf sool:LegalOccurrent ;
+    rdfs:label "Legal Chain" ;
+    rdfs:comment "Unit of structural analysis. Valid chains close all 8 nodes. Invalid chains generate CD." .
+
+sool:LegalClaim a owl:Class ;
+    rdfs:subClassOf sool:LegalChain ;
+    rdfs:label "Legal Claim" .
+
+sool:ProtectionGrantedChain a owl:Class ;
+    rdfs:subClassOf sool:LegalChain ;
+    rdfs:label "Protection Granted Chain" ;
+    rdfs:comment "Claimant right recognized. In civil: individual prevails. In criminal: state prevails. Low CD." .
+
+sool:ProtectionDeniedChain a owl:Class ;
+    rdfs:subClassOf sool:LegalChain ;
+    rdfs:label "Protection Denied Chain" ;
+    rdfs:comment "Claimant right denied. NOTE: this individual denotes a *derived* outcome, computed from node closures by the Pass-2 rule, not the court's recorded disposition. Do not treat correlations between it and Contradiction Debt as predictive." .
+
+sool:PartialChain a owl:Class ;
+    rdfs:subClassOf sool:LegalChain ;
+    rdfs:label "Partial Chain" .
+
+# PART V: Civil domain taxonomy (11 domains)
+
+sool:FirstAmendmentClaim a owl:Class ;
+    rdfs:subClassOf sool:LegalClaim ;
+    sool:primaryFailureNode "N3" ; sool:dominantCT "RC3, NI" ;
+    rdfs:label "First Amendment Claim" .
+
+sool:FourthAmendmentClaim a owl:Class ;
+    rdfs:subClassOf sool:LegalClaim ;
+    sool:primaryFailureNode "N4" ; sool:dominantCT "FM, NI" ;
+    rdfs:label "Fourth Amendment Claim" .
+
+sool:EqualProtectionClaim a owl:Class ;
+    rdfs:subClassOf sool:LegalClaim ;
+    sool:primaryFailureNode "N2" ; sool:dominantCT "NI, JC" ;
+    rdfs:label "Equal Protection Claim" .
+
+sool:CriminalProcedureClaim a owl:Class ;
+    rdfs:subClassOf sool:LegalClaim ;
+    sool:primaryFailureNode "N6" ; sool:dominantCT "FM, CF" ;
+    rdfs:label "Criminal Procedure Claim" .
+
+sool:ImmigrationClaim a owl:Class ;
+    rdfs:subClassOf sool:LegalClaim ;
+    sool:primaryFailureNode "N3" ; sool:dominantCT "CF, RCL" ;
+    rdfs:label "Immigration Claim" .
+
+sool:CivilRightsClaim a owl:Class ;
+    rdfs:subClassOf sool:LegalClaim ;
+    sool:primaryFailureNode "N7" ; sool:dominantCT "RF, CC" ;
+    rdfs:label "Civil Rights Claim (sec 1983)" .
+
+sool:ContractClaim a owl:Class ;
+    rdfs:subClassOf sool:LegalClaim ;
+    sool:primaryFailureNode "N2" ; sool:dominantCT "NI, TC" ;
+    rdfs:label "Contract Claim" .
+
+sool:FamilyLawClaim a owl:Class ;
+    rdfs:subClassOf sool:LegalClaim ;
+    sool:primaryFailureNode "N3" ; sool:dominantCT "RC3, CF" ;
+    rdfs:label "Family Law Claim" .
+
+sool:HabeasClaim a owl:Class ;
+    rdfs:subClassOf sool:LegalClaim ;
+    sool:primaryFailureNode "N8" ; sool:dominantCT "RPF, FM" ;
+    rdfs:label "Habeas Corpus Claim" .
+
+sool:PatentClaim a owl:Class ;
+    rdfs:subClassOf sool:LegalClaim ;
+    sool:primaryFailureNode "N2" ; sool:dominantCT "NI, JC" ;
+    rdfs:label "Patent and IP Claim" .
+
+sool:SecuritiesClaim a owl:Class ;
+    rdfs:subClassOf sool:LegalClaim ;
+    sool:primaryFailureNode "N3" ; sool:dominantCT "RC3, NI, FM" ;
+    rdfs:label "Securities Claim" .
+
+# PART VI: Properties
+
+sool:inCluster a owl:ObjectProperty ;
+    rdfs:domain sool:MLCNode ; rdfs:range sool:MLCCluster ;
+    rdfs:label "in cluster" .
+
+sool:nodeIndex a owl:DatatypeProperty ;
+    rdfs:domain sool:MLCNode ; rdfs:range xsd:integer ;
+    rdfs:label "node index" .
+
+sool:isPivotal a owl:DatatypeProperty ;
+    rdfs:domain sool:MLCNode ; rdfs:range xsd:boolean ;
+    rdfs:label "is pivotal" .
+
+sool:cdWeight a owl:DatatypeProperty ;
+    rdfs:domain sool:ContradictionType ; rdfs:range xsd:decimal ;
+    rdfs:label "CD weight" .
+
+sool:indexedToNode a owl:ObjectProperty ;
+    rdfs:domain sool:ContradictionType ; rdfs:range sool:MLCNode ;
+    rdfs:label "indexed to node" .
+
+sool:hasContradictionType a owl:ObjectProperty ;
+    rdfs:domain sool:LegalChain ; rdfs:range sool:ContradictionType ;
+    rdfs:label "has contradiction type" .
+
+sool:contradictionDebt a owl:DatatypeProperty ;
+    rdfs:domain sool:LegalChain ; rdfs:range xsd:decimal ;
+    rdfs:label "contradiction debt" .
+
+sool:chainOutcome a owl:DatatypeProperty ;
+    rdfs:domain sool:LegalChain ; rdfs:range xsd:string ;
+    rdfs:label "chain outcome" .
+
+sool:satisfiesRuleOfLaw a owl:DatatypeProperty ;
+    rdfs:domain sool:LegalChain ; rdfs:range xsd:boolean ;
+    rdfs:label "satisfies Rule of Law" ;
+    rdfs:comment "True when N2 maintains ontological independence from N1." .
+
+sool:node1Closure a owl:DatatypeProperty ; rdfs:domain sool:LegalChain ; rdfs:range xsd:string ; rdfs:label "N1 closure" .
+sool:node2Closure a owl:DatatypeProperty ; rdfs:domain sool:LegalChain ; rdfs:range xsd:string ; rdfs:label "N2 closure" .
+sool:node3Closure a owl:DatatypeProperty ; rdfs:domain sool:LegalChain ; rdfs:range xsd:string ; rdfs:label "N3 closure" .
+sool:node4Closure a owl:DatatypeProperty ; rdfs:domain sool:LegalChain ; rdfs:range xsd:string ; rdfs:label "N4 closure" .
+sool:node5Closure a owl:DatatypeProperty ; rdfs:domain sool:LegalChain ; rdfs:range xsd:string ; rdfs:label "N5 closure" .
+sool:node6Closure a owl:DatatypeProperty ; rdfs:domain sool:LegalChain ; rdfs:range xsd:string ; rdfs:label "N6 closure" .
+sool:node7Closure a owl:DatatypeProperty ; rdfs:domain sool:LegalChain ; rdfs:range xsd:string ; rdfs:label "N7 closure" .
+sool:node8Closure a owl:DatatypeProperty ; rdfs:domain sool:LegalChain ; rdfs:range xsd:string ; rdfs:label "N8 closure" .
+sool:contradictionCode a owl:DatatypeProperty ; rdfs:domain sool:LegalChain ; rdfs:range xsd:string ; rdfs:label "CT code" .
+sool:caseId a owl:DatatypeProperty ; rdfs:domain sool:LegalChain ; rdfs:range xsd:integer ; rdfs:label "case ID" .
+sool:courtId a owl:DatatypeProperty ; rdfs:domain sool:LegalChain ; rdfs:range xsd:string ; rdfs:label "court ID" .
+sool:dateFiled a owl:DatatypeProperty ; rdfs:domain sool:LegalChain ; rdfs:range xsd:date ; rdfs:label "date filed" .
+sool:annotationConfidence a owl:DatatypeProperty ; rdfs:domain sool:LegalChain ; rdfs:range xsd:string ; rdfs:label "annotation confidence" .
+sool:corpus a owl:DatatypeProperty ; rdfs:domain sool:LegalChain ; rdfs:range xsd:string ; rdfs:label "corpus" .
+sool:domainId a owl:DatatypeProperty ; rdfs:domain sool:LegalClaim ; rdfs:range xsd:integer ; rdfs:label "domain ID" .
+sool:primaryFailureNode a owl:DatatypeProperty ; rdfs:domain owl:Class ; rdfs:range xsd:string ; rdfs:label "primary failure node" .
+sool:dominantCT a owl:DatatypeProperty ; rdfs:domain owl:Class ; rdfs:range xsd:string ; rdfs:label "dominant CTs" .
+
+# IAT properties
+sool:hasStanding a owl:DatatypeProperty ; rdfs:domain owl:Thing ; rdfs:range xsd:boolean ; rdfs:label "IAT-1: standing" .
+sool:attributableBreach a owl:DatatypeProperty ; rdfs:domain owl:Thing ; rdfs:range xsd:boolean ; rdfs:label "IAT-2: attributable breach" .
+sool:nonResettableResidue a owl:DatatypeProperty ; rdfs:domain owl:Thing ; rdfs:range xsd:boolean ; rdfs:label "IAT-3: non-resettable residue" .
+sool:repairCapacity a owl:DatatypeProperty ; rdfs:domain owl:Thing ; rdfs:range xsd:boolean ; rdfs:label "IAT-4: repair capacity" .
+sool:counterfactualControl a owl:DatatypeProperty ; rdfs:domain owl:Thing ; rdfs:range xsd:boolean ; rdfs:label "IAT-5: counterfactual control" .
+
+# OWL axioms
+sool:RuleOfLawViolation a owl:Class ;
+    rdfs:subClassOf sool:LegalChain ;
+    rdfs:label "Rule of Law Violation" ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:intersectionOf (
+            sool:LegalChain
+            [ a owl:Restriction ;
+              owl:onProperty sool:hasContradictionType ;
+              owl:hasValue sool:AuthorityInflation ]
+        )
+    ] .
+
+sool:RecognitionCollapseChain a owl:Class ;
+    rdfs:subClassOf sool:LegalChain ;
+    rdfs:label "Recognition Collapse Chain" ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:intersectionOf (
+            sool:LegalChain
+            [ a owl:Restriction ;
+              owl:onProperty sool:hasContradictionType ;
+              owl:hasValue sool:RecognitionCollapse ]
+        )
+    ] .
+
+# ============================================================================
+# END sool_bfo_mlc_core.ttl v2.0
+# ============================================================================

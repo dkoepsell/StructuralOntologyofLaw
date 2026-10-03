@@ -1,0 +1,519 @@
+{
+  "_meta": {
+    "registry_version": "1.0.0",
+    "generated": "2026-10-03T21:26:44+00:00",
+    "generator": "build_registry.py",
+    "canonical_namespace": "https://w3id.org/sool#",
+    "deprecated_namespaces": [
+      "http://ontologyoflaw.org/structural#",
+      "http://ontologyoflaw.org/criminal#",
+      "http://ontologyoflaw.org/corpus/",
+      "http://ontologyoflaw.org/corpus/civil/",
+      "http://ontologyoflaw.org/corpus/criminal/",
+      "http://seal.tamu.edu/legal-kernel/",
+      "http://seal.tamu.edu/legal-kernel/cases/",
+      "http://seal.tamu.edu/legal-kernel/mlc/",
+      "http://example.org/legal-ontology",
+      "http://example.org/sool",
+      "http://davidkoepsell.com/bfo-agent/working"
+    ],
+    "default_measure": "ct_count",
+    "sourceOntology": "sool_bfo_mlc_core.ttl",
+    "ontologyHash": "b8a0160a64afa0d59540c0aeefe39b7a4e0550258932f9463730c445fe11c5c6",
+    "kernel_present": true,
+    "kernel_version": "0.2.0",
+    "kernel_path": "/home/drkoepsell/projects/recognition/recognition-kernel/data/kernel.json",
+    "spec_authority_present": false,
+    "spec_authority_note": "SOoLRev2.owl is declared canonical but the file bearing that name has ontology IRI http://davidkoepsell.com/bfo-agent/working and contains zero K-A1..K-D3 IRIs. The identity layer is therefore assembled from kernel.json and marked provisional.",
+    "lof_conventions_enforced": [
+      "LOF-P-003",
+      "LOF-P-005",
+      "LOF-P-012"
+    ],
+    "measures": {
+      "ct_count": "Unweighted count of active contradiction types, 0..13.",
+      "cd_case": "Weighted sum over active types for one adjudication.",
+      "cd_upstream": "cd_case restricted to N1..N6; excludes the five outcome-entangled types. Report this, not cd_case, in any predictive analysis (annotate.py:297-319).",
+      "cd_stock": "An institution's accumulated debt over time, clamped to [0,1]. SimLex only. Not comparable to cd_case."
+    },
+    "weight_profiles": {
+      "core-v1": {
+        "n_types": 13,
+        "ceiling": 1.52,
+        "source": "sool:cdWeight in the ontology of record, in place"
+      },
+      "simlex-v1.3": {
+        "n_types": 13,
+        "ceiling": 1.63,
+        "source": "parsed from SimLex.html",
+        "warning": "A different 13-type list. Not comparable to core-v1."
+      },
+      "count": {
+        "n_types": 13,
+        "ceiling": 13,
+        "source": "unweighted"
+      }
+    },
+    "reserved_codes": [
+      "AI"
+    ],
+    "simlex_unregistered_codes": [
+      "AE",
+      "CS",
+      "EN",
+      "RC",
+      "RGR",
+      "RV",
+      "TA"
+    ],
+    "mlclink_unconfirmed": [],
+    "cross_system_kind_label_collisions": [
+      {
+        "label": "Recognition Failure",
+        "kernel_key": "CT-6",
+        "kernel_primitive": "K-C3",
+        "kernel_locus": "criteria",
+        "kernel_system_kind": "classification",
+        "corpus_code": "RF",
+        "resolution": "A0 escalation: relabel the kernel entry. The corpus label has 6,165 annotations behind it."
+      }
+    ],
+    "mlclink_multiclaim": {
+      "N7": [
+        "CC",
+        "SE"
+      ]
+    },
+    "mlclink_multiclaim_note": "These chain links are claimed by more than one type. Uniqueness per node is therefore not enforceable without a discriminator. Treat the set, not the node, as the clustering key."
+  },
+  "types": {
+    "AINF": {
+      "code": "AINF",
+      "prefLabel": "Authority Inflation",
+      "iri_operational": "sool:AuthorityInflation",
+      "iri_canonical": "https://w3id.org/sool#AuthorityInflation",
+      "notation": {
+        "core-v1": "AINF",
+        "kernel-0.2.0": "AI",
+        "simlex-v1.3": "AI"
+      },
+      "deprecatedCodes": [
+        "AI"
+      ],
+      "altLabels": [
+        "AI"
+      ],
+      "ontologyLabel": "Authority Inflation",
+      "definition": "N1->N2. Will displaces norm. Primary structural marker of authoritarian legal pathology. Rule of Law violation.",
+      "cd_weight_core_v1": 0.12,
+      "nodes_referenced": [
+        "Node1_SourceOfAuthority",
+        "Node2_Norm"
+      ],
+      "mlcLink": "1->2",
+      "mlcLink_confirmed": true,
+      "layer": "operational",
+      "source_ontology": "sool_bfo_mlc_core.ttl",
+      "status": "active",
+      "kernel": {
+        "primitive": "K-B2",
+        "stratum": "B",
+        "primitive_name": "Equivocation",
+        "locus": "authority",
+        "kernel_label": "Authority Inflation",
+        "kernel_key": "AI",
+        "system_kind": "legal_order",
+        "source": "Structural Ontology of Law (Koepsell forthcoming), located at these coordinates in §7.2 Table 7.",
+        "code_collision": "The kernel's key 'AI' is NOT the corpus code 'AI'. This entry is corpus AINF. Mapping is by locus (authority) and node, never by code string."
+      },
+      "cd_weight_simlex_v1_3": 0.12
+    },
+    "CC": {
+      "code": "CC",
+      "prefLabel": "Correlativity Contradiction",
+      "iri_operational": "sool:CorrelativityContradiction",
+      "iri_canonical": "https://w3id.org/sool#CorrelativityContradiction",
+      "notation": {
+        "core-v1": "CC",
+        "simlex-v1.3": "CC"
+      },
+      "deprecatedCodes": [],
+      "altLabels": [
+        "CC"
+      ],
+      "ontologyLabel": "Correlativity Contradiction",
+      "definition": "N7. Rights claimed without Hohfeldian correlative duties honored. Most structurally irreducible CT.",
+      "cd_weight_core_v1": 0.14,
+      "nodes_referenced": [
+        "Node7_LegalEffect"
+      ],
+      "mlcLink": "N7",
+      "mlcLink_confirmed": true,
+      "layer": "operational",
+      "source_ontology": "sool_bfo_mlc_core.ttl",
+      "status": "active",
+      "cd_weight_simlex_v1_3": 0.14
+    },
+    "CF": {
+      "code": "CF",
+      "prefLabel": "Conferral Failure",
+      "iri_operational": "sool:ConferralFailure",
+      "iri_canonical": "https://w3id.org/sool#ConferralFailure",
+      "notation": {
+        "core-v1": "CF",
+        "simlex-v1.3": "CF"
+      },
+      "deprecatedCodes": [],
+      "altLabels": [
+        "CF"
+      ],
+      "ontologyLabel": "Conferral Failure",
+      "definition": "N1->N3. Authority fails to vest actor in role. Most common flaw in constitutional challenges.",
+      "cd_weight_core_v1": 0.15,
+      "nodes_referenced": [
+        "Node1_SourceOfAuthority",
+        "Node3_ActorInRole"
+      ],
+      "mlcLink": "1->3",
+      "mlcLink_confirmed": true,
+      "layer": "operational",
+      "source_ontology": "sool_bfo_mlc_core.ttl",
+      "status": "active",
+      "kernel": {
+        "primitive": "K-C3",
+        "stratum": "C",
+        "primitive_name": "Dependence Violation",
+        "locus": "assessor",
+        "kernel_label": "Conferral Failure",
+        "kernel_key": "CF",
+        "system_kind": "legal_order",
+        "source": "Structural Ontology of Law (Koepsell forthcoming), located at these coordinates in §7.2 Table 7."
+      },
+      "cd_weight_simlex_v1_3": 0.15
+    },
+    "FM": {
+      "code": "FM",
+      "prefLabel": "Fact Manipulation",
+      "iri_operational": "sool:FactManipulation",
+      "iri_canonical": "https://w3id.org/sool#FactManipulation",
+      "notation": {
+        "core-v1": "FM"
+      },
+      "deprecatedCodes": [],
+      "altLabels": [
+        "FM"
+      ],
+      "ontologyLabel": "Fact Manipulation",
+      "definition": "N4. Triggering facts fabricated, suppressed, or indeterminate. Brady violations, entrapment, planted evidence.",
+      "cd_weight_core_v1": 0.11,
+      "nodes_referenced": [
+        "Node4_TriggeringFacts"
+      ],
+      "mlcLink": "N4",
+      "mlcLink_confirmed": true,
+      "layer": "operational",
+      "source_ontology": "sool_bfo_mlc_core.ttl",
+      "status": "active"
+    },
+    "JC": {
+      "code": "JC",
+      "prefLabel": "Jurisdictional Contradiction",
+      "iri_operational": "sool:JurisdictionalContradiction",
+      "iri_canonical": "https://w3id.org/sool#JurisdictionalContradiction",
+      "notation": {
+        "core-v1": "JC",
+        "simlex-v1.3": "JC"
+      },
+      "deprecatedCodes": [],
+      "altLabels": [
+        "JC"
+      ],
+      "ontologyLabel": "Jurisdictional Contradiction",
+      "definition": "N2->N6. Competing normative regimes over same situation. Basis of justification defenses in criminal law.",
+      "cd_weight_core_v1": 0.1,
+      "nodes_referenced": [
+        "Node2_Norm",
+        "Node6_Target"
+      ],
+      "mlcLink": "2->6",
+      "mlcLink_confirmed": true,
+      "layer": "operational",
+      "source_ontology": "sool_bfo_mlc_core.ttl",
+      "status": "active",
+      "kernel": {
+        "primitive": "K-A1",
+        "stratum": "A",
+        "primitive_name": "Inconsistency",
+        "locus": "effects",
+        "kernel_label": "Jurisdictional Contradiction",
+        "kernel_key": "JC",
+        "system_kind": "legal_order",
+        "source": "Structural Ontology of Law (Koepsell forthcoming), located at these coordinates in §7.2 Table 7."
+      },
+      "cd_weight_simlex_v1_3": 0.1
+    },
+    "NI": {
+      "code": "NI",
+      "prefLabel": "Norm Indeterminacy",
+      "iri_operational": "sool:NormIndeterminacy",
+      "iri_canonical": "https://w3id.org/sool#NormIndeterminacy",
+      "notation": {
+        "core-v1": "NI"
+      },
+      "deprecatedCodes": [],
+      "altLabels": [
+        "NI"
+      ],
+      "ontologyLabel": "Norm Indeterminacy",
+      "definition": "N2. Norm too vague for determinate chain closure. Void for vagueness in criminal context is categorically impermissible.",
+      "cd_weight_core_v1": 0.07,
+      "nodes_referenced": [
+        "Node2_Norm"
+      ],
+      "mlcLink": "N2",
+      "mlcLink_confirmed": true,
+      "layer": "operational",
+      "source_ontology": "sool_bfo_mlc_core.ttl",
+      "status": "active"
+    },
+    "PC": {
+      "code": "PC",
+      "prefLabel": "Procedural Contradiction",
+      "iri_operational": "sool:ProceduralContradiction",
+      "iri_canonical": "https://w3id.org/sool#ProceduralContradiction",
+      "notation": {
+        "core-v1": "PC"
+      },
+      "deprecatedCodes": [],
+      "altLabels": [
+        "PC"
+      ],
+      "ontologyLabel": "Procedural Contradiction",
+      "definition": "N2->N5. Act required by norm cannot be performed through norm own procedures. Strict liability generates PC systematically.",
+      "cd_weight_core_v1": 0.09,
+      "nodes_referenced": [
+        "Node2_Norm",
+        "Node5_LegalAct"
+      ],
+      "mlcLink": "2->5",
+      "mlcLink_confirmed": true,
+      "layer": "operational",
+      "source_ontology": "sool_bfo_mlc_core.ttl",
+      "status": "active"
+    },
+    "RC3": {
+      "code": "RC3",
+      "prefLabel": "Role Contradiction",
+      "iri_operational": "sool:RoleContradiction",
+      "iri_canonical": "https://w3id.org/sool#RoleContradiction",
+      "notation": {
+        "core-v1": "RC3"
+      },
+      "deprecatedCodes": [],
+      "altLabels": [
+        "RC3"
+      ],
+      "ontologyLabel": "Role Contradiction",
+      "definition": "N3. Role simultaneously authorizes and prohibits same conduct. Paradigm: Garcetti v. Ceballos.",
+      "cd_weight_core_v1": 0.14,
+      "nodes_referenced": [
+        "Node3_ActorInRole"
+      ],
+      "mlcLink": "N3",
+      "mlcLink_confirmed": true,
+      "layer": "operational",
+      "source_ontology": "sool_bfo_mlc_core.ttl",
+      "status": "active"
+    },
+    "RCL": {
+      "code": "RCL",
+      "prefLabel": "Recognition Collapse",
+      "iri_operational": "sool:RecognitionCollapse",
+      "iri_canonical": "https://w3id.org/sool#RecognitionCollapse",
+      "notation": {
+        "core-v1": "RCL"
+      },
+      "deprecatedCodes": [],
+      "altLabels": [
+        "RCL"
+      ],
+      "ontologyLabel": "Recognition Collapse",
+      "definition": "N6->N8. Subjecthood stripped while obligations enforced. Highest CD weight. Nazi Germany paradigm case.",
+      "cd_weight_core_v1": 0.18,
+      "nodes_referenced": [
+        "Node6_Target",
+        "Node8_Remedy"
+      ],
+      "mlcLink": "6->8",
+      "mlcLink_confirmed": true,
+      "layer": "operational",
+      "source_ontology": "sool_bfo_mlc_core.ttl",
+      "status": "active"
+    },
+    "RF": {
+      "code": "RF",
+      "prefLabel": "Recognition Failure",
+      "iri_operational": "sool:RecognitionFailure",
+      "iri_canonical": "https://w3id.org/sool#RecognitionFailure",
+      "notation": {
+        "core-v1": "RF",
+        "simlex-v1.3": "RF"
+      },
+      "deprecatedCodes": [],
+      "altLabels": [
+        "RF"
+      ],
+      "ontologyLabel": "Recognition Failure",
+      "definition": "N6/N7. Target or legal effect fails recognition. Frequency figures against the derived outcome variable are not reported here: the outcome is derived from these nodes, so the association is definitional.",
+      "cd_weight_core_v1": 0.11,
+      "nodes_referenced": [
+        "Node6_Target",
+        "Node7_LegalEffect"
+      ],
+      "mlcLink": "6/7",
+      "mlcLink_confirmed": true,
+      "layer": "operational",
+      "source_ontology": "sool_bfo_mlc_core.ttl",
+      "status": "active",
+      "cd_weight_simlex_v1_3": 0.11
+    },
+    "RPF": {
+      "code": "RPF",
+      "prefLabel": "Repair Failure",
+      "iri_operational": "sool:RepairProcedureFailure",
+      "iri_canonical": "https://w3id.org/sool#RepairProcedureFailure",
+      "notation": {
+        "core-v1": "RPF",
+        "kernel-0.2.0": "RF",
+        "simlex-v1.3": "RPF"
+      },
+      "deprecatedCodes": [],
+      "altLabels": [
+        "RPF",
+        "Repair Procedure Failure"
+      ],
+      "ontologyLabel": "Repair Procedure Failure",
+      "definition": "N8. Remedy structurally available but blocked. Criminal: proportionality constraint (independent of N7). Qualified immunity = RPF.",
+      "cd_weight_core_v1": 0.13,
+      "nodes_referenced": [
+        "Node8_Remedy"
+      ],
+      "mlcLink": "N8",
+      "mlcLink_confirmed": true,
+      "layer": "operational",
+      "source_ontology": "sool_bfo_mlc_core.ttl",
+      "status": "pending_ontology_correction",
+      "a0_note": "Registry prefLabel 'Repair Failure' differs from the ontology of record 'Repair Procedure Failure'. Amendment A1. Correct in the OWL under A0; this registry does not route around it.",
+      "kernel": {
+        "primitive": "K-D3",
+        "stratum": "D",
+        "primitive_name": "Modal Clash",
+        "locus": "remedy",
+        "kernel_label": "Repair Failure",
+        "kernel_key": "RF",
+        "system_kind": "legal_order",
+        "source": "Structural Ontology of Law (Koepsell forthcoming), located at these coordinates in §7.2 Table 7.",
+        "code_collision": "The kernel's key 'RF' is NOT the corpus code 'RF'. This entry is corpus RPF. Mapping is by locus (remedy) and node, never by code string."
+      },
+      "cd_weight_simlex_v1_3": 0.13
+    },
+    "SE": {
+      "code": "SE",
+      "prefLabel": "Self-Undermining Effect",
+      "iri_operational": "sool:SelfUnderminingEffect",
+      "iri_canonical": "https://w3id.org/sool#SelfUnderminingEffect",
+      "notation": {
+        "core-v1": "SE"
+      },
+      "deprecatedCodes": [],
+      "altLabels": [
+        "SE"
+      ],
+      "ontologyLabel": "Self-Undermining Effect",
+      "definition": "N7. Legal effect destabilizes conditions for system own persistence. Fuller inner morality of law basis.",
+      "cd_weight_core_v1": 0.1,
+      "nodes_referenced": [
+        "Node7_LegalEffect"
+      ],
+      "mlcLink": "N7",
+      "mlcLink_confirmed": true,
+      "layer": "operational",
+      "source_ontology": "sool_bfo_mlc_core.ttl",
+      "status": "active"
+    },
+    "TC": {
+      "code": "TC",
+      "prefLabel": "Temporal Contradiction",
+      "iri_operational": "sool:TemporalContradiction",
+      "iri_canonical": "https://w3id.org/sool#TemporalContradiction",
+      "notation": {
+        "core-v1": "TC"
+      },
+      "deprecatedCodes": [],
+      "altLabels": [
+        "TC"
+      ],
+      "ontologyLabel": "Temporal Contradiction",
+      "definition": "N2<->N4 (bidirectional). Temporal misalignment between norm and triggering facts. Ex post facto, statutes of limitations.",
+      "cd_weight_core_v1": 0.08,
+      "nodes_referenced": [
+        "Node2_Norm",
+        "Node4_TriggeringFacts"
+      ],
+      "mlcLink": "2<->4",
+      "mlcLink_confirmed": true,
+      "layer": "operational",
+      "source_ontology": "sool_bfo_mlc_core.ttl",
+      "status": "active",
+      "kernel": {
+        "primitive": "K-B1",
+        "stratum": "B",
+        "primitive_name": "Circularity",
+        "locus": "criteria",
+        "kernel_label": "Temporal Contradiction",
+        "kernel_key": "TC",
+        "system_kind": "legal_order",
+        "source": "Structural Ontology of Law (Koepsell forthcoming), located at these coordinates in §7.2 Table 7."
+      }
+    }
+  },
+  "aliases": {
+    "NI": "sool:NormIndeterminacy",
+    "Norm Indeterminacy": "sool:NormIndeterminacy",
+    "Normative contradiction": "UNRESOLVED_V5_MAPPING",
+    "PC": "sool:ProceduralContradiction",
+    "Procedural Contradiction": "sool:ProceduralContradiction",
+    "Procedural contradiction": "sool:ProceduralContradiction",
+    "TC": "sool:TemporalContradiction",
+    "Temporal Contradiction": "sool:TemporalContradiction",
+    "Temporal contradiction": "sool:TemporalContradiction",
+    "FM": "sool:FactManipulation",
+    "Fact Manipulation": "sool:FactManipulation",
+    "JC": "sool:JurisdictionalContradiction",
+    "Jurisdictional Contradiction": "sool:JurisdictionalContradiction",
+    "RF": "sool:RecognitionFailure",
+    "Recognition Failure": "sool:RecognitionFailure",
+    "Recognition failure": "sool:RecognitionFailure",
+    "RCL": "sool:RecognitionCollapse",
+    "Recognition Collapse": "sool:RecognitionCollapse",
+    "CC": "sool:CorrelativityContradiction",
+    "Correlativity Contradiction": "sool:CorrelativityContradiction",
+    "Correlativity contradiction": "sool:CorrelativityContradiction",
+    "SE": "sool:SelfUnderminingEffect",
+    "Self-Undermining Effect": "sool:SelfUnderminingEffect",
+    "RPF": "sool:RepairProcedureFailure",
+    "Repair Procedure Failure": "sool:RepairProcedureFailure",
+    "Repair Failure": "",
+    "Remedy failure": "",
+    "RC3": "sool:RoleContradiction",
+    "Role Contradiction": "sool:RoleContradiction",
+    "Role contradiction": "sool:RoleContradiction",
+    "AI": "",
+    "CF": "",
+    "RC": "",
+    "Authority failure": "",
+    "Factual misalignment": "",
+    "Role contradiction (authority)": "",
+    "Conferral failure": ""
+  }
+}

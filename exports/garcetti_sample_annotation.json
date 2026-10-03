@@ -1,0 +1,63 @@
+{
+  "case_id": 100001,
+  "case_name": "Garcetti v. Ceballos",
+  "citation": "547 U.S. 410 (2006)",
+  "court": "scotus",
+  "date_decided": "2006-05-30",
+  "domain_id": 1,
+  "annotator": "DRK",
+  "annotation_date": "2026-03-23",
+  "nodes": {
+    "1": {
+      "closure": "closed",
+      "entity": "First Amendment, U.S. Constitution",
+      "justification": "Court treats First Amendment as the governing constitutional authority without dispute."
+    },
+    "2": {
+      "closure": "partial",
+      "entity": "Garcetti doctrine: no First Amendment protection for official-duty speech",
+      "justification": "Court formulates new rule but explicitly reserves application to academic speech: 'We need not... decide whether the analysis we conduct today would apply in the same manner to a case involving speech related to scholarship or teaching.' Norm Indeterminacy fires for academic domain."
+    },
+    "3": {
+      "closure": "failed",
+      "entity": "Richard Ceballos, Deputy District Attorney",
+      "roles_borne": ["PublicEmployeeRole", "CitizenSpeakerRole"],
+      "justification": "Court absorbs citizen-speaker role into official-duty role, treating the memo as official-duty speech. Role Contradiction: Ceballos's role as citizen discovering prosecutorial misconduct is structurally collapsed into his official role. Two roles borne by same bearer, same act triggers both."
+    },
+    "4": {
+      "closure": "closed",
+      "entity": "Ceballos wrote and submitted memorandum re: warrant affidavit misrepresentations",
+      "justification": "Triggering facts uncontested: memo written, submitted to supervisors, supervisors overrode recommendation."
+    },
+    "5": {
+      "closure": "closed",
+      "entity": "Memo writing as official duty act",
+      "justification": "Act occurred; normative character contested but factual occurrence uncontested."
+    },
+    "6": {
+      "closure": "closed",
+      "entity": "Richard Ceballos as target of adverse employment action",
+      "justification": "Ceballos identified as target of alleged retaliation. Target recognition adequate."
+    },
+    "7": {
+      "closure": "failed",
+      "entity": "First Amendment protection for internal whistleblower speech",
+      "justification": "Court denies protection. Because memo = official-duty speech, First Amendment does not insulate it from employer discipline. Legal Effect does not attach."
+    },
+    "8": {
+      "closure": "failed",
+      "entity": "No remedy — chain severed at Node 3",
+      "justification": "Node 7 failure cascades to Node 8. No First Amendment remedy available because protection did not attach. Repair Failure is a structural cascade from Node 3 Role Contradiction."
+    }
+  },
+  "active_contradictions": ["RC3", "NI", "RF", "RPF"],
+  "chain_outcome": "protection_denied",
+  "outcome_notes": "5-4 decision. Majority: Kennedy. Dissents: Souter, Stevens, Ginsburg, Breyer. Academic speech reservation preserves Norm Indeterminacy at Node 2 for all subsequent academic cases.",
+  "contradiction_debt": null,
+  "deferred_contradictions": ["NI"],
+  "propagates_to": [],
+  "structural_signature": [],
+  "confidence": "high",
+  "needs_review": false,
+  "review_note": ""
+}

@@ -1,0 +1,487 @@
+{
+  "Other": {
+    "n": 72,
+    "avg_cd": 0.2225,
+    "min_cd": 0.11,
+    "max_cd": 0.51,
+    "ct_rates": {
+      "RF": 1.0,
+      "NI": 0.903,
+      "JC": 0.194,
+      "TC": 0.097,
+      "CF": 0.069,
+      "AI": 0.028,
+      "RCL": 0.028,
+      "FM": 0.014,
+      "RPF": 0.014
+    },
+    "node_stress": {
+      "N1": 0.069,
+      "N2": 0.972,
+      "N3": 0.111,
+      "N4": 0.25,
+      "N5": 0.069,
+      "N6": 0.056,
+      "N7": 1.0,
+      "N8": 0.333
+    },
+    "high_conf_pct": 0.042,
+    "avg_adversarial": 0.513,
+    "top_ct": [
+      "RF",
+      "NI",
+      "JC"
+    ]
+  },
+  "Immigration": {
+    "n": 26,
+    "avg_cd": 0.2073,
+    "min_cd": 0.18,
+    "max_cd": 0.38,
+    "ct_rates": {
+      "RF": 1.0,
+      "NI": 0.923,
+      "JC": 0.154,
+      "CF": 0.038,
+      "AI": 0.038,
+      "TC": 0.038,
+      "SE": 0.038
+    },
+    "node_stress": {
+      "N1": 0.115,
+      "N2": 0.962,
+      "N3": 0.115,
+      "N4": 0.423,
+      "N5": 0.231,
+      "N6": 0.077,
+      "N7": 1.0,
+      "N8": 0.308
+    },
+    "high_conf_pct": 0.231,
+    "avg_adversarial": 0.549,
+    "top_ct": [
+      "RF",
+      "NI",
+      "JC"
+    ]
+  },
+  "First Amendment": {
+    "n": 22,
+    "avg_cd": 0.1968,
+    "min_cd": 0.18,
+    "max_cd": 0.31,
+    "ct_rates": {
+      "NI": 1.0,
+      "RF": 1.0,
+      "TC": 0.136,
+      "RPF": 0.045
+    },
+    "node_stress": {
+      "N1": 0.091,
+      "N2": 1.0,
+      "N3": 0.091,
+      "N4": 0.455,
+      "N5": 0.0,
+      "N6": 0.091,
+      "N7": 1.0,
+      "N8": 0.227
+    },
+    "high_conf_pct": 0.227,
+    "avg_adversarial": 0.552,
+    "top_ct": [
+      "NI",
+      "RF",
+      "TC"
+    ]
+  },
+  "Antitrust": {
+    "n": 21,
+    "avg_cd": 0.2071,
+    "min_cd": 0.11,
+    "max_cd": 0.46,
+    "ct_rates": {
+      "RF": 1.0,
+      "NI": 0.952,
+      "CF": 0.048,
+      "JC": 0.048,
+      "TC": 0.048,
+      "RCL": 0.048,
+      "RPF": 0.048
+    },
+    "node_stress": {
+      "N1": 0.048,
+      "N2": 0.952,
+      "N3": 0.095,
+      "N4": 0.429,
+      "N5": 0.19,
+      "N6": 0.095,
+      "N7": 1.0,
+      "N8": 0.333
+    },
+    "high_conf_pct": 0.19,
+    "avg_adversarial": 0.547,
+    "top_ct": [
+      "RF",
+      "NI",
+      "CF"
+    ]
+  },
+  "Fifth Amendment": {
+    "n": 17,
+    "avg_cd": 0.2418,
+    "min_cd": 0.18,
+    "max_cd": 0.43,
+    "ct_rates": {
+      "RF": 1.0,
+      "NI": 0.941,
+      "JC": 0.235,
+      "RPF": 0.118,
+      "CF": 0.059,
+      "AI": 0.059,
+      "TC": 0.059,
+      "FM": 0.059
+    },
+    "node_stress": {
+      "N1": 0.059,
+      "N2": 1.0,
+      "N3": 0.0,
+      "N4": 0.412,
+      "N5": 0.118,
+      "N6": 0.059,
+      "N7": 1.0,
+      "N8": 0.294
+    },
+    "high_conf_pct": 0.176,
+    "avg_adversarial": 0.588,
+    "top_ct": [
+      "RF",
+      "NI",
+      "JC"
+    ]
+  },
+  "Criminal Procedure": {
+    "n": 13,
+    "avg_cd": 0.2038,
+    "min_cd": 0.18,
+    "max_cd": 0.33,
+    "ct_rates": {
+      "NI": 1.0,
+      "RF": 1.0,
+      "TC": 0.154,
+      "CF": 0.077
+    },
+    "node_stress": {
+      "N1": 0.0,
+      "N2": 1.0,
+      "N3": 0.0,
+      "N4": 0.385,
+      "N5": 0.0,
+      "N6": 0.0,
+      "N7": 1.0,
+      "N8": 0.308
+    },
+    "high_conf_pct": 0.077,
+    "avg_adversarial": 0.535,
+    "top_ct": [
+      "NI",
+      "RF",
+      "TC"
+    ]
+  },
+  "Sixth Amendment": {
+    "n": 13,
+    "avg_cd": 0.1977,
+    "min_cd": 0.11,
+    "max_cd": 0.35,
+    "ct_rates": {
+      "RF": 1.0,
+      "NI": 0.923,
+      "PC": 0.077,
+      "TC": 0.077,
+      "RPF": 0.077
+    },
+    "node_stress": {
+      "N1": 0.0,
+      "N2": 0.923,
+      "N3": 0.0,
+      "N4": 0.385,
+      "N5": 0.077,
+      "N6": 0.0,
+      "N7": 1.0,
+      "N8": 0.308
+    },
+    "high_conf_pct": 0.077,
+    "avg_adversarial": 0.538,
+    "top_ct": [
+      "RF",
+      "NI",
+      "PC"
+    ]
+  },
+  "Securities": {
+    "n": 13,
+    "avg_cd": 0.2285,
+    "min_cd": 0.11,
+    "max_cd": 0.33,
+    "ct_rates": {
+      "RF": 1.0,
+      "NI": 0.923,
+      "CF": 0.308,
+      "SE": 0.077
+    },
+    "node_stress": {
+      "N1": 0.0,
+      "N2": 0.923,
+      "N3": 0.077,
+      "N4": 0.615,
+      "N5": 0.308,
+      "N6": 0.0,
+      "N7": 1.0,
+      "N8": 0.385
+    },
+    "high_conf_pct": 0.077,
+    "avg_adversarial": 0.609,
+    "top_ct": [
+      "RF",
+      "NI",
+      "CF"
+    ]
+  },
+  "Fourth Amendment": {
+    "n": 12,
+    "avg_cd": 0.2617,
+    "min_cd": 0.18,
+    "max_cd": 0.56,
+    "ct_rates": {
+      "NI": 1.0,
+      "RF": 1.0,
+      "CF": 0.167,
+      "RPF": 0.167,
+      "AI": 0.083,
+      "JC": 0.083,
+      "PC": 0.083,
+      "FM": 0.083
+    },
+    "node_stress": {
+      "N1": 0.0,
+      "N2": 1.0,
+      "N3": 0.167,
+      "N4": 0.667,
+      "N5": 0.083,
+      "N6": 0.167,
+      "N7": 1.0,
+      "N8": 0.25
+    },
+    "high_conf_pct": 0.25,
+    "avg_adversarial": 0.533,
+    "top_ct": [
+      "NI",
+      "RF",
+      "CF"
+    ]
+  },
+  "Contract / Commerce": {
+    "n": 10,
+    "avg_cd": 0.293,
+    "min_cd": 0.18,
+    "max_cd": 0.41,
+    "ct_rates": {
+      "NI": 1.0,
+      "RF": 1.0,
+      "JC": 0.6,
+      "TC": 0.2,
+      "CF": 0.1,
+      "PC": 0.1,
+      "RPF": 0.1
+    },
+    "node_stress": {
+      "N1": 0.1,
+      "N2": 1.0,
+      "N3": 0.1,
+      "N4": 0.4,
+      "N5": 0.2,
+      "N6": 0.0,
+      "N7": 1.0,
+      "N8": 0.4
+    },
+    "high_conf_pct": 0.2,
+    "avg_adversarial": 0.597,
+    "top_ct": [
+      "NI",
+      "RF",
+      "JC"
+    ]
+  },
+  "Administrative Law": {
+    "n": 8,
+    "avg_cd": 0.2562,
+    "min_cd": 0.18,
+    "max_cd": 0.39,
+    "ct_rates": {
+      "RF": 1.0,
+      "NI": 0.875,
+      "CF": 0.125,
+      "AI": 0.125,
+      "JC": 0.125,
+      "RCL": 0.125,
+      "RPF": 0.125
+    },
+    "node_stress": {
+      "N1": 0.25,
+      "N2": 1.0,
+      "N3": 0.25,
+      "N4": 0.625,
+      "N5": 0.0,
+      "N6": 0.25,
+      "N7": 1.0,
+      "N8": 0.125
+    },
+    "high_conf_pct": 0.125,
+    "avg_adversarial": 0.575,
+    "top_ct": [
+      "RF",
+      "NI",
+      "CF"
+    ]
+  },
+  "Federal Jurisdiction": {
+    "n": 7,
+    "avg_cd": 0.1829,
+    "min_cd": 0.11,
+    "max_cd": 0.28,
+    "ct_rates": {
+      "NI": 0.857,
+      "RF": 0.857,
+      "JC": 0.286
+    },
+    "node_stress": {
+      "N1": 0.143,
+      "N2": 1.0,
+      "N3": 0.143,
+      "N4": 0.286,
+      "N5": 0.143,
+      "N6": 0.143,
+      "N7": 0.857,
+      "N8": 0.143
+    },
+    "high_conf_pct": 0.143,
+    "avg_adversarial": 0.531,
+    "top_ct": [
+      "NI",
+      "RF",
+      "JC"
+    ]
+  },
+  "Sovereign Immunity": {
+    "n": 5,
+    "avg_cd": 0.18,
+    "min_cd": 0.18,
+    "max_cd": 0.18,
+    "ct_rates": {
+      "NI": 1.0,
+      "RF": 1.0
+    },
+    "node_stress": {
+      "N1": 0.4,
+      "N2": 1.0,
+      "N3": 0.0,
+      "N4": 0.4,
+      "N5": 0.0,
+      "N6": 0.0,
+      "N7": 1.0,
+      "N8": 0.4
+    },
+    "high_conf_pct": 0.0,
+    "avg_adversarial": 0.59,
+    "top_ct": [
+      "NI",
+      "RF"
+    ]
+  },
+  "Tax": {
+    "n": 5,
+    "avg_cd": 0.216,
+    "min_cd": 0.18,
+    "max_cd": 0.36,
+    "ct_rates": {
+      "NI": 1.0,
+      "RF": 1.0,
+      "RCL": 0.2
+    },
+    "node_stress": {
+      "N1": 0.0,
+      "N2": 1.0,
+      "N3": 0.0,
+      "N4": 0.2,
+      "N5": 0.2,
+      "N6": 0.0,
+      "N7": 1.0,
+      "N8": 0.0
+    },
+    "high_conf_pct": 0.4,
+    "avg_adversarial": 0.584,
+    "top_ct": [
+      "NI",
+      "RF",
+      "RCL"
+    ]
+  },
+  "Patent / IP": {
+    "n": 5,
+    "avg_cd": 0.234,
+    "min_cd": 0.11,
+    "max_cd": 0.41,
+    "ct_rates": {
+      "RF": 1.0,
+      "NI": 0.8,
+      "CF": 0.2,
+      "TC": 0.2,
+      "FM": 0.2
+    },
+    "node_stress": {
+      "N1": 0.0,
+      "N2": 1.0,
+      "N3": 0.0,
+      "N4": 0.2,
+      "N5": 0.0,
+      "N6": 0.0,
+      "N7": 1.0,
+      "N8": 0.2
+    },
+    "high_conf_pct": 0.2,
+    "avg_adversarial": 0.49,
+    "top_ct": [
+      "RF",
+      "NI",
+      "CF"
+    ]
+  },
+  "Bankruptcy": {
+    "n": 5,
+    "avg_cd": 0.196,
+    "min_cd": 0.18,
+    "max_cd": 0.26,
+    "ct_rates": {
+      "RF": 1.0,
+      "NI": 0.8,
+      "CF": 0.2
+    },
+    "node_stress": {
+      "N1": 0.2,
+      "N2": 1.0,
+      "N3": 0.0,
+      "N4": 0.2,
+      "N5": 0.0,
+      "N6": 0.0,
+      "N7": 1.0,
+      "N8": 0.2
+    },
+    "high_conf_pct": 0.0,
+    "avg_adversarial": 0.47,
+    "top_ct": [
+      "RF",
+      "NI",
+      "CF"
+    ]
+  }
+}

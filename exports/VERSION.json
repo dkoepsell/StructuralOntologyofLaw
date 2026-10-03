@@ -1,0 +1,46 @@
+{
+ "corpus_version": "2.0.1",
+ "supersedes": "2.0.0",
+ "state": "staged",
+ "staged": "2026-10-03",
+ "annotation_regime": "v2",
+ "weight_profile": "core-v1",
+ "default_measure": "ct_count",
+ "registry_version": "1.0.0",
+ "domains": {
+  "included": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "excluded": [
+   9,
+   10,
+   11
+  ],
+  "excluded_reason": "annotated from stub text; see docs/COLLECTION_FAILURE.md"
+ },
+ "scopes": {
+  "scope_core": 5186,
+  "scope_analysis": 5103,
+  "scope_blind": 5022,
+  "scope_unflagged": 2940,
+  "scope_highconf": 4615
+ },
+ "withdrawn": {
+  "v1_predictive_claims": true,
+  "scotus_all": true,
+  "scotus_reason": "regime=scotus-v1-cascade on all 1,023 rows, plus predictor/prediction entanglement in apply_scotus_calibration.py"
+ },
+ "turtle_regenerated": true,
+ "turtle_cases": 4615,
+ "licence": {
+  "code": "MIT",
+  "data_and_ontology": "CC-BY-4.0"
+ }
+}

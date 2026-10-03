@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SOoL — A Structural Ontology of Law</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Inconsolata:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f6f1e7;--bg2:#ede7d8;--ink:#17120a;--ink2:#342b18;
+  --muted:#6b5c3e;--border:#c2a86a;--border2:#ddd0b0;
+  --gold:#7a4e08;--gold2:#5a3806;
+  --auth:#1a468a;--auth-bg:#eef3fa;--auth-bd:#9ab8e0;
+  --eff:#8a3a08;--eff-bg:#faf3ee;--eff-bd:#d8a878;
+  --rec:#1a6438;--rec-bg:#eef7f2;--rec-bd:#88c8a0;
+  --rep:#56188a;--rep-bg:#f5eefa;--rep-bd:#b890d8;
+}
+html,body{
+  background:#cfc6b4;
+  overflow:hidden;
+  width:100%;height:100%;
+  font-family:'Cormorant Garamond',serif;
+  color:var(--ink);
+  margin:0;padding:0;
+}
+
+/* ── PAN-ZOOM CANVAS ── */
+#canvas{
+  position:fixed;inset:0;overflow:hidden;
+  background:radial-gradient(ellipse at 40% 30%,#d8d0be 0%,#c0b8a6 100%);
+  cursor:grab;
+}
+#canvas.is-dragging{cursor:grabbing!important}
+#stage{
+  position:absolute;top:0;left:0;
+  transform-origin:0 0;
+  /* transform applied by JS */
+}
+
+/* ── POSTER SHELL ── */
+.poster{width:1380px;padding:40px 48px 50px;position:relative;background:var(--bg);box-shadow:0 12px 80px rgba(0,0,0,.28)}
+.poster::before{content:'';position:absolute;inset:13px;border:1.5px solid var(--border);pointer-events:none;z-index:0}
+.poster::after{content:'';position:absolute;inset:19px;border:.5px solid var(--border2);pointer-events:none;z-index:0}
+
+/* ── HEADER ── */
+.header{text-align:center;padding:20px 0 12px;position:relative;z-index:1}
+.header-sub{font-family:'Inconsolata',monospace;font-size:13px;letter-spacing:.28em;text-transform:uppercase;color:var(--muted);margin-bottom:9px}
+.header h1{font-family:'Cinzel Decorative',serif;font-size:36px;font-weight:900;color:var(--ink);letter-spacing:.05em;line-height:1.1}
+.header h1 em{color:var(--gold);font-style:normal}
+.header h2{font-family:'Cinzel',serif;font-size:13px;font-weight:400;color:var(--muted);letter-spacing:.2em;text-transform:uppercase;margin-top:6px}
+.hr{width:260px;height:1.5px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:13px auto 0}
+
+/* ── THESIS ── */
+.thesis{text-align:center;font-style:italic;font-weight:300;font-size:15.5px;color:var(--ink2);line-height:1.7;padding:12px 60px;margin-bottom:0;border-top:1px solid var(--border2);border-bottom:1px solid var(--border2);position:relative;z-index:1}
+
+/* ── MAIN DIAGRAM ── */
+.diagram{display:grid;grid-template-columns:264px 1fr 264px;column-gap:0;margin-top:20px;position:relative;z-index:1}
+
+/* ── LEFT / RIGHT CT COLUMNS ── */
+.col-l,.col-r{display:flex;flex-direction:column;padding-top:4px}
+.col-l{align-items:flex-end;padding-right:16px}
+.col-r{align-items:flex-start;padding-left:16px}
+
+/* ── COLUMN HEADING ── */
+.col-heading{
+  font-family:'Cinzel',serif;font-size:9px;font-weight:700;
+  letter-spacing:.30em;text-transform:uppercase;color:var(--muted);
+  padding:4px 0 5px;width:250px;
+  border-bottom:1.5px solid var(--border2);
+  margin-bottom:6px;text-align:center;
+  position:relative;z-index:1;
+}
+
+/* ── CENTRE SPINE ── */
+.spine{display:flex;flex-direction:column;align-items:center;padding:0 4px;position:relative}
+.spine::before{
+  content:'';position:absolute;top:28px;bottom:28px;left:50%;width:2px;
+  background:linear-gradient(180deg,
+    var(--auth) 0%,var(--auth) 38%,
+    var(--eff) 38%,var(--eff) 55%,
+    var(--rec) 55%,var(--rec) 78%,
+    var(--rep) 78%,var(--rep) 100%);
+  opacity:.35;transform:translateX(-50%);z-index:0;
+}
+
+/* ── CLUSTER LABEL ── */
+.cl{font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;padding:2px 11px;border-radius:2px;margin:5px 0 2px;z-index:1;position:relative;transition:opacity .25s}
+.cl-a{color:var(--auth);background:var(--auth-bg);border:1px solid var(--auth-bd)}
+.cl-e{color:var(--eff); background:var(--eff-bg); border:1px solid var(--eff-bd)}
+.cl-r{color:var(--rec); background:var(--rec-bg); border:1px solid var(--rec-bd)}
+.cl-p{color:var(--rep); background:var(--rep-bg); border:1px solid var(--rep-bd)}
+
+/* ── NODE BOX ── */
+.node{width:264px;border-radius:3px;padding:8px 11px;margin:2px 0;position:relative;z-index:1;cursor:pointer;transition:box-shadow .15s,opacity .25s}
+.node .nn{font-family:'Inconsolata',monospace;font-size:11px;font-weight:600;letter-spacing:.14em;display:flex;justify-content:space-between}
+.node .na{font-family:'Cinzel',serif;font-size:14.5px;font-weight:700;line-height:1.2}
+.node .nd{font-size:13px;font-style:italic;font-weight:300;line-height:1.4;margin-top:2px;opacity:.8}
+.node .nb{font-family:'Inconsolata',monospace;font-size:10.5px;margin-top:3px;opacity:.55;letter-spacing:.04em}
+.n-a{background:var(--auth-bg);border:1px solid var(--auth-bd);border-left:3px solid var(--auth)}
+.n-a .nn,.n-a .na{color:var(--auth)}
+.n-e{background:var(--eff-bg); border:1px solid var(--eff-bd); border-left:3px solid var(--eff)}
+.n-e .nn,.n-e .na{color:var(--eff)}
+.n-r{background:var(--rec-bg); border:1px solid var(--rec-bd); border-left:3px solid var(--rec)}
+.n-r .nn,.n-r .na{color:var(--rec)}
+.n-r.pivot{border-width:1.5px 1.5px 1.5px 3px;box-shadow:0 2px 10px rgba(26,100,56,.1)}
+.n-p{background:var(--rep-bg); border:1px solid var(--rep-bd); border-left:3px solid var(--rep)}
+.n-p .nn,.n-p .na{color:var(--rep)}
+.pivot-badge{font-family:'Inconsolata',monospace;font-size:10px;color:var(--gold);background:rgba(122,78,8,.08);border:1px solid var(--border);padding:1px 5px;border-radius:2px}
+
+/* chain arrow */
+.arr{width:2px;height:9px;margin:0 auto;position:relative;z-index:1;transition:opacity .25s}
+.arr::after{content:'▾';position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);font-size:8px}
+.ar-a{background:var(--auth);color:var(--auth)}
+.ar-e{background:var(--eff); color:var(--eff)}
+.ar-r{background:var(--rec); color:var(--rec)}
+.ornament{font-size:12px;color:var(--border);letter-spacing:.15em;text-align:center;margin:2px 0;z-index:1;position:relative;transition:opacity .25s}
+
+/* ── CT CARD ── */
+.ct{width:250px;border-radius:3px;padding:6px 9px;margin:3px 0;position:relative;cursor:pointer;transition:box-shadow .15s,opacity .25s,transform .1s;user-select:none}
+.ct .cc{font-family:'Inconsolata',monospace;font-size:12.5px;font-weight:700;letter-spacing:.05em}
+.ct .cn{font-family:'Cinzel',serif;font-size:13px;font-weight:600;line-height:1.25;margin-top:1px}
+.ct .cno{font-family:'Inconsolata',monospace;font-size:10.5px;opacity:.65;letter-spacing:.05em;margin-top:1px}
+.ct .cd{font-size:13px;font-style:italic;font-weight:300;line-height:1.4;margin-top:2px;opacity:.82}
+.ct .cw{position:absolute;top:6px;right:7px;font-family:'Inconsolata',monospace;font-size:10.5px;font-weight:600;opacity:.6}
+.sp{height:8px}
+.sp2{height:16px}
+
+.ct-a{background:var(--auth-bg);border:1px solid var(--auth-bd)}
+.ct-a .cc,.ct-a .cn{color:var(--auth)}
+.ct-e{background:var(--eff-bg);border:1px solid var(--eff-bd)}
+.ct-e .cc,.ct-e .cn{color:var(--eff)}
+.ct-r{background:var(--rec-bg);border:1px solid var(--rec-bd)}
+.ct-r .cc,.ct-r .cn{color:var(--rec)}
+.ct-p{background:var(--rep-bg);border:1px solid var(--rep-bd)}
+.ct-p .cc,.ct-p .cn{color:var(--rep)}
+
+/* ── SVG CONNECTOR OVERLAY ── */
+.conn-svg{position:absolute;top:0;left:0;width:100%;pointer-events:none;overflow:visible;z-index:2}
+
+/* ── HOVER / DIM / ACTIVE ── */
+.col-l .ct:hover{transform:translateX(3px);box-shadow:0 3px 12px rgba(0,0,0,.18)}
+.col-r .ct:hover{transform:translateX(-3px);box-shadow:0 3px 12px rgba(0,0,0,.18)}
+.node:hover{box-shadow:0 3px 14px rgba(0,0,0,.22)}
+.ct.ct-dim{opacity:.12!important;pointer-events:none!important;transform:none!important}
+.node.nd-dim{opacity:.12!important;pointer-events:none!important}
+.cl.cl-dim,.ornament.or-dim,.arr.arr-dim{opacity:.1!important}
+.ct.ct-active{box-shadow:0 0 0 2px var(--gold),0 4px 18px rgba(122,78,8,.3)!important;opacity:1!important;z-index:10}
+.node.nd-active{box-shadow:0 0 0 2.5px var(--gold),0 4px 18px rgba(122,78,8,.25)!important;opacity:1!important}
+svg path.p-dim{opacity:.04!important}
+svg path.p-hi{opacity:.9!important;stroke-width:2.5px!important}
+svg circle.p-dim{opacity:.04!important}
+svg circle.p-hi{opacity:.95!important}
+
+/* ── BOTTOM BAND ── */
+.bottom{margin-top:24px;padding-top:17px;border-top:1.5px solid var(--border2);display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;position:relative;z-index:1}
+.bs h3{font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--gold2);margin-bottom:6px;padding-bottom:3px;border-bottom:1px solid var(--border2)}
+.bs p{font-size:13px;font-style:italic;font-weight:300;line-height:1.65;color:var(--muted)}
+.formula{font-family:'Inconsolata',monospace;font-size:12.5px;color:var(--ink2);background:var(--bg2);border:1px solid var(--border2);padding:5px 9px;border-radius:3px;margin-top:6px;line-height:1.8;font-style:normal}
+
+/* ── FOOTER ── */
+.footer{text-align:center;margin-top:18px;padding-top:13px;border-top:1px solid var(--border2);font-family:'Inconsolata',monospace;font-size:11px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;position:relative;z-index:1}
+.footer em{color:var(--gold2);font-style:normal}
+
+/* ════════════════════════════════════════
+   TOOLBAR
+════════════════════════════════════════ */
+.toolbar{
+  position:fixed;top:12px;right:16px;z-index:9900;
+  background:rgba(246,241,231,.97);
+  backdrop-filter:blur(6px);
+  border:1.5px solid var(--border);border-radius:6px;
+  padding:7px 14px;display:flex;align-items:center;gap:8px;
+  font-family:'Inconsolata',monospace;font-size:11px;color:var(--muted);
+  box-shadow:0 4px 24px rgba(0,0,0,.18);user-select:none;
+}
+.tb-label{letter-spacing:.1em;text-transform:uppercase;font-size:10px;color:var(--muted)}
+.tb-pct{font-weight:600;color:var(--ink2);min-width:34px;text-align:center;font-size:12px}
+.tb-div{width:1px;height:18px;background:var(--border2);flex-shrink:0}
+.tb-btn{
+  background:var(--bg2);border:1px solid var(--border);border-radius:3px;
+  padding:3px 10px;font-family:'Inconsolata',monospace;font-size:11px;
+  color:var(--ink2);cursor:pointer;transition:all .12s;white-space:nowrap;
+}
+.tb-btn:hover{background:var(--border2)}
+.tb-btn.tb-on{background:var(--gold2);color:#fff;border-color:var(--gold2)}
+.tb-zoom{padding:2px 9px;font-size:14px;font-weight:700;min-width:26px;text-align:center}
+
+/* ── HINT BAR (bottom-left) ── */
+.hint-bar{
+  position:fixed;bottom:14px;left:16px;z-index:9900;
+  font-family:'Inconsolata',monospace;font-size:10px;
+  letter-spacing:.08em;color:rgba(80,65,40,.55);
+  user-select:none;pointer-events:none;
+}
+
+/* ════════════════════════════════════════
+   DETAIL PANEL
+════════════════════════════════════════ */
+.dp{
+  position:fixed;right:0;top:0;height:100%;width:320px;
+  background:var(--bg);border-left:2px solid var(--border);
+  transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);
+  z-index:9800;display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:-8px 0 40px rgba(0,0,0,.12);
+}
+.dp.dp-open{transform:translateX(0)}
+.dp-head{
+  background:var(--bg2);border-bottom:1.5px solid var(--border2);
+  padding:18px 18px 14px;flex-shrink:0;position:relative;
+}
+.dp-x{
+  position:absolute;top:10px;right:10px;
+  background:none;border:none;font-size:15px;color:var(--muted);cursor:pointer;
+  padding:4px 8px;border-radius:3px;line-height:1;font-family:'Inconsolata',monospace;
+  transition:all .1s;
+}
+.dp-x:hover{background:var(--border2);color:var(--ink)}
+.dp-tag{font-family:'Inconsolata',monospace;font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.dp-code{font-family:'Cinzel Decorative',serif;font-size:22px;line-height:1.1;margin-bottom:3px}
+.dp-name{font-family:'Cinzel',serif;font-size:14px;font-weight:700;color:var(--ink)}
+.dp-body{flex:1;overflow-y:auto;padding:16px 18px 24px}
+.dp-wt{font-family:'Inconsolata',monospace;font-size:11px;color:var(--muted);margin-bottom:11px;display:flex;align-items:baseline;gap:6px}
+.dp-wt-val{font-size:18px;font-weight:600;color:var(--eff)}
+.dp-desc{font-size:13.5px;font-style:italic;line-height:1.78;color:var(--ink2);margin-bottom:16px;border-bottom:1px solid var(--border2);padding-bottom:14px}
+.dp-sec{margin-bottom:14px}
+.dp-sh{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold2);border-bottom:1px solid var(--border2);padding-bottom:3px;margin-bottom:8px}
+.dp-sec p{font-size:12.5px;line-height:1.72;color:var(--ink2)}
+.dp-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.dp-chip{font-family:'Inconsolata',monospace;font-size:11px;padding:3px 9px;border-radius:3px;border:1px solid;cursor:pointer;transition:opacity .12s}
+.dp-chip:hover{opacity:.7}
+.dp-chip-a{color:var(--auth);border-color:var(--auth-bd);background:var(--auth-bg)}
+.dp-chip-e{color:var(--eff);border-color:var(--eff-bd);background:var(--eff-bg)}
+.dp-chip-r{color:var(--rec);border-color:var(--rec-bd);background:var(--rec-bg)}
+.dp-chip-p{color:var(--rep);border-color:var(--rep-bd);background:var(--rep-bg)}
+.dp-hint{font-family:'Inconsolata',monospace;font-size:9.5px;color:var(--muted);margin-top:8px;font-style:italic}
+
+/* ════════════════════════════════════════
+   CD CALCULATOR PANEL
+════════════════════════════════════════ */
+.cdp{
+  position:fixed;bottom:0;left:0;right:0;z-index:9700;
+  background:var(--bg);border-top:2px solid var(--border);
+  transform:translateY(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 -6px 40px rgba(0,0,0,.14);
+}
+.cdp.cdp-open{transform:translateY(0)}
+.cdp-head{
+  padding:8px 32px;background:var(--bg2);border-bottom:1px solid var(--border2);
+  display:flex;align-items:center;gap:16px;
+}
+.cdp-title{font-family:'Cinzel',serif;font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold2)}
+.cdp-sub{font-family:'Inconsolata',monospace;font-size:10px;color:var(--muted);font-style:italic;flex:1}
+.cdp-close{background:none;border:none;font-family:'Inconsolata',monospace;font-size:11px;color:var(--muted);cursor:pointer;padding:2px 6px;transition:color .1s}
+.cdp-close:hover{color:var(--ink)}
+.cdp-body{padding:14px 32px 16px;display:flex;gap:28px;align-items:start}
+.cdp-score-box{flex-shrink:0;width:130px;display:flex;flex-direction:column;align-items:center;border-right:1px solid var(--border2);padding-right:22px;padding-top:2px}
+.cdp-sl{font-family:'Cinzel',serif;font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold2);margin-bottom:5px}
+.cdp-sv{font-family:'Inconsolata',monospace;font-size:44px;color:var(--ink);line-height:1;transition:color .25s}
+.cdp-sm{font-family:'Inconsolata',monospace;font-size:10px;color:var(--muted);margin-top:3px}
+.cdp-sev{font-family:'Cinzel',serif;font-size:10.5px;margin-top:8px;padding:3px 10px;border-radius:2px;text-align:center;transition:all .25s}
+.cdp-grid{flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:5px 18px}
+.cdp-item{display:flex;align-items:start;gap:7px;cursor:pointer;padding:3px 0}
+.cdp-item input[type=checkbox]{cursor:pointer;accent-color:var(--gold);margin-top:3px;flex-shrink:0;width:12px;height:12px}
+.cdp-il{display:flex;flex-direction:column}
+.cdp-ic{font-family:'Inconsolata',monospace;font-size:11.5px;font-weight:700;color:var(--ink2)}
+.cdp-in{font-family:'Inconsolata',monospace;font-size:9.5px;color:var(--muted);line-height:1.3}
+.cdp-iw{font-family:'Inconsolata',monospace;font-size:9.5px;color:var(--gold2);margin-top:1px}
+.cdp-actions{display:flex;flex-direction:column;gap:6px;justify-content:flex-start;flex-shrink:0;padding-top:4px}
+.cdp-act{font-family:'Inconsolata',monospace;font-size:10px;color:var(--muted);background:none;border:1px solid var(--border2);border-radius:3px;padding:3px 10px;cursor:pointer;white-space:nowrap;transition:all .1s}
+.cdp-act:hover{background:var(--border2);color:var(--ink)}
+
+/* ════════════════════════════════════════
+   APP NAV (top-left, mirrors toolbar)
+════════════════════════════════════════ */
+.app-nav{
+  position:fixed;top:12px;left:16px;z-index:9900;
+  background:rgba(246,241,231,.97);
+  backdrop-filter:blur(6px);
+  border:1.5px solid var(--border);border-radius:6px;
+  padding:7px 14px;display:flex;align-items:center;gap:8px;
+  font-family:'Inconsolata',monospace;font-size:11px;color:var(--muted);
+  box-shadow:0 4px 24px rgba(0,0,0,.18);user-select:none;
+}
+.an-lbl{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);flex-shrink:0}
+.an-sep{width:1px;height:16px;background:var(--border2);flex-shrink:0}
+.an-curr{
+  font-size:11px;font-weight:700;color:var(--gold2);
+  padding:2px 8px;background:rgba(122,78,8,.08);
+  border:1px solid var(--border);border-radius:3px;cursor:default
+}
+.an-link{
+  font-size:11px;color:var(--ink2);padding:2px 8px;
+  background:var(--bg2);border:1px solid var(--border2);border-radius:3px;
+  text-decoration:none;transition:all .12s;white-space:nowrap;
+}
+.an-link:hover{background:var(--border2);color:var(--ink);border-color:var(--border)}
+</style>
+</head>
+<body>
+
+<!-- ── PAN/ZOOM CANVAS ── -->
+<div id="canvas">
+  <div id="stage">
+    <div class="poster">
+
+      <div class="header">
+        <div class="header-sub">Koepsell · SEAL Lab · Texas A&M University · Palgrave Macmillan, forthcoming</div>
+        <h1>A <em>S</em>tructural <em>O</em>ntology <em>o</em>f <em>L</em>aw</h1>
+        <h2>The Minimum Legal Chain &nbsp;·&nbsp; Thirteen Contradiction Types &nbsp;·&nbsp; Four Structural Clusters</h2>
+        <div class="hr"></div>
+      </div>
+
+      <div class="thesis">
+        "Law is the architecture of social being — sustained through recognition, obligation, and institutional repair.<br>
+        A legal effect is valid only when each node of the Minimum Legal Chain closes without structural self-defeat."
+      </div>
+
+      <div class="diagram" id="diag">
+
+        <!-- ── LEFT COLUMN ── -->
+        <div class="col-l">
+          <div class="col-heading">Contradictions</div>
+          <div style="height:10px"></div>
+
+          <div class="ct ct-a" id="CF" tabindex="0" role="button">
+            <span class="cw">0.15</span>
+            <div class="cc">CF</div><div class="cn">Conferral Failure</div>
+            <div class="cno">N1 → N3</div>
+            <div class="cd">Authority fails to vest the actor in their legal role. Ground of norm-issuance is broken.</div>
+          </div>
+
+          <div class="ct ct-a" id="AI" tabindex="0" role="button">
+            <span class="cw">0.12</span>
+            <div class="cc">AI</div><div class="cn">Authority Inflation</div>
+            <div class="cno">N1 → N2</div>
+            <div class="cd">Decision-maker's will displaces the norm. The structural Rule of Law violation.</div>
+          </div>
+
+          <div class="sp2"></div>
+
+          <div class="ct ct-a" id="JC" tabindex="0" role="button">
+            <span class="cw">0.10</span>
+            <div class="cc">JC</div><div class="cn">Jurisdictional Contradiction</div>
+            <div class="cno">N2 → N6</div>
+            <div class="cd">Two competing normative regimes govern the same situation without a priority rule.</div>
+          </div>
+
+          <div class="ct ct-a" id="NI" tabindex="0" role="button">
+            <span class="cw">0.07</span>
+            <div class="cc">NI</div><div class="cn">Norm Indeterminacy</div>
+            <div class="cno">N2</div>
+            <div class="cd">Governing rule too vague for determinate closure. The structural basis of vagueness doctrine.</div>
+          </div>
+
+          <div class="sp2"></div>
+
+          <div class="ct ct-a" id="RC3" tabindex="0" role="button">
+            <span class="cw">0.14</span>
+            <div class="cc">RC3</div><div class="cn">Role Contradiction</div>
+            <div class="cno">N3</div>
+            <div class="cd">Same bearer holds roles generating incompatible obligations for the same act or omission.</div>
+          </div>
+
+          <div class="sp2" style="height:22px"></div>
+
+          <div class="ct ct-e" id="FM" tabindex="0" role="button">
+            <span class="cw">0.11</span>
+            <div class="cc">FM</div><div class="cn">Fact Manipulation</div>
+            <div class="cno">N4</div>
+            <div class="cd">Triggering facts fabricated, suppressed, or rendered indeterminate. Epistemic failure.</div>
+          </div>
+
+          <div class="ct ct-e" id="TC" tabindex="0" role="button">
+            <span class="cw">0.08</span>
+            <div class="cc">TC</div><div class="cn">Temporal Contradiction</div>
+            <div class="cno">N2 ↔ N4</div>
+            <div class="cd">Norm and triggering facts in bidirectional temporal misalignment. Retroactive application.</div>
+          </div>
+
+          <div class="ct ct-e" id="PC" tabindex="0" role="button">
+            <span class="cw">0.09</span>
+            <div class="cc">PC</div><div class="cn">Procedural Contradiction</div>
+            <div class="cno">N2 → N5</div>
+            <div class="cd">Required act cannot be performed through the norm's own procedure. Structural catch-22.</div>
+          </div>
+        </div>
+
+        <!-- ── CENTRE SPINE ── -->
+        <div class="spine">
+          <div class="cl cl-a">Authority Cluster &nbsp;·&nbsp; Nodes 1–3</div>
+
+          <div class="node n-a" id="n1" tabindex="0" role="button">
+            <div class="nn"><span>NODE 1</span></div>
+            <div class="na">Source of Authority</div>
+            <div class="nd">The constitutional, statutory, or institutional ground of norm-issuance</div>
+            <div class="nb">BFO: Realizable Dependent Continuant</div>
+          </div>
+          <div class="arr ar-a"></div>
+
+          <div class="node n-a" id="n2" tabindex="0" role="button">
+            <div class="nn"><span>NODE 2</span></div>
+            <div class="na">Norm</div>
+            <div class="nd">The specific rule or standard issued; must be determinate and non-contradictory</div>
+            <div class="nb">BFO: Specifically Dependent Continuant</div>
+          </div>
+          <div class="arr ar-a"></div>
+
+          <div class="node n-a" id="n3" tabindex="0" role="button">
+            <div class="nn"><span>NODE 3</span></div>
+            <div class="na">Actor in Role</div>
+            <div class="nd">The agent properly vested in the norm-governed capacity; bearer of the obligation</div>
+            <div class="nb">BFO: Role (Specifically Dependent Continuant)</div>
+          </div>
+
+          <div class="ornament">· · ·</div>
+          <div class="cl cl-e">Effect Cluster &nbsp;·&nbsp; Nodes 4–5</div>
+
+          <div class="node n-e" id="n4" tabindex="0" role="button">
+            <div class="nn"><span>NODE 4</span></div>
+            <div class="na">Triggering Facts</div>
+            <div class="nd">Circumstances activating the norm; must be established and determinate</div>
+            <div class="nb">BFO: Process + Information Artifact</div>
+          </div>
+          <div class="arr ar-e"></div>
+
+          <div class="node n-e" id="n5" tabindex="0" role="button">
+            <div class="nn"><span>NODE 5</span></div>
+            <div class="na">Legal Act / Omission</div>
+            <div class="nd">The conduct that instantiates the trigger; procedurally valid performance</div>
+            <div class="nb">BFO: Process</div>
+          </div>
+
+          <div class="ornament">· · ·</div>
+          <div class="cl cl-r">Recognition Cluster &nbsp;·&nbsp; Nodes 6–7</div>
+
+          <div class="node n-r" id="n6" tabindex="0" role="button">
+            <div class="nn"><span>NODE 6</span></div>
+            <div class="na">Target</div>
+            <div class="nd">The party upon whom the legal effect is directed; must retain legal subjecthood</div>
+            <div class="nb">BFO: Specifically Dependent Continuant</div>
+          </div>
+          <div class="arr ar-r"></div>
+
+          <div class="node n-r pivot" id="n7" tabindex="0" role="button">
+            <div class="nn"><span>NODE 7</span><span class="pivot-badge">★ PIVOTAL</span></div>
+            <div class="na">Legal Effect</div>
+            <div class="nd">The normative consequence — right, duty, power, liability — that attaches. Primary failure node in 67% of reversals.</div>
+            <div class="nb">BFO: Realizable Dependent Continuant</div>
+          </div>
+
+          <div class="ornament">· · ·</div>
+          <div class="cl cl-p">Repair Cluster &nbsp;·&nbsp; Node 8</div>
+
+          <div class="node n-p" id="n8" tabindex="0" role="button">
+            <div class="nn"><span>NODE 8</span></div>
+            <div class="na">Remedy</div>
+            <div class="nd">The mechanism for restoring structural coherence on breach; must be accessible and effective</div>
+            <div class="nb">BFO: Process + Realizable Dependent Continuant</div>
+          </div>
+        </div>
+
+        <!-- ── RIGHT COLUMN ── -->
+        <div class="col-r">
+          <div class="col-heading">Contradictions</div>
+          <div style="height:10px"></div>
+          <div id="rightSpacer" style="height:0px"></div>
+
+          <div class="ct ct-r" id="RF" tabindex="0" role="button">
+            <span class="cw">0.11</span>
+            <div class="cc">RF</div><div class="cn">Recognition Failure</div>
+            <div class="cno">N6 / N7</div>
+            <div class="cd">Target or legal effect denied required recognition. The asserted right is not acknowledged.</div>
+          </div>
+
+          <div class="ct ct-r" id="RCL" tabindex="0" role="button">
+            <span class="cw">0.18</span>
+            <div class="cc">RCL</div><div class="cn">Recognition Collapse</div>
+            <div class="cno">N6 → N8</div>
+            <div class="cd">Subjecthood stripped while enforcement of obligations continues. Civil death. Highest CD weight.</div>
+          </div>
+
+          <div class="sp2"></div>
+
+          <div class="ct ct-r" id="CC" tabindex="0" role="button">
+            <span class="cw">0.14</span>
+            <div class="cc">CC</div><div class="cn">Correlativity Contradiction</div>
+            <div class="cno">N7</div>
+            <div class="cd">Right claimed without the Hohfeldian correlative duty honored by the obligated party.</div>
+          </div>
+
+          <div class="ct ct-r" id="SE" tabindex="0" role="button">
+            <span class="cw">0.10</span>
+            <div class="cc">SE</div><div class="cn">Self-Undermining Effect</div>
+            <div class="cno">N7</div>
+            <div class="cd">Legal effect destabilizes the structural conditions required for its own persistence.</div>
+          </div>
+
+          <div class="sp2" style="height:20px"></div>
+
+          <div class="ct ct-p" id="RPF" tabindex="0" role="button">
+            <span class="cw">0.13</span>
+            <div class="cc">RPF</div><div class="cn">Repair Procedure Failure</div>
+            <div class="cno">N8</div>
+            <div class="cd">Remedy structurally available but blocked, inaccessible, or procedurally foreclosed.</div>
+          </div>
+        </div>
+
+        <!-- SVG overlay -->
+        <svg class="conn-svg" id="svg" height="10"></svg>
+
+      </div><!-- /diagram -->
+
+
+      <!-- ── LEGEND ── -->
+      <div style="margin-top:18px;padding:12px 18px;background:var(--bg2);border:1px solid var(--border2);border-radius:4px;position:relative;z-index:1">
+        <div style="font-family:'Cinzel',serif;font-size:10px;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:var(--gold2);margin-bottom:10px;padding-bottom:4px;border-bottom:1px solid var(--border2)">Diagram Key</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px 20px;align-items:start">
+          <div>
+            <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Connection Type</div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;align-items:center;gap:8px">
+                <svg width="44" height="10" viewBox="0 0 44 10"><line x1="2" y1="5" x2="42" y2="5" stroke="#444" stroke-width="1.4" stroke-opacity=".6"/><circle cx="42" cy="5" r="2.5" fill="#444" opacity=".7"/></svg>
+                <span style="font-size:12px;font-style:italic;color:var(--ink2)">Primary connection — CT fires directly at this node</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <svg width="44" height="10" viewBox="0 0 44 10"><line x1="2" y1="5" x2="42" y2="5" stroke="#444" stroke-width="1.1" stroke-dasharray="5,3" stroke-opacity=".55"/><circle cx="42" cy="5" r="2" fill="#444" opacity=".6"/></svg>
+                <span style="font-size:12px;font-style:italic;color:var(--ink2)">Secondary connection — CT spans or propagates across nodes</span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Cluster Colour</div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <div style="display:flex;align-items:center;gap:7px"><div style="width:14px;height:14px;border-radius:2px;background:var(--auth-bg);border:2px solid var(--auth)"></div><span style="font-size:12px;color:var(--ink2)"><b style="color:var(--auth);font-family:Cinzel,serif">Authority</b> — Nodes 1–3: Source, Norm, Actor</span></div>
+              <div style="display:flex;align-items:center;gap:7px"><div style="width:14px;height:14px;border-radius:2px;background:var(--eff-bg);border:2px solid var(--eff)"></div><span style="font-size:12px;color:var(--ink2)"><b style="color:var(--eff);font-family:Cinzel,serif">Effect</b> — Nodes 4–5: Facts, Act/Omission</span></div>
+              <div style="display:flex;align-items:center;gap:7px"><div style="width:14px;height:14px;border-radius:2px;background:var(--rec-bg);border:2px solid var(--rec)"></div><span style="font-size:12px;color:var(--ink2)"><b style="color:var(--rec);font-family:Cinzel,serif">Recognition</b> — Nodes 6–7: Target, Legal Effect</span></div>
+              <div style="display:flex;align-items:center;gap:7px"><div style="width:14px;height:14px;border-radius:2px;background:var(--rep-bg);border:2px solid var(--rep)"></div><span style="font-size:12px;color:var(--ink2)"><b style="color:var(--rep);font-family:Cinzel,serif">Repair</b> — Node 8: Remedy</span></div>
+            </div>
+          </div>
+          <div>
+            <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Node Closure</div>
+            <div style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--ink2)">
+              <div><b style="font-family:Inconsolata,monospace;color:var(--rec)">closed</b> — node fully satisfied; chain continues</div>
+              <div><b style="font-family:Inconsolata,monospace;color:#cc2200">failed</b> — node not satisfied; chain breaks here</div>
+              <div><b style="font-family:Inconsolata,monospace;color:var(--eff)">partial</b> — node under structural stress</div>
+              <div><b style="font-family:Inconsolata,monospace;color:var(--muted)">indeterminate</b> — cannot be determined from text</div>
+            </div>
+          </div>
+          <div>
+            <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Reading the Chain</div>
+            <div style="font-size:12px;font-style:italic;color:var(--ink2);line-height:1.65">The chain is read top to bottom. Each CT on the left column attaches to nodes via lines running right. Each CT on the right column attaches via lines running left. A CT fires when its indexed node(s) fail or partially close, adding its weight to the <b style="font-style:normal;font-family:Inconsolata,monospace;font-size:11px">CD</b> score.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── BOTTOM BAND ── -->
+      <div class="bottom">
+        <div class="bs">
+          <h3>Contradiction Debt</h3>
+          <p>CD is SOoL's quantitative measure of structural ontological instability — a scalar sum of weighted contradiction type activations. CD is diagnostic, not moral: a clean chain may produce an unjust outcome; a contradictory chain may pursue just ends.</p>
+          <div class="formula">
+            CD = Σ w(CTᵢ) for all active CTᵢ<br>
+            Theoretical max CD ≈ 1.52<br>
+            AUC (CD → outcome) = 0.9985 civil<br>
+            CD ratio denied / granted = 16.9×
+          </div>
+        </div>
+        <div class="bs">
+          <h3>Rule of Law as Structural Condition</h3>
+          <p>The Rule of Law is the structural condition under which N2 (Norm) maintains ontological independence from N1 (Source of Authority). When N1 displaces N2, Authority Inflation fires. Regimes violating this condition have diseased law — high unresolvable CD — not an absence of law.</p>
+          <div class="formula">
+            Rule of Law ≡ N2 ⊥ N1<br>
+            AI fires when N1 absorbs N2<br>
+            Authoritarian signature: AI + RCL + RPF<br>
+            Structural diagnosis, not moral verdict
+          </div>
+        </div>
+        <div class="bs">
+          <h3>Irreversible Accountability Test (IAT)</h3>
+          <p>The IAT assesses genuine normative agency via five conditions: standing in a legally recognised role; attributable breach; enduring non-resettable residue; repair capacity; and counterfactual control. Current AI systems satisfy neither the residue nor the counterfactual conditions.</p>
+          <div class="formula">
+            IAT: standing ∧ attribution<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;∧ residue ∧ repair ∧ control<br>
+            Grounded in OWL / RDF / BFO<br>
+            seal.tamu.edu/legal-kernel
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <em>SOoL</em> &nbsp;·&nbsp; A Structural Ontology of the Law &nbsp;·&nbsp; David R. Koepsell &nbsp;·&nbsp;
+        SEAL Lab, Texas A&M University &nbsp;·&nbsp;
+        <em>Palgrave Macmillan, forthcoming</em> &nbsp;·&nbsp;
+        BFO-grounded · Empirically validated across 5,886 U.S. appellate decisions · AUC 0.9985
+      </div>
+
+    </div><!-- /poster -->
+  </div><!-- /stage -->
+</div><!-- /canvas -->
+
+<!-- ── FIXED OVERLAYS (outside canvas, viewport-relative) ── -->
+
+<div class="toolbar" id="toolbar">
+  <span class="tb-label">Zoom</span>
+  <button class="tb-btn tb-zoom" id="zoomOut" title="Zoom out (−)">−</button>
+  <span class="tb-pct" id="zoomPct">80%</span>
+  <button class="tb-btn tb-zoom" id="zoomIn"  title="Zoom in (+)">+</button>
+  <button class="tb-btn" id="fitBtn" title="Fit poster to window">Fit</button>
+  <div class="tb-div"></div>
+  <button class="tb-btn" id="cdpBtn" onclick="toggleCDP()">CD Calculator</button>
+  <button class="tb-btn" id="clearBtn" onclick="clearActive()" style="display:none">× Clear</button>
+</div>
+
+<div class="app-nav">
+  <span class="an-lbl">SOoL</span>
+  <div class="an-sep"></div>
+  <span class="an-curr">Diagram</span>
+  <a href="SOoL_QueryTool.html" class="an-link" title="Browse 3,200+ annotated opinions — filter by domain, node, contradiction type, and outcome">Query Tool ↗</a>
+</div>
+
+<div class="hint-bar">Scroll to zoom &nbsp;·&nbsp; Drag to pan &nbsp;·&nbsp; Click nodes &amp; CTs to explore</div>
+
+<div class="dp" id="detailPanel">
+  <div class="dp-head">
+    <button class="dp-x" onclick="closeDetail()">×</button>
+    <div class="dp-tag" id="dp-tag">—</div>
+    <div class="dp-code" id="dp-code">—</div>
+    <div class="dp-name" id="dp-name">—</div>
+  </div>
+  <div class="dp-body" id="dp-body"></div>
+</div>
+
+<div class="cdp" id="cdPanel">
+  <div class="cdp-head">
+    <span class="cdp-title">Contradiction Debt Calculator</span>
+    <span class="cdp-sub">Check active contradiction types to compute CD score</span>
+    <button class="cdp-close" onclick="toggleCDP()">Close ×</button>
+  </div>
+  <div class="cdp-body">
+    <div class="cdp-score-box">
+      <div class="cdp-sl">CD Score</div>
+      <div class="cdp-sv" id="cdScore">0.00</div>
+      <div class="cdp-sm">/ max 1.52</div>
+      <div class="cdp-sev" id="cdSev" style="color:var(--rec);background:var(--rec-bg);border:1px solid var(--rec-bd)">Coherent</div>
+    </div>
+    <div class="cdp-grid" id="cdGrid"></div>
+    <div class="cdp-actions">
+      <button class="cdp-act" onclick="cdSelectAll()">Select All</button>
+      <button class="cdp-act" onclick="cdClearAll()">Clear All</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+
+  /* ══════════════════════════════════════
+     DATA
+  ══════════════════════════════════════ */
+  var CT_NODES = {
+    CF:['n1','n3'], AI:['n1','n2'], JC:['n2','n6'], NI:['n2'], RC3:['n3'],
+    FM:['n4'], TC:['n2','n4'], PC:['n2','n5'],
+    RF:['n6','n7'], RCL:['n6','n8'], CC:['n7'], SE:['n7'], RPF:['n8']
+  };
+  var NODE_CTS = {};
+  Object.keys(CT_NODES).forEach(function(ct){
+    CT_NODES[ct].forEach(function(n){
+      if(!NODE_CTS[n]) NODE_CTS[n]=[];
+      NODE_CTS[n].push(ct);
+    });
+  });
+
+  var CT_DATA = {
+    CF:{name:'Conferral Failure',cluster:'Authority',clCls:'a',weight:0.15,
+      desc:'Authority fails to vest the actor in their legal role. Ground of norm-issuance is broken.',
+      sig:'Authority fails to vest the actor in their legal role. The N1→N3 conferral path is severed — even a valid norm cannot be legitimately applied by an improperly vested actor.',
+      ex:'An administrative agency issues a rule without statutory delegation. Courts strike it as ultra vires — the conferral chain is broken at N1→N3.'},
+    AI:{name:'Authority Inflation',cluster:'Authority',clCls:'a',weight:0.12,
+      desc:"Decision-maker's will displaces the norm. The structural Rule of Law violation.",
+      sig:"The decision-maker's will displaces the norm. N2 loses independence from N1 — the structural signature of Rule of Law violation. When N1 absorbs N2, the structural condition N2 ⊥ N1 fails.",
+      ex:"A judge substitutes personal policy for statutory text. AI is the structural definition of authoritarianism: N2 ⊥ N1 fails."},
+    JC:{name:'Jurisdictional Contradiction',cluster:'Authority',clCls:'a',weight:0.10,
+      desc:'Two competing normative regimes govern the same situation without a priority rule.',
+      sig:'Two competing normative regimes govern the same situation without a priority rule. The chain cannot close under any single coherent norm. JC uniquely spans Authority and Recognition — the conflict affects both which norm applies (N2) and who bears the effect (N6).',
+      ex:'A contract subject to both state and federal law where both cannot simultaneously apply and no conflict-of-laws rule resolves it.'},
+    NI:{name:'Norm Indeterminacy',cluster:'Authority',clCls:'a',weight:0.07,
+      desc:'Governing rule too vague for determinate closure. The structural basis of vagueness doctrine.',
+      sig:'The governing rule is too vague or ambiguous for determinate application. No closure is possible at N2 — the structural basis of void-for-vagueness doctrine. The chain halts because no determinate norm can be applied.',
+      ex:"A statute prohibiting 'unreasonable' conduct with no standard. The chain halts at N2: no determinate norm can be applied."},
+    RC3:{name:'Role Contradiction',cluster:'Authority',clCls:'a',weight:0.14,
+      desc:'Same bearer holds roles generating incompatible obligations for the same act or omission.',
+      sig:'The same bearer holds roles generating incompatible obligations for the same act. The role structure (N3) itself demands contradictory performance — no action can simultaneously satisfy all role obligations.',
+      ex:"A judge who is also the prosecutor; an attorney representing conflicting clients. No performance can satisfy both roles."},
+    FM:{name:'Fact Manipulation',cluster:'Effect',clCls:'e',weight:0.11,
+      desc:'Triggering facts fabricated, suppressed, or rendered indeterminate. Epistemic failure.',
+      sig:'Triggering facts (N4) are fabricated, suppressed, or rendered indeterminate. The epistemic basis of the legal effect is corrupted. N4 closes on false facts — the entire downstream chain (N5→N8) is built on compromised ground.',
+      ex:'Fabricated evidence, destroyed records, or withheld exculpatory material. N4 closes on false facts — the entire downstream chain is compromised.'},
+    TC:{name:'Temporal Contradiction',cluster:'Effect',clCls:'e',weight:0.08,
+      desc:'Norm and triggering facts in bidirectional temporal misalignment. Retroactive application.',
+      sig:'Norm and triggering facts are in bidirectional temporal misalignment. TC is the only CT with a bidirectional connection — retroactive application of norms to prior facts, or prospective fact attribution.',
+      ex:'Ex post facto laws. A criminal statute applied to conduct completed before enactment violates TC at N2↔N4.'},
+    PC:{name:'Procedural Contradiction',cluster:'Effect',clCls:'e',weight:0.09,
+      desc:"Required act cannot be performed through the norm's own procedure. Structural catch-22.",
+      sig:"The required act (N5) cannot be performed through the norm's own procedure (N2). A structural catch-22 — compliance is procedurally impossible. The chain requires N5 to close, but N2's own procedure forecloses the only path.",
+      ex:"A statute requiring filing in a court that no longer exists; regulatory compliance requiring a permit obtainable only through a foreclosed process."},
+    RF:{name:'Recognition Failure',cluster:'Recognition',clCls:'r',weight:0.11,
+      desc:'Target or legal effect denied required recognition. The asserted right is not acknowledged.',
+      sig:'The target (N6) or the legal effect (N7) is denied the institutional recognition required for the chain to close. The failure is not in the authority or act, but in the institutional acknowledgment of the result.',
+      ex:'A court refuses to recognize the legal status of a party or the validity of a right properly established through the chain.'},
+    RCL:{name:'Recognition Collapse',cluster:'Recognition',clCls:'r',weight:0.18,
+      desc:'Subjecthood stripped while enforcement of obligations continues. Civil death. Highest CD weight.',
+      sig:'Subjecthood is stripped from N6 while enforcement of obligations continues. The most severe CT — it forecloses both Recognition (N6) and Repair (N8). The target cannot assert rights but remains bound by duties.',
+      ex:'Stateless persons, individuals declared legally dead while living, entities stripped of legal personality while remaining subject to prosecution.'},
+    CC:{name:'Correlativity Contradiction',cluster:'Recognition',clCls:'r',weight:0.14,
+      desc:"Right claimed without the Hohfeldian correlative duty honored by the obligated party.",
+      sig:"A right is claimed at N7 without the Hohfeldian correlative duty being honored. In Hohfeld's system, every right implies a duty in another party — CC fires when this structural correlation breaks at the legal effect node.",
+      ex:"Asserting a property right without any party bearing the correlative non-interference duty; contract right after the correlative obligation is extinguished."},
+    SE:{name:'Self-Undermining Effect',cluster:'Recognition',clCls:'r',weight:0.10,
+      desc:'Legal effect destabilizes the structural conditions required for its own persistence.',
+      sig:'The legal effect (N7) destabilizes the structural conditions required for its own persistence. SE is the only self-referential CT — the right or duty, when exercised, destroys its own conditions of existence.',
+      ex:"A legal regime whose rights, when exercised, destroy the institutional conditions making those rights possible."},
+    RPF:{name:'Repair Procedure Failure',cluster:'Repair',clCls:'p',weight:0.13,
+      desc:'Remedy structurally available but blocked, inaccessible, or procedurally foreclosed.',
+      sig:'The remedy mechanism (N8) is structurally available but blocked, inaccessible, or procedurally foreclosed. When RPF fires, structural incoherence becomes permanent — the system cannot self-correct.',
+      ex:'Standing doctrine preventing challenge of an unconstitutional law; habeas corpus suspended; immunities blocking all remedial paths.'}
+  };
+
+  var NODE_DATA = {
+    n1:{num:'1',name:'Source of Authority',cluster:'Authority',clCls:'a',
+      bfo:'Realizable Dependent Continuant',
+      closure:'Closes when: (a) the source exists as a valid legal entity, (b) has capacity to issue norms of this type, (c) the issuing act was within scope.',
+      failModes:'Ultra vires action; delegation defects; unconstitutional source; will displacing norm (AI).'},
+    n2:{num:'2',name:'Norm',cluster:'Authority',clCls:'a',
+      bfo:'Specifically Dependent Continuant',
+      closure:"Closes when: the norm is (a) valid, (b) determinate, (c) non-contradictory, (d) applicable, (e) independent of the decision-maker's will.",
+      failModes:'Vagueness (NI); jurisdictional conflict (JC); retroactivity (TC); absorbed into authority (AI); procedural catch-22 (PC).'},
+    n3:{num:'3',name:'Actor in Role',cluster:'Authority',clCls:'a',
+      bfo:'Role (Specifically Dependent Continuant)',
+      closure:'Closes when: (a) the actor is vested through proper conferral from N1, (b) the role is coherent and non-contradictory, (c) the actor has legal capacity.',
+      failModes:'Conferral failure (CF) — no valid vesting; role contradiction (RC3) — incompatible obligations.'},
+    n4:{num:'4',name:'Triggering Facts',cluster:'Effect',clCls:'e',
+      bfo:'Process + Information Artifact',
+      closure:"Closes when: triggering facts (a) exist, (b) are properly established, (c) satisfy the norm's conditions, (d) are temporally aligned with N2.",
+      failModes:'Fact manipulation (FM) — epistemic corruption; temporal contradiction (TC) — retroactive misalignment.'},
+    n5:{num:'5',name:'Legal Act / Omission',cluster:'Effect',clCls:'e',
+      bfo:'Process',
+      closure:'Closes when: the act (a) occurred, (b) satisfies norm conditions, (c) was performed through a valid procedure, (d) is attributable to N3.',
+      failModes:"Procedural contradiction (PC) only — the act cannot be performed through the norm's own procedure."},
+    n6:{num:'6',name:'Target',cluster:'Recognition',clCls:'r',
+      bfo:'Specifically Dependent Continuant',
+      closure:'Closes when: (a) the target exists as a legal subject, (b) has capacity to bear the effect, (c) is properly identified within scope.',
+      failModes:'Jurisdictional conflict (JC) — scope contested; recognition failure (RF) — subjecthood denied; recognition collapse (RCL) — subjecthood stripped.'},
+    n7:{num:'7',name:'Legal Effect',cluster:'Recognition',clCls:'r',
+      bfo:'Realizable Dependent Continuant',
+      closure:"Closes when: the effect (a) properly attaches to N6, (b) has a Hohfeldian correlative duty, (c) doesn't undermine its own conditions, (d) is institutionally recognized.",
+      failModes:'Recognition failure (RF); correlativity contradiction (CC); self-undermining effect (SE). Primary failure node in 67% of reversals.'},
+    n8:{num:'8',name:'Remedy',cluster:'Repair',clCls:'p',
+      bfo:'Process + Realizable Dependent Continuant',
+      closure:'Closes when: a remedy (a) exists, (b) is accessible to the target, (c) can address the structural failure, (d) is not procedurally blocked.',
+      failModes:'Recognition collapse (RCL) — target lacks standing; repair procedure failure (RPF) — remedy mechanically blocked.'}
+  };
+
+  /* ══════════════════════════════════════
+     PAN / ZOOM STATE
+  ══════════════════════════════════════ */
+  var state = { z:0.8, px:0, py:0, dragging:false, lx:0, ly:0 };
+  var canvas = document.getElementById('canvas');
+  var stage  = document.getElementById('stage');
+
+  function applyTx(redraw) {
+    stage.style.transform =
+      'translate('+state.px+'px,'+state.py+'px) scale('+state.z+')';
+    document.getElementById('zoomPct').textContent = Math.round(state.z*100)+'%';
+    if(redraw) run();
+  }
+
+  function fitView() {
+    var cw = canvas.clientWidth, ch = canvas.clientHeight;
+    state.z = Math.min(0.9, (cw - 40) / 1380);
+    state.px = Math.max(20, (cw - 1380 * state.z) / 2);
+    state.py = 24;
+    applyTx(true);
+  }
+  window.fitView = fitView;
+
+  function zoomToward(factor, cx, cy) {
+    var nz = Math.max(0.2, Math.min(3.0, state.z * factor));
+    state.px = cx - (cx - state.px) * (nz / state.z);
+    state.py = cy - (cy - state.py) * (nz / state.z);
+    state.z = nz;
+    applyTx(false);
+  }
+
+  /* Scroll-wheel zoom */
+  canvas.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    var rect = canvas.getBoundingClientRect();
+    zoomToward(
+      e.deltaY < 0 ? 1.1 : 0.9,
+      e.clientX - rect.left,
+      e.clientY - rect.top
+    );
+  }, {passive:false});
+
+  /* Mouse drag pan */
+  canvas.addEventListener('mousedown', function(e) {
+    if(e.target.closest('.ct,.node,button,input,.tb-btn,.dp,.cdp')) return;
+    state.dragging = true;
+    state.lx = e.clientX; state.ly = e.clientY;
+    canvas.classList.add('is-dragging');
+  });
+  document.addEventListener('mousemove', function(e) {
+    if(!state.dragging) return;
+    state.px += e.clientX - state.lx;
+    state.py += e.clientY - state.ly;
+    state.lx = e.clientX; state.ly = e.clientY;
+    applyTx(false);
+  });
+  document.addEventListener('mouseup', function() {
+    state.dragging = false;
+    canvas.classList.remove('is-dragging');
+  });
+
+  /* Touch: pan (1 finger) + pinch (2 fingers) */
+  var tLast = null, tDist = null;
+  canvas.addEventListener('touchstart', function(e) {
+    if(e.touches.length === 1) {
+      tLast = {x:e.touches[0].clientX, y:e.touches[0].clientY};
+      tDist = null;
+    } else if(e.touches.length === 2) {
+      tDist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      tLast = null;
+    }
+  }, {passive:true});
+  canvas.addEventListener('touchmove', function(e) {
+    e.preventDefault();
+    if(e.touches.length === 1 && tLast) {
+      state.px += e.touches[0].clientX - tLast.x;
+      state.py += e.touches[0].clientY - tLast.y;
+      tLast = {x:e.touches[0].clientX, y:e.touches[0].clientY};
+      applyTx(false);
+    } else if(e.touches.length === 2 && tDist) {
+      var d = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      var mx = (e.touches[0].clientX + e.touches[1].clientX)/2;
+      var my = (e.touches[0].clientY + e.touches[1].clientY)/2;
+      var rect = canvas.getBoundingClientRect();
+      zoomToward(d/tDist, mx - rect.left, my - rect.top);
+      tDist = d;
+    }
+  }, {passive:false});
+  canvas.addEventListener('touchend', function(){ tLast=null; tDist=null; });
+
+  /* Toolbar zoom buttons */
+  document.getElementById('zoomIn').addEventListener('click', function(){
+    var cw=canvas.clientWidth, ch=canvas.clientHeight;
+    zoomToward(1.2, cw/2, ch/2);
+  });
+  document.getElementById('zoomOut').addEventListener('click', function(){
+    var cw=canvas.clientWidth, ch=canvas.clientHeight;
+    zoomToward(1/1.2, cw/2, ch/2);
+  });
+  document.getElementById('fitBtn').addEventListener('click', fitView);
+
+  /* Keyboard shortcuts */
+  document.addEventListener('keydown', function(e) {
+    if(e.target.tagName === 'INPUT') return;
+    var cw=canvas.clientWidth, ch=canvas.clientHeight;
+    if(e.key==='+' || e.key==='=') zoomToward(1.15, cw/2, ch/2);
+    else if(e.key==='-')           zoomToward(1/1.15, cw/2, ch/2);
+    else if(e.key==='0')           fitView();
+    else if(e.key==='ArrowLeft')   { state.px+=40; applyTx(false); }
+    else if(e.key==='ArrowRight')  { state.px-=40; applyTx(false); }
+    else if(e.key==='ArrowUp')     { state.py+=40; applyTx(false); }
+    else if(e.key==='ArrowDown')   { state.py-=40; applyTx(false); }
+    else if(e.key==='Escape')      { clearActive(); closeCDP(); }
+  });
+
+  window.addEventListener('resize', function() { run(); });
+
+  /* ══════════════════════════════════════
+     SVG — drawn in natural (unscaled) coords
+     getBoundingClientRect() values are in
+     viewport space; dividing by state.z
+     converts them to poster-layout space.
+  ══════════════════════════════════════ */
+  var pathRegistry = {};
+
+  function rel(el, wrap) {
+    var er = el.getBoundingClientRect(), wr = wrap.getBoundingClientRect();
+    var z = state.z;
+    return {
+      top:   (er.top    - wr.top)  / z,
+      bottom:(er.bottom - wr.top)  / z,
+      left:  (er.left   - wr.left) / z,
+      right: (er.right  - wr.left) / z,
+      cy:    ((er.top  + er.bottom)/2 - wr.top)  / z,
+      cx:    ((er.left + er.right) /2 - wr.left) / z,
+      w:     er.width  / z,
+      h:     er.height / z
+    };
+  }
+
+  function bezier(svg, x1,y1,x2,y2, col, dash, sw, ctId) {
+    var dx = x2-x1;
+    var p = document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('d','M'+x1+' '+y1+' C'+(x1+dx*.5)+' '+y1+','+(x2-dx*.5)+' '+y2+','+x2+' '+y2);
+    p.setAttribute('fill','none');
+    p.setAttribute('stroke',col);
+    p.setAttribute('stroke-width', sw||'1.1');
+    p.setAttribute('opacity','0.5');
+    if(dash) p.setAttribute('stroke-dasharray',dash);
+    if(ctId){ p.setAttribute('data-ct',ctId); if(!pathRegistry[ctId]) pathRegistry[ctId]=[]; pathRegistry[ctId].push(p); }
+    svg.appendChild(p);
+    var c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx',x2); c.setAttribute('cy',y2);
+    c.setAttribute('r','2.5'); c.setAttribute('fill',col); c.setAttribute('opacity','0.65');
+    if(ctId){ c.setAttribute('data-ct',ctId); pathRegistry[ctId].push(c); }
+    svg.appendChild(c);
+  }
+
+  function run() {
+    var diag = document.getElementById('diag');
+    var svg  = document.getElementById('svg');
+    while(svg.firstChild) svg.removeChild(svg.firstChild);
+    pathRegistry = {};
+
+    /* Natural (unscaled) dimensions of the diagram */
+    var dr = diag.getBoundingClientRect();
+    var dw = dr.width  / state.z;
+    var dh = dr.height / state.z;
+    svg.setAttribute('height', dh);
+    svg.setAttribute('viewBox', '0 0 '+dw+' '+dh);
+
+    /* Align right spacer: RF should start at the same vertical position as N6 */
+    var spacer = document.getElementById('rightSpacer');
+    spacer.style.height = '0px';
+    void diag.getBoundingClientRect(); /* force reflow */
+    var n6t = rel(document.getElementById('n6'), diag).top;
+    var rft = rel(document.getElementById('RF'),  diag).top;
+    if(n6t > rft) spacer.style.height = (n6t - rft) + 'px';
+    void diag.getBoundingClientRect(); /* force reflow again */
+
+    function m(id){ return rel(document.getElementById(id), diag); }
+
+    var C = { auth:'#1a468a', eff:'#8a3a08', rec:'#1a6438', rep:'#56188a' };
+
+    bezier(svg, m('CF').right,  m('CF').cy,    m('n1').left, m('n1').cy,    C.auth, null,  null,  'CF');
+    bezier(svg, m('CF').right,  m('CF').cy+3,  m('n3').left, m('n3').cy,    C.auth, '5,3', null,  'CF');
+    bezier(svg, m('AI').right,  m('AI').cy,    m('n1').left, m('n1').cy+4,  C.auth, null,  null,  'AI');
+    bezier(svg, m('AI').right,  m('AI').cy+3,  m('n2').left, m('n2').cy-4,  C.auth, '4,3', null,  'AI');
+    bezier(svg, m('JC').right,  m('JC').cy,    m('n2').left, m('n2').cy+3,  C.auth, null,  null,  'JC');
+    bezier(svg, m('JC').right,  m('JC').cy+4,  m('n6').left, m('n6').cy-4,  C.auth, '6,4', '0.9', 'JC');
+    bezier(svg, m('NI').right,  m('NI').cy,    m('n2').left, m('n2').cy+6,  C.auth, '3,3', null,  'NI');
+    bezier(svg, m('RC3').right, m('RC3').cy,   m('n3').left, m('n3').cy+2,  C.auth, null,  null,  'RC3');
+    bezier(svg, m('FM').right,  m('FM').cy,    m('n4').left, m('n4').cy,    C.eff,  null,  null,  'FM');
+    bezier(svg, m('TC').right,  m('TC').cy,    m('n4').left, m('n4').cy+4,  C.eff,  '5,3', null,  'TC');
+    bezier(svg, m('TC').right,  m('TC').cy-4,  m('n2').left, m('n2').cy+8,  C.eff,  '4,4', '0.9', 'TC');
+    bezier(svg, m('PC').right,  m('PC').cy,    m('n5').left, m('n5').cy,    C.eff,  null,  null,  'PC');
+    bezier(svg, m('PC').right,  m('PC').cy-4,  m('n2').left, m('n2').cy+10, C.eff,  '4,4', '0.9', 'PC');
+    bezier(svg, m('RF').left,   m('RF').cy,    m('n6').right,m('n6').cy,    C.rec,  null,  null,  'RF');
+    bezier(svg, m('RF').left,   m('RF').cy+4,  m('n7').right,m('n7').cy-4,  C.rec,  '4,3', null,  'RF');
+    bezier(svg, m('RCL').left,  m('RCL').cy,   m('n6').right,m('n6').cy+4,  C.rec,  '5,3', null,  'RCL');
+    bezier(svg, m('RCL').left,  m('RCL').cy+4, m('n8').right,m('n8').cy,    C.rep,  '5,3', '0.9', 'RCL');
+    bezier(svg, m('CC').left,   m('CC').cy,    m('n7').right,m('n7').cy,    C.rec,  null,  null,  'CC');
+    bezier(svg, m('SE').left,   m('SE').cy,    m('n7').right,m('n7').cy+5,  C.rec,  '3,3', null,  'SE');
+    bezier(svg, m('RPF').left,  m('RPF').cy,   m('n8').right,m('n8').cy,    C.rep,  null,  null,  'RPF');
+  }
+
+  /* Initial draw after load */
+  window.addEventListener('load', function(){
+    fitView();          /* sets state.z, px, py, calls run() */
+    buildCDGrid();
+    updateCDScore();
+    bindInteractive();
+  });
+
+  /* ══════════════════════════════════════
+     HIGHLIGHT / DIM
+  ══════════════════════════════════════ */
+  var activeId = null, activeType = null;
+
+  function allCTs()   { return Object.keys(CT_NODES); }
+  function allNodes() { return Object.keys(NODE_DATA); }
+  function allSVGEls(){
+    var a=[];
+    allCTs().forEach(function(ct){ if(pathRegistry[ct]) a=a.concat(pathRegistry[ct]); });
+    return a;
+  }
+
+  window.clearActive = function() {
+    allCTs().forEach(function(ct){
+      var el=document.getElementById(ct);
+      if(el) el.classList.remove('ct-active','ct-dim');
+    });
+    allNodes().forEach(function(n){
+      var el=document.getElementById(n);
+      if(el) el.classList.remove('nd-active','nd-dim');
+    });
+    allSVGEls().forEach(function(el){ el.classList.remove('p-hi','p-dim'); });
+    activeId=null; activeType=null;
+    document.getElementById('clearBtn').style.display='none';
+    closeDetail();
+  };
+
+  function activateCT(ctId) {
+    if(activeId===ctId && activeType==='ct'){ clearActive(); return; }
+    clearActive();
+    activeId=ctId; activeType='ct';
+    allCTs().forEach(function(ct){
+      var el=document.getElementById(ct); if(!el) return;
+      el.classList.add(ct===ctId ? 'ct-active' : 'ct-dim');
+    });
+    var conn=CT_NODES[ctId]||[];
+    allNodes().forEach(function(n){
+      var el=document.getElementById(n); if(!el) return;
+      el.classList.add(conn.indexOf(n)>=0 ? 'nd-active' : 'nd-dim');
+    });
+    allCTs().forEach(function(ct){
+      if(!pathRegistry[ct]) return;
+      pathRegistry[ct].forEach(function(el){
+        el.classList.add(ct===ctId ? 'p-hi' : 'p-dim');
+      });
+    });
+    document.getElementById('clearBtn').style.display='';
+    showCTDetail(ctId);
+  }
+
+  function activateNode(nId) {
+    if(activeId===nId && activeType==='node'){ clearActive(); return; }
+    clearActive();
+    activeId=nId; activeType='node';
+    allNodes().forEach(function(n){
+      var el=document.getElementById(n); if(!el) return;
+      el.classList.add(n===nId ? 'nd-active' : 'nd-dim');
+    });
+    var conn=NODE_CTS[nId]||[];
+    allCTs().forEach(function(ct){
+      var el=document.getElementById(ct); if(!el) return;
+      el.classList.add(conn.indexOf(ct)>=0 ? 'ct-active' : 'ct-dim');
+    });
+    allCTs().forEach(function(ct){
+      if(!pathRegistry[ct]) return;
+      pathRegistry[ct].forEach(function(el){
+        el.classList.add(conn.indexOf(ct)>=0 ? 'p-hi' : 'p-dim');
+      });
+    });
+    document.getElementById('clearBtn').style.display='';
+    showNodeDetail(nId);
+  }
+
+  function bindInteractive(){
+    allCTs().forEach(function(id){
+      var el=document.getElementById(id); if(!el) return;
+      el.addEventListener('click',function(e){ e.stopPropagation(); activateCT(id); });
+      el.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); activateCT(id); }});
+    });
+    allNodes().forEach(function(id){
+      var el=document.getElementById(id); if(!el) return;
+      el.addEventListener('click',function(e){ e.stopPropagation(); activateNode(id); });
+      el.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); activateNode(id); }});
+    });
+  }
+
+  /* ══════════════════════════════════════
+     DETAIL PANEL
+  ══════════════════════════════════════ */
+  var clsMap = {
+    a:{color:'var(--auth)',label:'Authority'},
+    e:{color:'var(--eff)', label:'Effect'},
+    r:{color:'var(--rec)', label:'Recognition'},
+    p:{color:'var(--rep)', label:'Repair'}
+  };
+
+  function showCTDetail(ctId){
+    var d=CT_DATA[ctId]; if(!d) return;
+    var cm=clsMap[d.clCls];
+    document.getElementById('dp-tag').textContent = cm.label+' Cluster  ·  Contradiction Type';
+    var ce=document.getElementById('dp-code');
+    ce.textContent=ctId; ce.style.color=cm.color;
+    document.getElementById('dp-name').textContent=d.name;
+    var chips=(CT_NODES[ctId]||[]).map(function(n){
+      var nd=NODE_DATA[n];
+      return '<span class="dp-chip dp-chip-'+nd.clCls+'" onclick="window._dpNode(\''+n+'\')">N'+nd.num+' — '+nd.name+'</span>';
+    }).join('');
+    document.getElementById('dp-body').innerHTML=
+      '<div class="dp-wt">CD Weight: <span class="dp-wt-val">'+d.weight.toFixed(2)+'</span></div>'+
+      '<div class="dp-desc">'+d.desc+'</div>'+
+      '<div class="dp-sec"><div class="dp-sh">Structural Significance</div><p>'+d.sig+'</p></div>'+
+      '<div class="dp-sec"><div class="dp-sh">Canonical Example</div><p>'+d.ex+'</p></div>'+
+      '<div class="dp-sec"><div class="dp-sh">Affected Nodes</div>'+
+        '<div class="dp-chips">'+chips+'</div>'+
+        '<div class="dp-hint">Click a chip to explore that node</div></div>';
+    document.getElementById('detailPanel').classList.add('dp-open');
+  }
+
+  function showNodeDetail(nId){
+    var d=NODE_DATA[nId]; if(!d) return;
+    var cm=clsMap[d.clCls];
+    document.getElementById('dp-tag').textContent = cm.label+' Cluster  ·  Chain Node';
+    var ce=document.getElementById('dp-code');
+    ce.textContent='N'+d.num; ce.style.color=cm.color;
+    document.getElementById('dp-name').textContent=d.name;
+    var chips=(NODE_CTS[nId]||[]).map(function(ct){
+      var ctd=CT_DATA[ct];
+      return '<span class="dp-chip dp-chip-'+ctd.clCls+'" onclick="window._dpCT(\''+ct+'\')">'+ct+' — '+ctd.name+'</span>';
+    }).join('');
+    document.getElementById('dp-body').innerHTML=
+      '<div class="dp-wt" style="flex-direction:column;align-items:start;gap:2px">'+
+        '<span style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">BFO Class</span>'+
+        '<span style="font-family:Inconsolata,monospace;font-size:12px;color:var(--ink2)">'+d.bfo+'</span>'+
+      '</div>'+
+      '<div class="dp-sec" style="margin-top:12px"><div class="dp-sh">What Closure Means</div><p>'+d.closure+'</p></div>'+
+      '<div class="dp-sec"><div class="dp-sh">Failure Modes</div><p>'+d.failModes+'</p></div>'+
+      '<div class="dp-sec"><div class="dp-sh">Vulnerable Contradiction Types</div>'+
+        (chips ? '<div class="dp-chips">'+chips+'</div><div class="dp-hint">Click a chip to explore that CT</div>'
+               : '<p style="font-size:12px;color:var(--muted)">No CTs directly indexed to this node.</p>')+
+      '</div>';
+    document.getElementById('detailPanel').classList.add('dp-open');
+  }
+
+  window._dpNode = function(n){ activateNode(n); };
+  window._dpCT   = function(ct){ activateCT(ct); };
+  window.closeDetail = function(){ document.getElementById('detailPanel').classList.remove('dp-open'); };
+
+  /* ══════════════════════════════════════
+     CD CALCULATOR
+  ══════════════════════════════════════ */
+  var cdChecked={};
+  var CD_LIST=['CF','AI','JC','NI','RC3','FM','TC','PC','RF','RCL','CC','SE','RPF'];
+
+  function buildCDGrid(){
+    var grid=document.getElementById('cdGrid');
+    grid.innerHTML='';
+    CD_LIST.forEach(function(ct){
+      var d=CT_DATA[ct]; if(!d) return;
+      var item=document.createElement('label');
+      item.className='cdp-item';
+      item.innerHTML=
+        '<input type="checkbox" id="cd_'+ct+'" onchange="window.cdToggle(\''+ct+'\')">'+
+        '<div class="cdp-il">'+
+          '<span class="cdp-ic">'+ct+'</span>'+
+          '<span class="cdp-in">'+d.name+'</span>'+
+          '<span class="cdp-iw">w = '+d.weight.toFixed(2)+'</span>'+
+        '</div>';
+      grid.appendChild(item);
+    });
+  }
+  window.cdToggle=function(ct){ cdChecked[ct]=document.getElementById('cd_'+ct).checked; updateCDScore(); };
+  window.cdSelectAll=function(){ CD_LIST.forEach(function(ct){ cdChecked[ct]=true; var cb=document.getElementById('cd_'+ct); if(cb) cb.checked=true; }); updateCDScore(); };
+  window.cdClearAll=function(){  CD_LIST.forEach(function(ct){ cdChecked[ct]=false; var cb=document.getElementById('cd_'+ct); if(cb) cb.checked=false; }); updateCDScore(); };
+
+  function updateCDScore(){
+    var tot=0;
+    CD_LIST.forEach(function(ct){ if(cdChecked[ct]&&CT_DATA[ct]) tot+=CT_DATA[ct].weight; });
+    var sv=document.getElementById('cdScore'), se=document.getElementById('cdSev');
+    sv.textContent=tot.toFixed(2);
+    var sev,col,bg,bd;
+    if(tot<0.2){ sev='Coherent'; col='var(--rec)'; bg='var(--rec-bg)'; bd='var(--rec-bd)'; }
+    else if(tot<0.5){ sev='Stressed'; col='var(--eff)'; bg='var(--eff-bg)'; bd='var(--eff-bd)'; }
+    else if(tot<0.9){ sev='Diseased'; col='#8a0808'; bg='#faeaea'; bd='#d89090'; }
+    else           { sev='Collapsed'; col='#5a0000'; bg='#f5e0e0'; bd='#b87070'; }
+    sv.style.color=col; se.textContent=sev; se.style.color=col; se.style.background=bg; se.style.border='1px solid '+bd;
+  }
+
+  window.toggleCDP=function(){
+    var p=document.getElementById('cdPanel'), b=document.getElementById('cdpBtn');
+    var open=p.classList.toggle('cdp-open');
+    b.classList.toggle('tb-on',open);
+  };
+  window.closeCDP=function(){
+    document.getElementById('cdPanel').classList.remove('cdp-open');
+    document.getElementById('cdpBtn').classList.remove('tb-on');
+  };
+
+})();
+</script>
+</body>
+</html>

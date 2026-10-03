@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use this corpus or ontology, please cite it as below."
+title: "A Structural Ontology of the Law (SOoL): corpus release 2.0.1"
+version: "2.0.1"
+date-released: "2026-10-03"
+type: dataset
+authors:
+  - family-names: Koepsell
+    given-names: David R.
+    affiliation: "SEAL Lab, Texas A&M University"
+license: CC-BY-4.0
+abstract: >-
+  An empirical legal science corpus testing whether Minimal Legal Chain (MLC)
+  node failures cluster structurally across doctrinal domains independently of
+  doctrine content. Release 2.0.1 covers eight domains and carries MLC
+  node closures, contradiction-type annotations under weight profile core-v1,
+  and a BFO-grounded OWL ontology aligned to Legal Ontologies Foundry patterns.
+  Predictive claims made in version 1 are withdrawn; see README.
+keywords:
+  - legal ontology
+  - BFO
+  - applied ontology
+  - Minimal Legal Chain
+  - empirical legal studies

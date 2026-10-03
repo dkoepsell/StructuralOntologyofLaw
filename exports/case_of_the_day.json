@@ -1,0 +1,65 @@
+{
+  "date": "2026-08-05",
+  "generated": "2026-08-05T11:00:18.143506+00:00",
+  "court": "CA5",
+  "case_name": "Fields v. CIR",
+  "cl_url": "https://www.courtlistener.com/docket/73453463/fields-v-cir/",
+  "opinion_excerpt": "Case: 25-60403       Document: 83-1     Page: 1    Date Filed: 07/31/2026\n\n\n\n\n                                REVISED\n\n        United States Court of Appeals\n             for the Fifth Circuit\n                                                                United States Court of Appeals\n                                                                         Fifth Circuit\n\n                                       FILED\n                             ____________\n                                                                    June 8, 2026\n                              No. 25-60403                        Lyle W. Cayce\n                             ____________                              Clerk\n\nEstate of Anne Milner Fields, Deceased, Bryan K. Milner,\nExecutor,\u2026",
+  "annotation": {
+    "case_name": "Estate of Anne Milner Fields v. Commissioner of Internal Revenue",
+    "legal_claim": "The Estate seeks redetermination of an IRS-assessed estate tax deficiency and accuracy-related penalty, arguing that transferred assets were properly excluded from the gross estate under the bona fide sale exception to I.R.C. \u00a7 2036(a).",
+    "claimant": "Estate of Anne Milner Fields, by Executor Bryan K. Milner",
+    "respondent": "Commissioner of Internal Revenue",
+    "nodes": {
+      "1": {
+        "closure": "closed",
+        "entity": "I.R.C. \u00a7 2036, \u00a7 6213(a), \u00a7 7482(a)(1)",
+        "justification": "Statutory authority for estate tax inclusion, Tax Court petition, and appellate jurisdiction is clearly established and undisputed."
+      },
+      "2": {
+        "closure": "closed",
+        "entity": "I.R.C. \u00a7 2036(a) and bona fide sale exception",
+        "justification": "The governing norm\u2014that retained-interest transfers are included in the gross estate unless a bona fide sale for adequate consideration occurred\u2014is clearly articulated and applied."
+      },
+      "3": {
+        "closure": "partial",
+        "entity": "Bryan Milner as agent/executor under POA and will",
+        "justification": "Milner's dual role as agent transferring assets and later as executor filing the return creates an unresolved tension between fiduciary duty to Fields during life and to the Estate after death."
+      },
+      "4": {
+        "closure": "closed",
+        "entity": "Transfers of ~$17 million into AM Fields, LP during Fields's terminal decline",
+        "justification": "The factual record\u2014timing of transfers relative to hospitalizations, heart attack, and hospice\u2014is well documented and largely undisputed."
+      },
+      "5": {
+        "closure": "failed",
+        "entity": "Milner's transfer of assets into AM Fields, LP",
+        "justification": "The Estate failed to establish the transfers were motivated by a legitimate, significant non-tax purpose, undermining the legal act's claim to the bona fide sale exception."
+      },
+      "6": {
+        "closure": "closed",
+        "entity": "Estate's gross estate valuation on tax return",
+        "justification": "The target of the disputed legal act\u2014the reported estate value\u2014is clearly identified as understated by approximately $6 million."
+      },
+      "7": {
+        "closure": "failed",
+        "entity": "Application of \u00a7 2036(a) inclusion and 20% penalty",
+        "justification": "Because the bona fide sale exception was not established and reasonable cause/good faith was not shown, the legal effect (full inclusion plus penalty) attaches against the Estate, defeating the claimed tax treatment."
+      },
+      "8": {
+        "closure": "closed",
+        "entity": "Tax Court's deficiency and penalty determination affirmed",
+        "justification": "The Fifth Circuit affirms the Tax Court's remedy of $1,828,594 deficiency and $270,417 penalty, closing the remedial chain against the Estate."
+      }
+    },
+    "active_contradictions": [
+      "RC3",
+      "FM",
+      "CC"
+    ],
+    "chain_outcome": "protection_denied",
+    "outcome_confidence": "high",
+    "structural_narrative": "The chain fails at N5 and N7 because the Estate could not establish a non-tax purpose for the pre-death transfers, collapsing the bona fide sale exception and triggering full inclusion under \u00a7 2036(a) plus penalty. Milner's overlapping roles as agent and executor (N3) create a latent role contradiction, but the court treats the factual insufficiency as dispositive, resulting in a clean affirmance denying the Estate's claimed tax treatment.",
+    "contradiction_debt": 0.39
+  }
+}

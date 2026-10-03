@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SOoL — SCOTUS Case Browser</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inconsolata:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f6f1e7;--bg2:#ede7d8;--bg3:#e5dece;
+  --ink:#17120a;--ink2:#342b18;--muted:#6b5c3e;
+  --border:#c2a86a;--border2:#ddd0b0;
+  --gold:#7a4e08;--gold2:#5a3806;
+  --auth:#1a468a;--auth-bg:#eef3fa;--auth-bd:#9ab8e0;
+  --eff:#8a3a08;--eff-bg:#faf3ee;--eff-bd:#d8a878;
+  --rec:#1a6438;--rec-bg:#eef7f2;--rec-bd:#88c8a0;
+  --rep:#56188a;--rep-bg:#f5eefa;--rep-bd:#b890d8;
+  --warn:#cc4400;
+  --correct:#1a6438;--correct-bg:#eef7f2;--correct-bd:#88c8a0;
+  --wrong:#cc2200;--wrong-bg:#faf0ee;--wrong-bd:#e0a898;
+  --partial:#7a5008;--partial-bg:#faf7ee;--partial-bd:#d8c878;
+}
+html,body{background:var(--bg);color:var(--ink);font-family:'Cormorant Garamond',serif;min-height:100vh}
+.app{max-width:1100px;margin:0 auto;padding:28px 32px 64px}
+
+/* ── HEADER ─────────────────────────────────────────────────────────────── */
+.header{margin-bottom:18px;padding-bottom:14px;border-bottom:1.5px solid var(--border2)}
+.header-top{display:flex;justify-content:space-between;align-items:flex-start}
+.header h1{font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:var(--ink);letter-spacing:.04em}
+.header h1 em{color:var(--gold);font-style:normal}
+.header p{font-size:12px;font-style:italic;color:var(--muted);margin-top:4px;line-height:1.6}
+.nav-link{font-family:'Inconsolata',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--auth);text-decoration:none;border:1px solid var(--auth-bd);padding:5px 10px;
+  border-radius:2px;background:var(--auth-bg);white-space:nowrap;margin-top:2px;display:inline-block}
+.nav-link:hover{background:var(--auth-bd)}
+.disclaimer{display:inline-flex;align-items:center;gap:6px;font-family:'Inconsolata',monospace;
+  font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--warn);
+  background:rgba(204,68,0,.06);border:1px solid rgba(204,68,0,.2);
+  padding:3px 10px;border-radius:2px;margin-top:8px}
+
+/* ── STAT BAR ────────────────────────────────────────────────────────────── */
+.stat-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.stat-pill{font-family:'Inconsolata',monospace;font-size:9px;letter-spacing:.08em;
+  padding:5px 11px;background:var(--bg2);border:1px solid var(--border2);border-radius:2px;color:var(--muted)}
+.stat-pill strong{color:var(--ink2)}
+.stat-pill.green{background:var(--correct-bg);border-color:var(--correct-bd);color:var(--correct)}
+.stat-pill.red{background:var(--wrong-bg);border-color:var(--wrong-bd);color:var(--wrong)}
+.stat-pill.purple{background:var(--rep-bg);border-color:var(--rep-bd);color:var(--rep)}
+
+/* ── CONTROLS ────────────────────────────────────────────────────────────── */
+.controls{display:flex;flex-direction:column;gap:10px;margin-bottom:18px}
+.controls-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.search-box{flex:1;min-width:220px;position:relative}
+.search-box input{width:100%;background:white;border:1px solid var(--border2);
+  border-radius:3px;padding:7px 12px 7px 30px;font-family:'Cormorant Garamond',serif;
+  font-size:13px;color:var(--ink);outline:none}
+.search-box input:focus{border-color:var(--border)}
+.search-icon{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:11px}
+.filter-label{font-family:'Inconsolata',monospace;font-size:8.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.pill-btn{font-family:'Inconsolata',monospace;font-size:8.5px;letter-spacing:.08em;
+  text-transform:uppercase;padding:5px 10px;border:1px solid var(--border2);
+  border-radius:2px;background:white;color:var(--muted);cursor:pointer;white-space:nowrap}
+.pill-btn:hover{border-color:var(--border)}
+.pill-btn.active{background:var(--bg3);border-color:var(--border);color:var(--gold2);font-weight:600}
+.pill-btn.correct-active{background:var(--correct-bg);border-color:var(--correct-bd);color:var(--correct)}
+.pill-btn.wrong-active{background:var(--wrong-bg);border-color:var(--wrong-bd);color:var(--wrong)}
+.pill-btn.dissent-active{background:var(--rep-bg);border-color:var(--rep-bd);color:var(--rep)}
+.result-count{font-family:'Inconsolata',monospace;font-size:9px;color:var(--muted);margin-left:auto}
+
+/* ── CASE LIST ───────────────────────────────────────────────────────────── */
+.case-list{display:flex;flex-direction:column;gap:8px}
+
+/* ── CASE CARD ───────────────────────────────────────────────────────────── */
+.case-card{background:white;border:1px solid var(--border2);border-radius:4px;
+  padding:14px 16px;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.case-card:hover{border-color:var(--border);box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.case-card.expanded{border-color:var(--gold);box-shadow:0 2px 12px rgba(122,78,8,.12)}
+
+.card-top{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.term-badge{font-family:'Inconsolata',monospace;font-size:8px;font-weight:700;
+  letter-spacing:.08em;padding:2px 7px;background:var(--bg2);border:1px solid var(--border2);
+  border-radius:10px;color:var(--gold2)}
+.correct-badge{font-family:'Inconsolata',monospace;font-size:8px;font-weight:700;
+  letter-spacing:.06em;padding:2px 8px;border-radius:10px}
+.correct-badge.correct{background:var(--correct-bg);border:1px solid var(--correct-bd);color:var(--correct)}
+.correct-badge.wrong{background:var(--wrong-bg);border:1px solid var(--wrong-bd);color:var(--wrong)}
+.correct-badge.unknown{background:var(--bg2);border:1px solid var(--border2);color:var(--muted)}
+.conf-badge{font-family:'Inconsolata',monospace;font-size:7.5px;letter-spacing:.06em;
+  padding:2px 7px;border-radius:10px}
+.conf-badge.high{background:#faf8ee;border:1px solid #d8c878;color:#7a5008}
+.conf-badge.medium{background:var(--bg2);border:1px solid var(--border2);color:var(--muted)}
+.conf-badge.low{background:var(--wrong-bg);border:1px solid var(--wrong-bd);color:var(--wrong)}
+.dissent-badge{font-family:'Inconsolata',monospace;font-size:7.5px;letter-spacing:.06em;
+  padding:2px 7px;border-radius:10px;background:var(--rep-bg);
+  border:1px solid var(--rep-bd);color:var(--rep);margin-left:auto}
+
+.case-name{font-family:'Cinzel',serif;font-size:14px;font-weight:700;color:var(--ink);
+  line-height:1.3;margin-bottom:4px}
+.case-meta{font-family:'Inconsolata',monospace;font-size:9px;color:var(--muted);margin-bottom:10px}
+.case-meta span{margin-right:12px}
+
+.card-mid{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.cd-label{font-family:'Inconsolata',monospace;font-size:8px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted);width:18px}
+.cd-bar-wrap{flex:1;min-width:80px;max-width:180px;height:5px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.cd-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--rec),var(--eff))}
+.cd-val{font-family:'Inconsolata',monospace;font-size:10px;color:var(--gold2);min-width:36px}
+.ct-chips{display:flex;gap:4px;flex-wrap:wrap}
+.ct-chip{font-family:'Inconsolata',monospace;font-size:8px;font-weight:700;
+  padding:2px 6px;border-radius:2px;letter-spacing:.04em}
+
+.card-outcome{display:flex;align-items:center;gap:6px;margin-bottom:6px;font-size:12px}
+.outcome-label{font-family:'Inconsolata',monospace;font-size:8.5px;
+  text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.outcome-val{font-family:'Inconsolata',monospace;font-size:9px;font-weight:600;
+  padding:2px 8px;border-radius:2px}
+.outcome-val.granted{background:var(--correct-bg);color:var(--correct)}
+.outcome-val.denied{background:var(--wrong-bg);color:var(--wrong)}
+.outcome-val.partial{background:var(--partial-bg);color:var(--partial)}
+.outcome-val.unknown{background:var(--bg2);color:var(--muted)}
+.arrow{color:var(--border);font-size:10px}
+
+.card-narrative{font-size:12px;font-style:italic;color:var(--muted);
+  line-height:1.6;border-left:2px solid var(--border2);padding-left:10px}
+
+/* ── DETAIL PANEL ────────────────────────────────────────────────────────── */
+.detail-panel{background:var(--bg2);border-top:1px dashed var(--border2);
+  padding:18px 16px 14px;margin-top:12px}
+
+.dp-section-title{font-family:'Cinzel',serif;font-size:8.5px;font-weight:700;
+  letter-spacing:.22em;text-transform:uppercase;color:var(--gold2);
+  margin-bottom:8px;padding-bottom:3px;border-bottom:1px solid var(--border2)}
+.dp-section{margin-bottom:16px}
+
+.node-grid{display:flex;gap:5px;flex-wrap:wrap}
+.node-box{font-family:'Inconsolata',monospace;font-size:8px;font-weight:700;
+  padding:4px 7px;border-radius:2px;border:1px solid transparent;text-align:center;min-width:52px}
+.node-box.closed{background:var(--correct-bg);border-color:var(--correct-bd);color:var(--correct)}
+.node-box.partial{background:var(--partial-bg);border-color:var(--partial-bd);color:var(--partial)}
+.node-box.failed{background:var(--wrong-bg);border-color:var(--wrong-bd);color:var(--wrong)}
+.node-box.indeterminate{background:var(--bg3);border-color:var(--border2);color:var(--muted)}
+.node-name{font-weight:400;font-size:7px;display:block;margin-top:1px}
+
+.dp-text{font-size:12px;font-style:italic;color:var(--ink2);line-height:1.7}
+.dp-text.adv{font-size:11.5px;color:var(--muted)}
+
+.adv-strength{font-family:'Inconsolata',monospace;font-size:9px;color:var(--ink2);
+  background:var(--bg3);border:1px solid var(--border2);padding:3px 8px;
+  border-radius:2px;display:inline-block;margin-bottom:6px}
+
+/* ── DISSENT SECTION ─────────────────────────────────────────────────────── */
+.dissent-section{background:var(--rep-bg);border:1px solid var(--rep-bd);
+  border-radius:3px;padding:12px 14px}
+.dissent-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.dissent-icon{font-size:14px}
+.dissent-title{font-family:'Cinzel',serif;font-size:9px;font-weight:700;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--rep)}
+.dissent-author-name{font-family:'Inconsolata',monospace;font-size:10px;color:var(--rep);
+  font-weight:600;margin-left:auto}
+
+.cd-compare{margin-bottom:10px}
+.cd-compare-row{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.cd-compare-label{font-family:'Inconsolata',monospace;font-size:8px;color:var(--muted);width:62px}
+.cd-compare-bar{flex:1;height:5px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.cd-compare-fill-maj{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--rec),var(--eff))}
+.cd-compare-fill-dis{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--rep),#cc44aa)}
+.cd-compare-val{font-family:'Inconsolata',monospace;font-size:9px;color:var(--ink2);min-width:36px}
+
+.divergence-row{display:flex;align-items:center;gap:6px;margin-top:8px}
+.divergence-label{font-family:'Inconsolata',monospace;font-size:8px;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.divergence-val{font-family:'Inconsolata',monospace;font-size:11px;color:var(--rep);font-weight:700}
+.divergence-interp{font-size:11px;font-style:italic;color:var(--muted)}
+
+/* ── EMPTY / LOADING ─────────────────────────────────────────────────────── */
+.empty-state{text-align:center;padding:48px 24px;color:var(--muted);
+  font-style:italic;font-size:14px}
+.loading{text-align:center;padding:48px;font-family:'Inconsolata',monospace;
+  font-size:11px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+
+/* ── FOOTER ──────────────────────────────────────────────────────────────── */
+.footer-note{text-align:center;font-family:'Inconsolata',monospace;font-size:8.5px;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+  padding-top:18px;border-top:1px solid var(--border2);margin-top:32px}
+.footer-note em{color:var(--warn);font-style:normal}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <h1>SOoL <em>SCOTUS</em> Case Browser</h1>
+        <p>Per-case structural annotation via SOoL Minimum Legal Chain · oral argument transcripts · 2005–present</p>
+        <div class="disclaimer">⚠ Structural description only — not an outcome predictor at SCOTUS tier</div>
+      </div>
+      <a href="scotus_profile.html" class="nav-link">↗ Domain Profile View</a>
+    </div>
+  </div>
+
+  <!-- STAT BAR -->
+  <div class="stat-bar" id="statBar">
+    <div class="stat-pill loading-pill">Loading…</div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <div class="controls-row">
+      <div class="search-box">
+        <span class="search-icon">🔎</span>
+        <input type="text" id="searchInput" placeholder="Search case name or docket…" oninput="applyFilters()">
+      </div>
+      <span class="filter-label">Sort:</span>
+      <button class="pill-btn active" id="sortTerm" onclick="setSort('term')">Term ↓</button>
+      <button class="pill-btn" id="sortCd" onclick="setSort('cd')">CD ↓</button>
+      <button class="pill-btn" id="sortName" onclick="setSort('name')">A–Z</button>
+      <div class="result-count" id="resultCount"></div>
+    </div>
+    <div class="controls-row" id="termFilters">
+      <span class="filter-label">Term:</span>
+      <!-- populated dynamically -->
+    </div>
+    <div class="controls-row">
+      <span class="filter-label">Outcome:</span>
+      <button class="pill-btn active" id="fAll" onclick="setOutcome('all')">All</button>
+      <button class="pill-btn" id="fCorrect" onclick="setOutcome('correct')">✓ Correct</button>
+      <button class="pill-btn" id="fWrong" onclick="setOutcome('wrong')">✗ Wrong</button>
+      <button class="pill-btn" id="fUnknown" onclick="setOutcome('unknown')">— No outcome</button>
+      <span class="filter-label" style="margin-left:12px">Dissent:</span>
+      <button class="pill-btn active" id="fdAll" onclick="setDissent('all')">All</button>
+      <button class="pill-btn" id="fdWith" onclick="setDissent('with')">With dissent</button>
+      <button class="pill-btn" id="fdWithout" onclick="setDissent('without')">No dissent</button>
+    </div>
+  </div>
+
+  <!-- CASE LIST -->
+  <div id="caseList"><div class="loading">Loading case data…</div></div>
+
+  <div class="footer-note">
+    SOoL · SEAL Lab · Texas A&M University ·
+    <em>CD scores derived from oral argument transcripts — structural description only</em>
+  </div>
+
+</div>
+
+<script>
+// ── CT METADATA ─────────────────────────────────────────────────────────────
+const CT_META = {
+  CF:  {name:"Conferral Failure",             col:"#1a468a", bg:"#eef3fa"},
+  AI:  {name:"Authority Inflation",           col:"#1a468a", bg:"#eef3fa"},
+  JC:  {name:"Jurisdictional Contradiction",  col:"#5a1a8a", bg:"#f5eefa"},
+  NI:  {name:"Norm Indeterminacy",            col:"#8a3a08", bg:"#faf3ee"},
+  RF:  {name:"Recognition Failure",           col:"#1a6438", bg:"#eef7f2"},
+  RC3: {name:"Role Contradiction",            col:"#7a4e08", bg:"#faf8ee"},
+  PC:  {name:"Procedural Contradiction",      col:"#8a3a08", bg:"#faf3ee"},
+  TC:  {name:"Temporal Contradiction",        col:"#5a1a8a", bg:"#f5eefa"},
+  FM:  {name:"Fact Manipulation",             col:"#8a3a08", bg:"#faf3ee"},
+  RCL: {name:"Recognition Collapse",          col:"#cc2200", bg:"#faf0ee"},
+  CC:  {name:"Correlativity Contradiction",   col:"#1a6438", bg:"#eef7f2"},
+  SE:  {name:"Self-Undermining Effect",       col:"#5a1a8a", bg:"#f5eefa"},
+  RPF: {name:"Repair Procedure Failure",      col:"#56188a", bg:"#f5eefa"},
+};
+const NODE_LABELS = {N1:"Authority",N2:"Norm",N3:"Actor",N4:"Trig. Facts",
+                     N5:"Legal Act",N6:"Target",N7:"Effect",N8:"Remedy"};
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+let ALL_CASES = [];
+let sortMode = 'term';
+let filterOutcome = 'all';
+let filterDissent = 'all';
+let filterTerm = 'all';
+let expandedDocket = null;
+
+// ── LOAD ─────────────────────────────────────────────────────────────────────
+async function loadData() {
+  try {
+    const r = await fetch('scotus_backtest_results.json');
+    if (!r.ok) throw new Error('not found');
+    const data = await r.json();
+    ALL_CASES = data.all_cases || data.cases || [];
+    if (!ALL_CASES.length) throw new Error('empty');
+  } catch(e) {
+    document.getElementById('caseList').innerHTML =
+      '<div class="empty-state">Could not load scotus_backtest_results.json.<br>Run: python3 backtest_scotus.py --export</div>';
+    return;
+  }
+  buildTermFilters();
+  renderStats();
+  applyFilters();
+}
+
+// ── TERM FILTER BUTTONS ───────────────────────────────────────────────────────
+function buildTermFilters() {
+  const terms = [...new Set(ALL_CASES.map(c => c.term).filter(Boolean))].sort((a,b) => b - a);
+  const row = document.getElementById('termFilters');
+  row.innerHTML = '<span class="filter-label">Term:</span>';
+  const allBtn = document.createElement('button');
+  allBtn.className = 'pill-btn active'; allBtn.id = 'ftAll';
+  allBtn.textContent = 'All terms';
+  allBtn.onclick = () => setTerm('all');
+  row.appendChild(allBtn);
+  for (const t of terms) {
+    const btn = document.createElement('button');
+    btn.className = 'pill-btn'; btn.id = `ft${t}`;
+    btn.textContent = t;
+    btn.onclick = () => setTerm(t);
+    row.appendChild(btn);
+  }
+}
+
+// ── STAT BAR ─────────────────────────────────────────────────────────────────
+function renderStats() {
+  const n = ALL_CASES.length;
+  const withOutcome = ALL_CASES.filter(c => c.correct !== null).length;
+  const correct = ALL_CASES.filter(c => c.correct === true).length;
+  const wrong = ALL_CASES.filter(c => c.correct === false).length;
+  const withDissent = ALL_CASES.filter(c => c.dissent_cd !== null && c.dissent_cd !== undefined).length;
+  const acc = withOutcome ? (correct / withOutcome * 100).toFixed(1) : '—';
+  const meanCd = (ALL_CASES.reduce((s,c) => s + (c.cd||0), 0) / n).toFixed(3);
+  document.getElementById('statBar').innerHTML = `
+    <div class="stat-pill"><strong>${n}</strong> annotated cases</div>
+    <div class="stat-pill"><strong>${withOutcome}</strong> with known outcomes</div>
+    <div class="stat-pill green"><strong>${correct} / ${withOutcome}</strong> correct predictions (${acc}%)</div>
+    <div class="stat-pill red"><strong>${wrong}</strong> wrong predictions</div>
+    <div class="stat-pill">Mean CD <strong>${meanCd}</strong></div>
+    ${withDissent ? `<div class="stat-pill purple"><strong>${withDissent}</strong> with dissent analysis</div>` : ''}
+  `;
+}
+
+// ── FILTER + SORT ─────────────────────────────────────────────────────────────
+function setSort(mode) {
+  sortMode = mode;
+  ['Term','Cd','Name'].forEach(s => document.getElementById('sort'+s).classList.remove('active'));
+  document.getElementById('sort' + mode.charAt(0).toUpperCase() + mode.slice(1)).classList.add('active');
+  applyFilters();
+}
+
+function setOutcome(mode) {
+  filterOutcome = mode;
+  ['All','Correct','Wrong','Unknown'].forEach(s => {
+    const el = document.getElementById('f'+s);
+    if (el) { el.classList.remove('active','correct-active','wrong-active'); }
+  });
+  const map = {all:'active', correct:'correct-active', wrong:'wrong-active', unknown:'active'};
+  const el = document.getElementById('f' + mode.charAt(0).toUpperCase() + mode.slice(1));
+  if (el) el.classList.add(map[mode] || 'active');
+  applyFilters();
+}
+
+function setDissent(mode) {
+  filterDissent = mode;
+  ['All','With','Without'].forEach(s => {
+    const el = document.getElementById('fd'+s);
+    if (el) el.classList.remove('active','dissent-active');
+  });
+  const el = document.getElementById('fd' + mode.charAt(0).toUpperCase() + mode.slice(1));
+  if (el) el.classList.add(mode === 'with' ? 'dissent-active' : 'active');
+  applyFilters();
+}
+
+function setTerm(term) {
+  filterTerm = term;
+  document.querySelectorAll('[id^="ft"]').forEach(b => b.classList.remove('active'));
+  const el = document.getElementById(term === 'all' ? 'ftAll' : `ft${term}`);
+  if (el) el.classList.add('active');
+  applyFilters();
+}
+
+function getFiltered() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  return ALL_CASES.filter(c => {
+    if (q && !`${c.case_name||''} ${c.docket||''}`.toLowerCase().includes(q)) return false;
+    if (filterTerm !== 'all' && c.term !== filterTerm) return false;
+    if (filterOutcome === 'correct' && c.correct !== true) return false;
+    if (filterOutcome === 'wrong' && c.correct !== false) return false;
+    if (filterOutcome === 'unknown' && c.correct !== null) return false;
+    const hasDissent = c.dissent_cd !== null && c.dissent_cd !== undefined;
+    if (filterDissent === 'with' && !hasDissent) return false;
+    if (filterDissent === 'without' && hasDissent) return false;
+    return true;
+  }).sort((a, b) => {
+    if (sortMode === 'term') return ((b.term||0) - (a.term||0)) || (a.argument_date||'').localeCompare(b.argument_date||'');
+    if (sortMode === 'cd') return (b.cd||0) - (a.cd||0);
+    if (sortMode === 'name') return (a.case_name||'').localeCompare(b.case_name||'');
+    return 0;
+  });
+}
+
+function applyFilters() {
+  const filtered = getFiltered();
+  document.getElementById('resultCount').textContent = `${filtered.length} cases`;
+  renderList(filtered);
+}
+
+// ── RENDER LIST ───────────────────────────────────────────────────────────────
+function renderList(cases) {
+  const el = document.getElementById('caseList');
+  if (!cases.length) {
+    el.innerHTML = '<div class="empty-state">No cases match the current filters.</div>';
+    return;
+  }
+  el.innerHTML = '';
+  for (const c of cases) el.appendChild(makeCard(c));
+}
+
+// ── CASE CARD ─────────────────────────────────────────────────────────────────
+function outcomeVal(v) {
+  if (!v) return {cls:'unknown', label:'Unknown'};
+  if (v === 'protection_granted') return {cls:'granted', label:'Granted'};
+  if (v === 'protection_denied')  return {cls:'denied',  label:'Denied'};
+  if (v.includes('partial'))      return {cls:'partial', label:'Partial'};
+  return {cls:'unknown', label: v.replace(/_/g,' ')};
+}
+
+function makeCTChips(cts) {
+  return (cts||[]).map(ct => {
+    const m = CT_META[ct] || {col:'#7a4e08', bg:'#faf8ee'};
+    return `<span class="ct-chip" title="${(CT_META[ct]||{}).name||ct}"
+      style="background:${m.bg};color:${m.col};border:1px solid ${m.col}40">${ct}</span>`;
+  }).join('');
+}
+
+function makeCard(c) {
+  const div = document.createElement('div');
+  div.className = 'case-card' + (expandedDocket === c.docket ? ' expanded' : '');
+  div.setAttribute('data-docket', c.docket);
+  div.onclick = () => toggleDetail(c.docket);
+
+  const hasDissent = c.dissent_cd !== null && c.dissent_cd !== undefined;
+  const cdPct = Math.min((c.cd||0) / 0.5 * 100, 100).toFixed(1);
+
+  const correctCls = c.correct === true ? 'correct' : c.correct === false ? 'wrong' : 'unknown';
+  const correctLabel = c.correct === true ? '✓ Correct' : c.correct === false ? '✗ Wrong' : '— Outcome unknown';
+  const confCls = c.confidence || 'medium';
+  const pred = outcomeVal(c.predicted);
+  const actual = outcomeVal(c.actual);
+
+  const argDate = c.argument_date ? c.argument_date.slice(0,10) : '—';
+  const decDate = c.decision_date ? c.decision_date.slice(0,10) : '—';
+
+  const narrative = (c.narrative||'').substring(0,180) + ((c.narrative||'').length > 180 ? '…' : '');
+
+  div.innerHTML = `
+    <div class="card-top">
+      ${c.term ? `<span class="term-badge">Term ${c.term}</span>` : ''}
+      <span class="correct-badge ${correctCls}">${correctLabel}</span>
+      <span class="conf-badge ${confCls}">${confCls} conf.</span>
+      ${hasDissent ? '<span class="dissent-badge">⚖ Dissent</span>' : ''}
+    </div>
+    <div class="case-name">${c.case_name || c.docket}</div>
+    <div class="case-meta">
+      <span>${c.docket || '—'}</span>
+      <span>Argued ${argDate}</span>
+      ${c.decision_date ? `<span>Decided ${decDate}</span>` : ''}
+    </div>
+    <div class="card-mid">
+      <div class="cd-label">CD</div>
+      <div class="cd-bar-wrap"><div class="cd-bar-fill" style="width:${cdPct}%"></div></div>
+      <div class="cd-val">${(c.cd||0).toFixed(3)}</div>
+      <div class="ct-chips">${makeCTChips(c.cts)}</div>
+    </div>
+    <div class="card-outcome">
+      <span class="outcome-label">Predicted</span>
+      <span class="outcome-val ${pred.cls}">${pred.label}</span>
+      ${c.actual ? `<span class="arrow">→</span>
+        <span class="outcome-label">Actual</span>
+        <span class="outcome-val ${actual.cls}">${actual.label}</span>` : ''}
+    </div>
+    ${narrative ? `<div class="card-narrative">${narrative}</div>` : ''}
+    ${expandedDocket === c.docket ? makeDetail(c) : ''}
+  `;
+  return div;
+}
+
+// ── DETAIL PANEL ──────────────────────────────────────────────────────────────
+function makeDetail(c) {
+  const hasDissent = c.dissent_cd !== null && c.dissent_cd !== undefined;
+  const maxCd = Math.max(c.cd||0, c.dissent_cd||0, 0.5);
+  const majPct  = Math.min(((c.cd||0)  / maxCd) * 100, 100).toFixed(1);
+  const disPct  = Math.min(((c.dissent_cd||0) / maxCd) * 100, 100).toFixed(1);
+
+  const nodeBoxes = Object.entries(c.nodes||{}).map(([n, closure]) => {
+    const cls = closure || 'indeterminate';
+    const label = NODE_LABELS[n] || n;
+    return `<div class="node-box ${cls}"><span>${n}</span><span class="node-name">${label}</span></div>`;
+  }).join('');
+
+  const advStr = c.adv_strength != null ? c.adv_strength.toFixed(3) : '—';
+
+  let dissentHtml = '';
+  if (hasDissent) {
+    const div0 = (c.cd_divergence||0).toFixed(3);
+    const divInterp = c.cd_divergence > 0.15 ? 'strong structural disagreement' :
+                      c.cd_divergence > 0.07 ? 'moderate structural divergence' :
+                      'minor structural divergence';
+    dissentHtml = `
+      <div class="dp-section">
+        <div class="dp-section-title">⚖ Dissent Analysis</div>
+        <div class="dissent-section">
+          <div class="dissent-header">
+            <span class="dissent-icon">⚖</span>
+            <span class="dissent-title">Dissenting Opinion</span>
+            ${c.dissent_author ? `<span class="dissent-author-name">${c.dissent_author}</span>` : ''}
+          </div>
+          <div class="cd-compare">
+            <div class="cd-compare-row">
+              <span class="cd-compare-label">Majority CD</span>
+              <div class="cd-compare-bar"><div class="cd-compare-fill-maj" style="width:${majPct}%"></div></div>
+              <span class="cd-compare-val">${(c.cd||0).toFixed(3)}</span>
+            </div>
+            <div class="cd-compare-row">
+              <span class="cd-compare-label">Dissent CD</span>
+              <div class="cd-compare-bar"><div class="cd-compare-fill-dis" style="width:${disPct}%"></div></div>
+              <span class="cd-compare-val">${(c.dissent_cd||0).toFixed(3)}</span>
+            </div>
+          </div>
+          ${(c.dissent_cts||[]).length ? `
+          <div style="margin-bottom:8px">
+            <div style="font-family:'Inconsolata',monospace;font-size:8px;letter-spacing:.1em;
+              text-transform:uppercase;color:var(--muted);margin-bottom:4px">Dissent CTs</div>
+            <div class="ct-chips">${makeCTChips(c.dissent_cts)}</div>
+          </div>` : ''}
+          <div class="divergence-row">
+            <span class="divergence-label">Divergence</span>
+            <span class="divergence-val">${div0}</span>
+            <span class="divergence-interp">— ${divInterp}</span>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  return `
+    <div class="detail-panel" onclick="event.stopPropagation()">
+      <div class="dp-section">
+        <div class="dp-section-title">Node Closures</div>
+        <div class="node-grid">${nodeBoxes}</div>
+      </div>
+      ${c.narrative ? `
+      <div class="dp-section">
+        <div class="dp-section-title">Structural Narrative</div>
+        <p class="dp-text">${c.narrative}</p>
+      </div>` : ''}
+      ${c.adv_notes ? `
+      <div class="dp-section">
+        <div class="dp-section-title">Adversarial Assessment
+          <span class="adv-strength" style="float:right">strength ${advStr}</span>
+        </div>
+        <p class="dp-text adv">${c.adv_notes}</p>
+      </div>` : ''}
+      ${dissentHtml}
+    </div>`;
+}
+
+// ── TOGGLE DETAIL ─────────────────────────────────────────────────────────────
+function toggleDetail(docket) {
+  expandedDocket = (expandedDocket === docket) ? null : docket;
+  applyFilters();
+  if (expandedDocket) {
+    requestAnimationFrame(() => {
+      const card = document.querySelector(`.case-card[data-docket="${CSS.escape(docket)}"]`);
+      if (card) card.scrollIntoView({behavior:'smooth', block:'nearest'});
+    });
+  }
+}
+
+loadData();
+</script>
+</body>
+</html>
