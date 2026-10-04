@@ -62,22 +62,47 @@ NODE_NAMES = {
     8: "Remedy",
 }
 
-# Contradiction type → sool: class mapping
-CT_CLASSES = {
-    'CF':  'ConferralFailure',
-    'AI':  'AuthorityInflation',
-    'JC':  'JurisdictionalContradiction',
-    'RC3': 'RoleContradictionTriad',
-    'PC':  'ProceduralContradiction',
-    'TC':  'TemporalContradiction',
-    'FM':  'FactManipulation',
-    'NI':  'NormIndeterminacy',
-    'RF':  'RecognitionFailure',
-    'RCL': 'RecognitionCollapse',
-    'CC':  'CorrelativityContradiction',
-    'SE':  'SovereigntyException',
-    'RPF': 'RepairProcedureFailure',
-}
+# Contradiction type → sool: class mapping, loaded from the registry.
+#
+# This was a hand-typed dict until 2026-10-03, and two of its thirteen values named
+# classes that exist in no TTL: 'RC3' emitted sool:RoleContradictionTriad (the ontology
+# has sool:RoleContradiction) and 'SE' emitted sool:SovereigntyException (the ontology
+# has sool:SelfUnderminingEffect, a different concept). Both were written into every
+# published graph as sool:hasContradictionType objects, so sool_corpus.ttl and
+# sool_criminal.ttl carried dangling IRIs on every nightly export.
+#
+# Reading the registry makes that class of error unrepresentable: the local names come
+# from the same parse of the ontology of record that produced vocab/registry.json.
+# Deprecated codes are accepted so stored rows keyed on 'AINF' still resolve after the
+# AI -> AINF rename (amendment A2).
+def _load_ct_classes():
+    import json
+    from pathlib import Path
+
+    path = Path(__file__).resolve().parent / "vocab" / "registry.json"
+    try:
+        reg = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as e:
+        sys.exit(
+            f"*** ABORT: cannot load {path}: {e}\n"
+            f"*** Run: python3 build_registry.py\n"
+            f"*** Refusing to export with a guessed type vocabulary."
+        )
+
+    out = {}
+    for code, entry in reg["types"].items():
+        local = (entry.get("iri_operational") or "").split(":")[-1].split("#")[-1]
+        if not local:
+            sys.exit(f"*** ABORT: registry entry {code} has no usable IRI")
+        out[code] = local
+        for dep in entry.get("deprecatedCodes") or []:
+            out.setdefault(dep, local)
+    if len(out) < 13:
+        sys.exit(f"*** ABORT: registry yielded only {len(out)} contradiction codes")
+    return out
+
+
+CT_CLASSES = _load_ct_classes()
 
 # Criminal category → crim: class mapping
 CRIM_CATEGORY_CLASSES = {
@@ -108,7 +133,7 @@ CIVIL_DOMAIN_CLASSES = {
 DEFENSE_CLASSES = {
     'justification': 'Justification',
     'excuse':        'Excuse',
-    'procedural':    'ProceduraliBarDefense',
+    'procedural':    'ProceduralBarDefense',
     'capacity':      'Excuse',
     'proof':         'CriminalDefense',
 }
@@ -168,8 +193,7 @@ def export_civil(ann_db: str, out_path: str) -> int:
                a.node7_closure, a.node8_closure,
                a.active_contradictions, a.confidence,
                NULL as primary_ct, a.outcome_notes
-        FROM annotations a
-        WHERE a.confidence IN ('high','medium')
+        FROM scope_highconf a
         ORDER BY a.domain_id, a.case_id
     """).fetchall()
     print(f"Exporting {len(rows):,} civil cases to RDF...")

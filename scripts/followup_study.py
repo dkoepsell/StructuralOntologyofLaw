@@ -516,7 +516,7 @@ def run_study_b(annotations_db_path, corpus_dir, results_db):
     log.info(f"With opinion text available: {texts_available}")
 
     cc_weights = {
-        "CF":0.15,"AI":0.12,"JC":0.10,"RC3":0.14,"PC":0.09,"TC":0.08,
+        "CF":0.15,"AINF":0.12,"JC":0.10,"RC3":0.14,"PC":0.09,"TC":0.08,
         "FM":0.11,"NI":0.07,"RF":0.11,"RCL":0.18,"CC":0.14,"SE":0.10,"RPF":0.13
     }
 
@@ -895,7 +895,7 @@ def export_turtle_standalone(annotations_db_path, output_dir="./turtle_export"):
 
 """
     CT_NAMES = {
-        "CF":"ConferralFailure","AI":"AuthorityInflation",
+        "CF":"ConferralFailure","AINF":"AuthorityInflation",
         "JC":"JurisdictionalContradiction","RC3":"RoleContradiction",
         "PC":"ProceduralContradiction","TC":"TemporalContradiction",
         "FM":"FactManipulation","NI":"NormIndeterminacy",

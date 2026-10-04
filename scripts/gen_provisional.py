@@ -20,7 +20,7 @@ START = "<!--PROVISIONAL-FINDINGS-START-->"
 END   = "<!--PROVISIONAL-FINDINGS-END-->"
 V2 = "claude-pipeline-v2"
 
-CT = ["CF","AI","JC","RC3","PC","TC","FM","NI","RF","RCL","CC","SE","RPF"]
+CT = ["CF","AINF","JC","RC3","PC","TC","FM","NI","RF","RCL","CC","SE","RPF"]
 # Type labels are READ FROM THE ONTOLOGY, never retyped here.
 #
 # They used to be a hand-written dict, and it drifted: AI was labelled "Authority
@@ -334,10 +334,10 @@ for st_ in sorted({r["node2_closure"] for r in rows if r["node2_closure"]}):
 # rather than as a table of domain differences.
 AI_HIT = None
 _AI_DOM = 3
-if "AI" not in FORCED and _AI_DOM in doms:
+if "AINF" not in FORCED and _AI_DOM in doms:
     _in = [r for r in rows if r["domain_id"] == _AI_DOM]
     _out = [r for r in rows if r["domain_id"] != _AI_DOM]
-    _ki = sum(1 for r in _in if "AI" in r["cts"]); _ko = sum(1 for r in _out if "AI" in r["cts"])
+    _ki = sum(1 for r in _in if "AINF" in r["cts"]); _ko = sum(1 for r in _out if "AINF" in r["cts"])
     if _ki and _ko and len(_in) and len(_out):
         _p_in, _p_out = _ki/len(_in), _ko/len(_out)
         _c2, _p, _, _ = st.chi2_contingency([[_ki, len(_in)-_ki], [_ko, len(_out)-_ko]])
@@ -775,7 +775,7 @@ if AI_HIT:
       f'advance, and it landed.</strong> Authority Inflation is the contradiction the ontology treats '
       f'as master: a legal act that claims more authority than was conferred on it. If that reading is '
       f'right, AI should concentrate in the one domain whose contested object <em>is</em> the scope of '
-      f'conferred authority. It does. AI fires in '
+      f'conferred authority. It does. AINF fires in '
       f'<span style="{NUM}">{pct(AI_HIT["din"])}</span> of Administrative Law cases against '
       f'<span style="{NUM}">{pct(AI_HIT["dout"])}</span> everywhere else — a '
       f'<span style="{NUM}">{AI_HIT["rr"]:.1f}&times;</span> elevation '
@@ -1280,22 +1280,32 @@ if len(co_types) >= 6:
 # ---- governance: the CD scale is not one scale
 A(f'<div style="{CARD};border-left-color:var(--red)">')
 A(f'<span style="{HID};background:var(--red)">governance</span> '
-  f'<strong style="margin-left:.5rem">Two artifacts in circulation state CD on scales this corpus '
-  f'cannot produce. This is a measurement incommensurability, not a labelling nuisance.</strong>')
+  f'<strong style="margin-left:.5rem">Two artifacts in circulation state contradiction debt on '
+  f'scales this corpus cannot produce. This is a measurement incommensurability, not a labelling '
+  f'nuisance.</strong>')
+A(f'<div style="{SUB}">Three distinct quantities have circulated under the one name &ldquo;CD&rdquo;: '
+  f'<code>cd_case</code> (the weighted per-case flow reported throughout this page, ceiling '
+  f'<span style="{NUM}">{CD_CEILING:.2f}</span> under <code>{CD_PROFILE}</code>), '
+  f'<code>ct_count</code> (the unweighted count of active types, 0&ndash;{len(CD_WEIGHTS)}), and '
+  f'<code>cd_stock</code> (an institution\'s accumulated debt over time, clamped to [0,&nbsp;1], '
+  f'used by the SimLex simulator). The two problems below are both consequences of not '
+  f'distinguishing them.</div>')
 A(f'<div style="{SUB}"><strong>1. The Quick Reference bands are a count scale; the pipeline computes '
-  f'a weighted sum.</strong> The card in circulation bands CD as 0 / 1–2 / 3–4 / 5–6 / 7+. Under '
-  f'profile <code>{CD_PROFILE}</code>, CD is &Sigma;w over active contradictions and its arithmetic '
+  f'a weighted sum.</strong> The card in circulation bands debt as 0 / 1–2 / 3–4 / 5–6 / 7+ — '
+  f'a <code>ct_count</code> scale. Under '
+  f'profile <code>{CD_PROFILE}</code>, <code>cd_case</code> is &Sigma;w over active contradictions '
+  f'and its arithmetic '
   f'ceiling is the sum of the {len(CD_WEIGHTS)} <code>sool:cdWeight</code> values, '
   f'<span style="{NUM}">{CD_CEILING:.2f}</span>. Observed mean is '
   f'<span style="{NUM}">{CD_MEAN:.4f}</span> and observed maximum is '
   f'<span style="{NUM}">{CD_MAX:.4f}</span>. So under the published bands every one of the '
   f'{N:,} cases is band&nbsp;"0", and bands "3–4", "5–6" and "7+" are not merely empty but '
   f'<em>unreachable</em> — no assignment of contradictions to a case can ever enter them. The bands '
-  f'are coherent under one reading only: CD as a plain count of active contradictions, which does '
-  f'populate them.</div>')
+  f'are coherent under one reading only: <code>ct_count</code>, a plain count of active '
+  f'contradictions, which does populate them.</div>')
 A(f'<table style="{TBL}"><tr><th style="{TH};text-align:left">band</th>'
-  f'<th style="{TH}">share of corpus if CD = count</th>'
-  f'<th style="{TH}">share of corpus if CD = &Sigma;w ({CD_PROFILE})</th></tr>')
+  f'<th style="{TH}">share as <code>ct_count</code></th>'
+  f'<th style="{TH}">share as <code>cd_case</code> (&Sigma;w, {CD_PROFILE})</th></tr>')
 for (lbl, pc), (_, pw) in zip(band_count, band_weighted):
     A(f'<tr><td style="{TD};text-align:left"><code>{lbl}</code></td>'
       f'<td style="{TD};font-weight:700">{pct(pc)}</td>'

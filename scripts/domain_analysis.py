@@ -115,7 +115,7 @@ def run(db_path: str) -> dict:
 
     # Compute per-domain stats
     results = {}
-    all_cts = ["CF","AI","JC","RC3","PC","TC","FM","NI","RF","RCL","CC","SE","RPF"]
+    all_cts = ["CF","AINF","JC","RC3","PC","TC","FM","NI","RF","RCL","CC","SE","RPF"]
 
     for domain, cases in sorted(by_domain.items(), key=lambda x: -len(x[1])):
         if len(cases) < 5:
@@ -235,7 +235,7 @@ def print_report(results: dict):
         for ct, rate in d['ct_rates'].items():
             all_domains_ct[ct].append((domain, rate))
 
-    for ct in ["NI","RF","JC","CF","AI","TC","RPF","RCL","CC","SE"]:
+    for ct in ["NI","RF","JC","CF","AINF","TC","RPF","RCL","CC","SE"]:
         domain_rates = all_domains_ct.get(ct, [])
         if len(domain_rates) < 3:
             continue

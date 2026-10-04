@@ -38,7 +38,7 @@ import anthropic
 
 # ── CD WEIGHTS (identical to civil corpus) ───────────────────────────────────
 CD_WEIGHTS = {
-    'CF':0.15, 'AI':0.12, 'JC':0.10, 'RC3':0.14, 'PC':0.09, 'TC':0.08,
+    'CF':0.15, 'AINF':0.12, 'JC':0.10, 'RC3':0.14, 'PC':0.09, 'TC':0.08,
     'FM':0.11, 'NI':0.07, 'RF':0.11, 'RCL':0.18, 'CC':0.14, 'SE':0.10,
     'RPF':0.13
 }

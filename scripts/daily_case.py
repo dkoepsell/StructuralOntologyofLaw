@@ -101,7 +101,7 @@ Analyze the provided legal text and return a JSON annotation with this exact str
     "7": {"closure": "closed|partial|failed", "entity": "string", "justification": "string"},
     "8": {"closure": "closed|partial|failed", "entity": "string", "justification": "string"}
   },
-  "active_contradictions": ["CF","AI","JC","RC3","PC","TC","FM","NI","RF","RCL","CC","SE","RPF"],
+  "active_contradictions": ["CF","AINF","JC","RC3","PC","TC","FM","NI","RF","RCL","CC","SE","RPF"],
   "chain_outcome": "protection_granted|protection_denied|partial|remanded|dismissed",
   "outcome_confidence": "high|medium|low",
   "structural_narrative": "2-3 sentence structural diagnosis explaining the chain outcome",
@@ -113,7 +113,7 @@ N1 Source of Authority, N2 Norm, N3 Actor in Role, N4 Triggering Facts,
 N5 Legal Act/Omission, N6 Target, N7 Legal Effect (PIVOTAL), N8 Remedy
 
 Contradiction types (use only applicable):
-CF Conferral Failure, AI Authority Inflation, JC Jurisdictional Contradiction,
+CF Conferral Failure, AINF Authority Inflation, JC Jurisdictional Contradiction,
 RC3 Role Contradiction, PC Procedural Contradiction, TC Temporal Contradiction,
 FM Fact Manipulation, NI Norm Indeterminacy, RF Recognition Failure,
 RCL Recognition Collapse, CC Correlativity Contradiction,
@@ -287,7 +287,7 @@ def main():
     # Compute CD if not already set
     CT_WEIGHTS = {
         "RCL":0.18,"CF":0.15,"RC3":0.14,"CC":0.14,"RPF":0.13,
-        "AI":0.12,"RF":0.11,"FM":0.11,"JC":0.10,"SE":0.10,
+        "AINF":0.12,"RF":0.11,"FM":0.11,"JC":0.10,"SE":0.10,
         "PC":0.09,"TC":0.08,"NI":0.07,
     }
     cts = annotation.get("active_contradictions", [])

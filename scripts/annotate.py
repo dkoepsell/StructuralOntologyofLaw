@@ -42,7 +42,7 @@ NODE_CLOSURE_VALUES = ["closed", "failed", "partial", "indeterminate"]
 
 CONTRADICTION_TYPES = {
     "CF":  ("Conferral Failure",            "1→3",   0.15),
-    "AI":  ("Authority Inflation",           "1→2",   0.12),
+    "AINF":  ("Authority Inflation",           "1→2",   0.12),
     "JC":  ("Jurisdictional Contradiction",  "2→6",   0.10),
     "RC3": ("Role Contradiction",            "N.3",   0.14),
     "PC":  ("Procedural Contradiction",      "2→5",   0.09),
@@ -328,7 +328,7 @@ def compute_structural_signature(annotation: dict) -> list[str]:
     signatures = []
     ct_to_node = {
         "CF":  "Node1_3",
-        "AI":  "Node1_2",
+        "AINF":  "Node1_2",
         "JC":  "Node2_6",
         "RC3": "Node3",
         "PC":  "Node2_5",

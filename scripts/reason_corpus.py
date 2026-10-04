@@ -242,7 +242,7 @@ def infer_case(row: dict) -> dict:
         )
 
     # Multiple high-weight CTs (AI + RC3 + RCL = authoritarian pattern)
-    authoritarian_cts = cts.intersection({'AI', 'RC3', 'RCL', 'CC'})
+    authoritarian_cts = cts.intersection({'AINF', 'RC3', 'RCL', 'CC'})
     if len(authoritarian_cts) >= 2:
         inferences['novel_findings'].append(
             f"High-weight CT cluster: {authoritarian_cts} — "

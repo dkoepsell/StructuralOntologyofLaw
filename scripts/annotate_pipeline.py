@@ -488,7 +488,7 @@ NODE CLOSURE VALUES:
 
 CONTRADICTION TYPES — use these exact codes:
   CF   Conferral Failure         (1→3)   Authority fails to vest actor in role properly
-  AI   Authority Inflation       (1→2)   Decision-maker's will displaces norm; personal rule
+  AINF Authority Inflation       (1→2)   Decision-maker's will displaces norm; personal rule
   JC   Jurisdictional Contradiction (2→6) Competing normative regimes govern same situation
   RC3  Role Contradiction        (N.3)   Same bearer holds roles that generate incompatible obligations for the SAME act
   PC   Procedural Contradiction  (2→5)   Act required by norm cannot follow norm's own procedure
@@ -1096,7 +1096,13 @@ def reannotate_mixed_perspective(db: AnnotationDB, api_key: str):
                     case = json.loads(line)
                     cid = case.get("id") or case.get("case_id")
                     if cid:
-                        corpus[cid] = (case, domain_id)
+                        # Key as str. The annotations table declares case_id TEXT, so
+                        # sqlite3 hands back '195132', while the corpus JSONL "id" is a
+                        # JSON number and arrives as int 195132. Keying on the raw value
+                        # made the membership test below always fail, so all 111
+                        # mixed-perspective rows were reported "not found in corpus"
+                        # on every nightly run since at least 2026-08-18.
+                        corpus[str(cid)] = (case, domain_id)
                 except json.JSONDecodeError:
                     continue
 
@@ -1104,7 +1110,7 @@ def reannotate_mixed_perspective(db: AnnotationDB, api_key: str):
     last_call = 0.0
 
     for row in tqdm(rows, desc="Re-annotating mixed-perspective", unit="case"):
-        case_id   = row["case_id"]
+        case_id   = str(row["case_id"])   # see the str() keying note above
         case_name = row["case_name"]
         domain_id = row["domain_id"]
 
@@ -1184,6 +1190,17 @@ def reannotate_mixed_perspective(db: AnnotationDB, api_key: str):
 
     log.info(f"\n  Re-annotation complete: {fixed} re-annotated, {failed} failed.")
     log.info(f"  Run --stats to see updated distribution.")
+
+    # Health gate, mirroring the one at the end of the normal annotation path.
+    # That gate exists because "the pipeline exits 0 on a dead model ID and the
+    # caller reports '0 errors'". It was never extended to this branch, which is
+    # the identical attempted>0 / saved==0 condition, so a 111-of-111 failure was
+    # recorded as a clean run for weeks.
+    attempted = fixed + failed
+    if attempted and fixed == 0:
+        log.error(f"  Attempted {attempted} re-annotation(s) and saved none. "
+                  f"Treating as failure.")
+        sys.exit(1)
 
 
 def print_stats(db: AnnotationDB):

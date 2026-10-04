@@ -82,8 +82,8 @@ DOMAIN_NAMES = {1:"D1 First Amendment",2:"D2 Employment Discrim.",
 DOMAIN_COLORS= {1:"#8B1A1A",2:"#B8922A",3:"#1B3C6E",4:"#7A4500",
                 5:"#5C1A7A",6:"#1A5C2E",7:"#666666",8:"#1A5C6E"}
 EXPORT_DOMAINS = set(DOMAIN_NAMES)
-CT_LIST = ["RF","RPF","NI","RC3","JC","AI","PC","TC","CF","FM","CC","SE","RCL"]
-CT_WEIGHTS = {"CF":0.15,"AI":0.12,"JC":0.10,"RC3":0.14,"PC":0.09,"TC":0.08,
+CT_LIST = ["RF","RPF","NI","RC3","JC","AINF","PC","TC","CF","FM","CC","SE","RCL"]
+CT_WEIGHTS = {"CF":0.15,"AINF":0.12,"JC":0.10,"RC3":0.14,"PC":0.09,"TC":0.08,
               "FM":0.11,"NI":0.07,"RF":0.11,"RCL":0.18,"CC":0.14,"SE":0.10,"RPF":0.13}
 NODE_NAMES  = ["Source of Authority","Norm","Actor in Role","Triggering Facts",
                "Legal Act / Omission","Target","Legal Effect","Remedy"]
@@ -144,7 +144,7 @@ def export(db_path, out_path):
                        a.node8_closure,a.node8_entity,a.outcome_notes, a.annotator,
                        COALESCE(c.absolute_url, '') AS absolute_url,
                        COALESCE(c.docket_number, '') AS docket_number
-                FROM annotations a
+                FROM scope_core a
                 LEFT JOIN corpus.cases c ON c.id = a.case_id
                 ORDER BY a.domain_id, a.case_id
             """).fetchall()
@@ -162,7 +162,7 @@ def export(db_path, out_path):
                        node6_closure,node6_entity,node7_closure,node7_entity,
                        node8_closure,node8_entity,outcome_notes, annotator,
                        '' AS absolute_url, '' AS docket_number
-                FROM annotations ORDER BY domain_id, case_id
+                FROM scope_core ORDER BY domain_id, case_id
             """).fetchall()
     else:
         all_rows = conn.execute("""
@@ -176,7 +176,7 @@ def export(db_path, out_path):
                    node6_closure,node6_entity,node7_closure,node7_entity,
                    node8_closure,node8_entity,outcome_notes, annotator,
                    '' AS absolute_url, '' AS docket_number
-            FROM annotations ORDER BY domain_id, case_id
+            FROM scope_core ORDER BY domain_id, case_id
         """).fetchall()
 
     # ── BUILD CASES LIST ─────────────────────────────────────────────────────

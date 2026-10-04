@@ -71,7 +71,7 @@ NODE CLOSURE VALUES:
 
 CONTRADICTION TYPES — use these exact codes:
   CF   Conferral Failure         Authority fails to vest actor in role
-  AI   Authority Inflation       Decision-maker's will displaces norm
+  AINF Authority Inflation       Decision-maker's will displaces norm
   JC   Jurisdictional Contradiction  Competing normative regimes over same situation
   RC3  Role Contradiction        Same bearer holds roles generating incompatible obligations
   PC   Procedural Contradiction  Act required by norm cannot follow norm's own procedure
@@ -275,7 +275,7 @@ def parse_json(raw: str) -> Optional[dict]:
 # ── MAIN THREE-PASS ANNOTATOR ────────────────────────────────────────────────
 
 CT_WEIGHTS = {
-    'CF': 0.15, 'AI': 0.12, 'JC': 0.10, 'RC3': 0.14, 'PC': 0.09,
+    'CF': 0.15, 'AINF': 0.12, 'JC': 0.10, 'RC3': 0.14, 'PC': 0.09,
     'TC': 0.08, 'FM': 0.11, 'NI': 0.07, 'RF': 0.11, 'RCL': 0.18,
     'CC': 0.14, 'SE': 0.10, 'RPF': 0.13,
 }

@@ -43,7 +43,7 @@ RATE_LIMIT      = 0.5
 
 # ── CT WEIGHTS ────────────────────────────────────────────────────────────────
 CT_WEIGHTS = {
-    "CF":0.15,"AI":0.12,"JC":0.10,"RC3":0.14,"PC":0.09,"TC":0.08,
+    "CF":0.15,"AINF":0.12,"JC":0.10,"RC3":0.14,"PC":0.09,"TC":0.08,
     "FM":0.11,"NI":0.07,"RF":0.11,"RCL":0.18,"CC":0.14,"SE":0.10,"RPF":0.13
 }
 
@@ -114,7 +114,7 @@ CT_PATTERNS = [
              "obligations without rights", "enforced without standing"]),
     ("CF",  ["vest", "confer", "authority failed to grant", "not properly authorized",
              "lacks standing to bear", "role not conferred", "conferral"]),
-    ("AI",  ["will displaces", "personal preference", "substitut", "no rule",
+    ("AINF",  ["will displaces", "personal preference", "substitut", "no rule",
              "arbitrary", "authority inflation", "norm displaced by will"]),
     ("RC3", ["incompatible roles", "conflicting obligations", "same actor",
              "role contradiction", "dual role", "wearing two hats"]),
@@ -562,6 +562,11 @@ def annotate_pending(conn, client, limit=0, reannotate=False):
 # ── CLI ───────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
+    # SYSTEM_PASS2 still contains forcing RULES 1 to 5, so this module must not
+    # produce new rows until WS6 task 5 re-annotates under the v2 blind regime.
+    import scotus_guard
+    scotus_guard.check("annotate_scotus.py")
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--db",         default="scotus_backtest.db")
     parser.add_argument("--docket",     type=str)
