@@ -1,4 +1,4 @@
-# SOoL corpus release 2.0.1
+# SOoL corpus release 2.1.0
 
 **A Structural Ontology of the Law.** SEAL Lab, Texas A&M University.
 PI: David R. Koepsell. Released 2026-10-03.
@@ -44,7 +44,7 @@ re-annotation. See `docs/SCOTUS_AUDIT.md`.
 
 ## What differs from the 6 August 2026 freeze
 
-This is **2.0.1**, not 2.0.0, and the difference is not cosmetic.
+This is **2.1.0**, not 2.0.0, and the difference is not cosmetic.
 
 1. **The 2.0.0 manifest could not be verified.** Its `SHA256SUMS.txt` was
    written at 14:33 while four payload files were modified between 15:01 and
