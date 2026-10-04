@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Structural Precedent Finder · SOoL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0705; --panel:#14100b; --panel-2:#1c160e; --line:#2e2418;
+  --brass:#c49020; --brass-dim:#8a6716; --parch:#f0e4c8; --muted:#8a7c66;
+  /* Closure states. SimLex uses gold for healthy, but gold is the interaction accent
+     here, so healthy moves to sage to keep the two readable apart. */
+  --closed:#8fa86a; --partial:#c98a2e; --failed:#b8452e; --indet:#4a3f33;
+  --display:"Cormorant Garamond",Georgia,serif;
+  --body:"Crimson Pro",Georgia,serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--parch); font-family:var(--body);
+  font-size:17px; line-height:1.55; -webkit-font-smoothing:antialiased;
+}
+body::before{
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:0; opacity:.035;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.wrap{position:relative; z-index:1; max-width:1180px; margin:0 auto; padding:0 24px 96px}
+a{color:var(--brass)}
+:focus-visible{outline:2px solid var(--brass); outline-offset:2px}
+
+/* ── header ── */
+header{padding:52px 0 30px; border-bottom:1px solid var(--line)}
+.eyebrow{
+  font-family:var(--mono); font-size:10.5px; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--brass-dim); display:flex; gap:18px; flex-wrap:wrap; margin-bottom:20px;
+  align-items:center;
+}
+.eyebrow .app-link{
+  margin-left:auto; color:var(--parch); text-decoration:none;
+  border:1px solid var(--brass-dim); border-radius:3px; padding:4px 10px;
+  transition:background .18s ease, color .18s ease;
+}
+.eyebrow .app-link:hover,.eyebrow .app-link:focus-visible{
+  background:var(--brass-dim); color:var(--bg);
+}
+h1{
+  font-family:var(--display); font-weight:300; font-size:clamp(38px,6vw,62px);
+  line-height:1.02; margin:0 0 14px; letter-spacing:-.015em;
+}
+h1 em{font-style:italic; color:var(--brass)}
+.thesis{max-width:60ch; color:#cdbfa4; margin:0; font-size:18px}
+
+/* ── mode ── */
+.modes{display:flex; gap:0; margin:34px 0 0; border:1px solid var(--line); width:fit-content}
+.modes button{
+  font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase;
+  background:transparent; color:var(--muted); border:0; padding:11px 20px; cursor:pointer;
+}
+.modes button[aria-pressed="true"]{background:var(--brass); color:#120d06; font-weight:700}
+
+section{padding:34px 0; border-bottom:1px solid var(--line)}
+.slabel{
+  font-family:var(--mono); font-size:10.5px; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--muted); margin:0 0 4px;
+}
+.shint{color:var(--muted); font-size:15px; margin:0 0 20px; max-width:70ch}
+
+/* ── signature chain ── */
+.chain{display:flex; align-items:flex-start; gap:0; overflow-x:auto; padding-bottom:6px}
+.node{flex:1 1 0; min-width:104px; position:relative; text-align:center}
+.node::after{
+  content:""; position:absolute; top:26px; right:-50%; width:100%; height:1px;
+  background:var(--line);
+}
+.node:last-child::after{display:none}
+.node button{
+  position:relative; z-index:1; width:52px; height:52px; border-radius:50%;
+  background:var(--panel); border:1.5px solid var(--indet); cursor:pointer;
+  font-family:var(--mono); font-size:16px; font-weight:700; color:var(--muted);
+  transition:transform .12s ease, box-shadow .12s ease;
+}
+.node button:hover{transform:translateY(-2px)}
+.node[data-s="c"] button{border-color:var(--closed); color:var(--closed); box-shadow:0 0 0 3px rgba(143,168,106,.13)}
+.node[data-s="f"] button{border-color:var(--failed); color:var(--failed); box-shadow:0 0 0 3px rgba(184,69,46,.15)}
+.node[data-s="p"] button{border-color:var(--partial); color:var(--partial); box-shadow:0 0 0 3px rgba(201,138,46,.14)}
+.node[data-s="i"] button{border-color:var(--muted); color:var(--muted)}
+.node .nm{display:block; font-size:12.5px; line-height:1.25; color:var(--muted); margin-top:9px; padding:0 4px}
+.node .st{
+  display:block; font-family:var(--mono); font-size:9.5px; letter-spacing:.1em;
+  text-transform:uppercase; margin-top:5px; color:var(--indet);
+}
+.node[data-s="c"] .st{color:var(--closed)} .node[data-s="f"] .st{color:var(--failed)}
+.node[data-s="p"] .st{color:var(--partial)} .node[data-s="i"] .st{color:var(--muted)}
+.clusters{display:flex; margin-top:14px; font-family:var(--mono); font-size:9.5px;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--brass-dim)}
+.clusters div{text-align:center; border-top:1px solid var(--line); padding-top:7px; margin:0 3px}
+
+/* ── chips ── */
+.chips{display:flex; flex-wrap:wrap; gap:7px}
+.chip{
+  font-family:var(--mono); font-size:11px; letter-spacing:.04em;
+  background:var(--panel); border:1px solid var(--line); color:var(--muted);
+  padding:7px 11px; cursor:pointer; display:flex; align-items:center; gap:7px;
+}
+.chip .code{font-weight:700}
+.chip[data-s="req"]{border-color:var(--closed); color:var(--closed); background:rgba(143,168,106,.09)}
+.chip[data-s="exc"]{border-color:var(--failed); color:var(--failed); background:rgba(184,69,46,.09);
+  text-decoration:line-through; text-decoration-thickness:1px}
+.chip .rule{font-size:9px; color:var(--brass-dim); letter-spacing:.08em}
+.chip .cnt{font-size:9.5px; opacity:.6}
+
+/* ── filters ── */
+.filters{display:flex; flex-wrap:wrap; gap:18px 26px; align-items:flex-end}
+.f{display:flex; flex-direction:column; gap:6px}
+.f label{font-family:var(--mono); font-size:9.5px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--muted)}
+select,input[type=text]{
+  background:var(--panel); color:var(--parch); border:1px solid var(--line);
+  font-family:var(--mono); font-size:12px; padding:8px 10px; min-width:150px;
+}
+.check{display:flex; align-items:center; gap:8px; font-size:14px; color:#cdbfa4; cursor:pointer}
+.check input{accent-color:var(--brass); width:15px; height:15px}
+.btn{
+  font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase;
+  background:transparent; border:1px solid var(--brass-dim); color:var(--brass);
+  padding:9px 16px; cursor:pointer;
+}
+.btn:hover{background:var(--brass); color:#120d06}
+
+/* ── reference case picker ── */
+.pick{position:relative; max-width:640px}
+.pick input{width:100%; font-family:var(--body); font-size:16px; padding:12px 14px}
+.sugg{position:absolute; top:100%; left:0; right:0; background:var(--panel-2);
+  border:1px solid var(--line); border-top:0; max-height:280px; overflow-y:auto; z-index:20}
+.sugg button{display:block; width:100%; text-align:left; background:transparent; border:0;
+  color:var(--parch); padding:9px 14px; cursor:pointer; font-family:var(--body); font-size:15px}
+.sugg button:hover,.sugg button:focus{background:var(--brass); color:#120d06}
+.sugg .meta{font-family:var(--mono); font-size:10px; color:var(--muted); margin-left:8px}
+.sugg button:hover .meta{color:#120d06}
+.refcard{margin-top:18px; background:var(--panel); border-left:2px solid var(--brass); padding:16px 18px}
+.refcard h3{font-family:var(--display); font-size:22px; font-weight:400; margin:0 0 6px}
+
+/* ── results ── */
+.rhead{display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:12px}
+.count{font-family:var(--display); font-size:34px; font-weight:300}
+.count b{color:var(--brass); font-weight:600}
+.caveat{
+  border-left:2px solid var(--brass-dim); background:rgba(196,144,32,.05);
+  padding:13px 16px; margin:18px 0 6px; font-size:15px; color:#cdbfa4; max-width:78ch;
+}
+.compose{margin:26px 0 8px}
+.bar{display:flex; height:26px; border:1px solid var(--line); overflow:hidden; font-family:var(--mono); font-size:9px}
+.bar span{display:flex; align-items:center; justify-content:center; overflow:hidden; white-space:nowrap; color:#120d06; font-weight:700}
+.legend{display:flex; flex-wrap:wrap; gap:14px; margin-top:9px; font-family:var(--mono); font-size:10px; color:var(--muted)}
+.legend i{display:inline-block; width:9px; height:9px; margin-right:5px}
+
+.rows{margin-top:20px}
+.row{display:grid; grid-template-columns:118px 1fr auto; gap:18px; align-items:center;
+  padding:13px 4px; border-bottom:1px solid var(--line); cursor:pointer}
+.row:hover{background:var(--panel)}
+.glyph{display:flex; gap:2px}
+.glyph i{flex:1; height:19px; background:var(--indet); display:block}
+.glyph i[data-s="c"]{background:var(--closed)} .glyph i[data-s="f"]{background:var(--failed)}
+.glyph i[data-s="p"]{background:var(--partial)}
+.cname{font-size:16px; line-height:1.3}
+.cmeta{font-family:var(--mono); font-size:10.5px; color:var(--muted); margin-top:4px;
+  display:flex; gap:12px; flex-wrap:wrap; align-items:center}
+.flag{color:var(--partial)}
+.tset{font-family:var(--mono); font-size:10px; color:var(--brass-dim)}
+.score{font-family:var(--mono); font-size:13px; color:var(--brass); text-align:right; white-space:nowrap}
+.score small{display:block; font-size:9px; color:var(--muted); letter-spacing:.1em}
+.detail{grid-column:1/-1; padding:16px 0 6px; border-top:1px solid var(--line); margin-top:12px}
+.dgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px}
+.dnode{background:var(--panel); padding:9px 11px; border-left:2px solid var(--indet)}
+.dnode[data-s="c"]{border-color:var(--closed)} .dnode[data-s="f"]{border-color:var(--failed)}
+.dnode[data-s="p"]{border-color:var(--partial)}
+.dnode b{display:block; font-family:var(--mono); font-size:9px; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--muted); margin-bottom:3px}
+.empty{padding:44px 0; color:var(--muted); max-width:62ch}
+/* In builder mode the chain is a hard filter, so every row would score 100 and the
+   column would say nothing. It only earns its place when ranking against a reference. */
+body[data-mode="build"] .score{display:none}
+body[data-mode="build"] .row{grid-template-columns:118px 1fr}
+body[data-mode="build"] #wrap-crossdomain{display:none}
+.more{margin-top:22px; text-align:center}
+
+/* ── honesty panel ── */
+details.limits{margin-top:38px; border:1px solid var(--line); background:var(--panel)}
+details.limits summary{
+  cursor:pointer; padding:14px 18px; font-family:var(--mono); font-size:11px;
+  letter-spacing:.13em; text-transform:uppercase; color:var(--brass);
+}
+details.limits .body{padding:0 18px 20px; max-width:82ch; color:#cdbfa4; font-size:15.5px}
+details.limits li{margin-bottom:9px}
+/* ── loader ── */
+#loader{padding:70px 0; text-align:center; color:var(--muted)}
+#drop{border:1px dashed var(--line); padding:34px; margin-top:22px; font-family:var(--mono); font-size:12px}
+@media (max-width:720px){
+  .row{grid-template-columns:1fr; gap:9px}
+  .score{text-align:left}
+  .node{min-width:76px}
+  .node button{width:42px;height:42px;font-size:14px}
+  .node::after{top:21px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important; animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">
+    <span>SEAL Lab · Texas A&amp;M</span>
+    <span id="ev-corpus">SOoL corpus —</span>
+    <span id="ev-n">— cases</span>
+    <a class="app-link" href="SOoL_QueryTool.html">↩ SOoL Query Tool</a>
+  </div>
+  <h1>Find cases that <em>break the same way</em></h1><p style="font-size:.78rem;color:#6a7a8a;line-height:1.6;max-width:70ch;margin:.6rem 0 0">Chain positions follow <em>LOF-ODP-004: Minimum Legal Chain</em>, a BFO-2020-grounded Legal Ontologies Foundry pattern. Node&nbsp;1 is <em>norm-establishing power</em>, Node&nbsp;4 <em>triggering occurrence</em>, Node&nbsp;7 <em>fully grounded legal position</em>, Node&nbsp;8 <em>remedial position</em>. Matches are structural: they describe where a chain failed, not how a case was or will be decided.</p>
+  <p class="thesis">Search federal appellate opinions by the shape of their reasoning rather than
+  their doctrine — which link in the legal chain gave way, and what contradiction was live when it
+  did. Every result is a case to read, not a score to cite.</p>
+</header>
+
+<div id="loader">
+  <p>Loading the corpus index…</p>
+  <div id="drop">
+    <p>If <code>sool_finder_index.json</code> isn't beside this file, choose it here.</p>
+    <input type="file" id="file" accept=".json">
+  </div>
+</div>
+
+<main id="app" hidden>
+
+  <div class="modes" role="group" aria-label="Search mode">
+    <button id="m-build" aria-pressed="true">Build a signature</button>
+    <button id="m-like" aria-pressed="false">Start from a case</button>
+  </div>
+
+  <!-- reference case -->
+  <section id="s-like" hidden>
+    <p class="slabel">Reference case</p>
+    <p class="shint">Pick a case from the corpus. The finder reads off its chain and ranks every
+    other case by how closely the shape matches — by default looking outside its own doctrinal area,
+    which is where the comparison earns its keep.</p>
+    <div class="pick">
+      <input type="text" id="q-case" placeholder="Type a case name…" autocomplete="off"
+             aria-label="Search for a reference case">
+      <div class="sugg" id="sugg" hidden></div>
+    </div>
+    <div id="refcard"></div>
+  </section>
+
+  <!-- chain -->
+  <section id="s-chain">
+    <p class="slabel">The chain</p>
+    <p class="shint">Click a node to set what you're looking for: closed, failed, partial, or
+    indeterminate. Leave a node blank to ignore it.</p>
+    <div class="chain" id="chain"></div>
+    <div class="clusters" id="clusters"></div>
+    <div style="margin-top:22px"><button class="btn" id="clear-chain">Clear the chain</button></div>
+  </section>
+
+  <!-- contradictions -->
+  <section>
+    <p class="slabel">Contradiction types</p>
+    <p class="shint">Click once to require a type, twice to exclude it. Types marked with a rule
+    number are assigned by mandatory inference when stated conditions hold — their frequency
+    reflects how often that trigger fires, not an independent reading of the opinion.</p>
+    <div class="chips" id="chips"></div>
+  </section>
+
+  <!-- filters -->
+  <section>
+    <p class="slabel">Narrow the field</p>
+    <div class="filters">
+      <div class="f"><label for="f-domain">Doctrinal area</label>
+        <select id="f-domain"><option value="">Any</option></select></div>
+      <div class="f"><label for="f-court">Court</label>
+        <select id="f-court"><option value="">Any</option></select></div>
+      <div class="f"><label for="f-outcome">Outcome</label>
+        <select id="f-outcome"><option value="">Any</option></select></div>
+      <div class="f"><label for="f-from">Decided from</label>
+        <input type="text" id="f-from" placeholder="1990" inputmode="numeric" style="min-width:88px"></div>
+      <div class="f"><label for="f-to">to</label>
+        <input type="text" id="f-to" placeholder="2026" inputmode="numeric" style="min-width:88px"></div>
+      <div class="f"><label for="f-sort">Order by</label>
+        <select id="f-sort">
+          <option value="match">Closeness of match</option>
+          <option value="recent">Most recent</option>
+          <option value="oldest">Oldest</option>
+          <option value="conf">Annotation confidence</option>
+        </select></div>
+    </div>
+    <div class="filters" style="margin-top:18px">
+      <span id="wrap-crossdomain"><label class="check"><input type="checkbox" id="f-crossdomain" checked>
+        Exclude the reference case's own doctrinal area</label></span>
+      <label class="check"><input type="checkbox" id="f-highconf">
+        High-confidence annotations only</label>
+      <label class="check"><input type="checkbox" id="f-noreview">
+        Hide cases flagged for review</label>
+      <label class="check"><input type="checkbox" id="f-nonempty" checked>
+        Hide chains the annotator could not read at all</label>
+    </div>
+  </section>
+
+  <!-- results -->
+  <section style="border-bottom:0">
+    <div class="rhead">
+      <div class="count" id="count"></div>
+      <div class="tset" id="query-summary"></div>
+    </div>
+    <div class="caveat" id="reflink-note" hidden></div>
+    <div class="caveat" id="caveat"></div>
+    <div class="compose" id="compose"></div>
+    <div class="rows" id="rows"></div>
+    <div class="more"><button class="btn" id="more" hidden>Show more</button></div>
+  </section>
+
+  <details class="limits">
+    <summary>What this tool does not tell you</summary>
+    <div class="body">
+      <ul>
+        <li><b>Nothing here is a prediction.</b> The outcome mix of a result set describes the cases
+        retrieved. It is not a forecast for a case you are working on, and the corpus is not a random
+        sample of litigation — it is a keyword-collected set of federal appellate opinions.</li>
+        <li><b>Every annotation is machine-generated and unvalidated.</b> One model, one prompt, no
+        second coder. No inter-annotator agreement statistic exists for this corpus, so there is no
+        measured error rate to quote. Read the case before you rely on it — the verification link on
+        each result goes to the full opinion.</li>
+        <li><b>The annotator was told the court, the date, and the doctrinal area</b> before it saw
+        the opinion. Effect sizes for court and domain shrink as opinions get longer, which is the
+        pattern you would expect if some of that signal came from the model's priors rather than the
+        text. Treat any pattern you notice <i>across</i> courts or doctrinal areas as a hypothesis to
+        test, not a result. Patterns within a single case stand on the opinion itself.</li>
+        <li><b>Four of the thirteen contradiction types are assigned by mandatory rule</b> — Role
+        Contradiction, Norm Indeterminacy, Jurisdictional Contradiction, and Correlativity
+        Contradiction. They are marked in the type list above.</li>
+        <li><b>Node 7 and the outcome are two readings of one text by one annotator.</b> They agree
+        about 90% of the time. That is internal consistency, not corroboration, so a Node 7 failure
+        is close to a restatement that the claimant lost.</li>
+        <li><b>There is no Contradiction Debt score in this tool, deliberately.</b> On this corpus CD
+        correlates with a simple count of active contradictions at r = 0.97, so the weighted scale
+        adds essentially nothing, and the published 0–7 stability bands are on a different scale than
+        the weighted sum can produce. The count is shown instead.</li>
+      </ul>
+      <p style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:18px" id="prov"></p>
+    </div>
+  </details>
+</main>
+</div>
+
+<script>
+"use strict";
+const S={data:null,mode:"build",nodes:[null,null,null,null,null,null,null,null],
+  req:new Set(),exc:new Set(),ref:null,limit:40};
+const CYC=[null,"c","f","p","i"];
+const SNAME={c:"closed",f:"failed",p:"partial",i:"indeterminate"};
+const OUTCOL={protection_granted:"#8fa86a",partial:"#c98a2e",remanded:"#c49020",
+  protection_denied:"#b8452e",dismissed:"#6d5f4c",moot:"#4a3f33"};
+const OUTLAB={protection_granted:"granted",protection_denied:"denied",partial:"partial",
+  remanded:"remanded",dismissed:"dismissed",moot:"moot"};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ── load ── */
+fetch("sool_finder_index.json").then(r=>{if(!r.ok)throw 0;return r.json()}).then(boot)
+  .catch(()=>{$("loader").querySelector("p").textContent="Couldn't load the index automatically.";});
+$("file").addEventListener("change",e=>{
+  const f=e.target.files[0]; if(!f)return;
+  const rd=new FileReader();
+  rd.onload=()=>{try{boot(JSON.parse(rd.result))}catch(err){alert("That file isn't a valid index.")}};
+  rd.readAsText(f);
+});
+
+function boot(d){
+  S.data=d; d.cases.forEach(c=>{c.tset=new Set(c.t)});
+  $("loader").hidden=true; $("app").hidden=false;
+  $("ev-corpus").textContent=`SOoL corpus ${d.corpus_version} · regime ${d.regime}`;
+  $("ev-n").textContent=`${d.n.toLocaleString()} annotated opinions`;
+  $("prov").textContent=`Index built ${d.generated} · ontology sha256 ${(d.ontology_sha256||"").slice(0,16)}… · `+
+    `${d.skipped_invalid_outcome} rows dropped for an outcome outside the documented set.`;
+  buildChain(); buildChips(); buildFilters(); wire(); setMode("build");
+  applyRefFromURL();
+}
+
+/* ── chain ── */
+function buildChain(){
+  const ch=$("chain"); ch.innerHTML="";
+  S.data.nodes.forEach((nm,i)=>{
+    const d=document.createElement("div"); d.className="node"; d.dataset.s="";
+    d.innerHTML=`<button type="button" aria-label="Node ${i+1}, ${esc(nm)}">${i+1}</button>`+
+      `<span class="nm">${esc(nm)}</span><span class="st">any</span>`;
+    d.querySelector("button").addEventListener("click",()=>{
+      S.nodes[i]=CYC[(CYC.indexOf(S.nodes[i])+1)%CYC.length];
+      paintChain(); render();
+    });
+    ch.appendChild(d);
+  });
+  const cl=$("clusters"); cl.innerHTML="";
+  S.data.clusters.forEach(c=>{
+    const d=document.createElement("div");
+    d.style.flex=(c.to-c.from+1); d.textContent=c.name; cl.appendChild(d);
+  });
+  paintChain();
+}
+function paintChain(){
+  [...$("chain").children].forEach((el,i)=>{
+    const s=S.nodes[i];
+    el.dataset.s=s||"";
+    el.querySelector(".st").textContent=s?SNAME[s]:"any";
+  });
+}
+
+/* ── chips ── */
+function buildChips(){
+  const counts={};
+  S.data.cases.forEach(c=>c.t.forEach(t=>counts[t]=(counts[t]||0)+1));
+  const box=$("chips"); box.innerHTML="";
+  Object.keys(S.data.labels).forEach(code=>{
+    const b=document.createElement("button");
+    b.className="chip"; b.type="button"; b.dataset.s=""; b.dataset.code=code;
+    const rule=S.data.forced[code];
+    b.innerHTML=`<span class="code">${esc(code)}</span><span>${esc(S.data.labels[code])}</span>`+
+      (rule?`<span class="rule">${esc(rule)}</span>`:"")+
+      `<span class="cnt">${counts[code]||0}</span>`;
+    b.addEventListener("click",()=>{
+      if(S.req.has(code)){S.req.delete(code);S.exc.add(code);}
+      else if(S.exc.has(code)){S.exc.delete(code);}
+      else S.req.add(code);
+      b.dataset.s=S.req.has(code)?"req":S.exc.has(code)?"exc":"";
+      render();
+    });
+    box.appendChild(b);
+  });
+}
+
+/* ── filters ── */
+function buildFilters(){
+  const uniq=k=>[...new Set(S.data.cases.map(c=>c[k]).filter(Boolean))].sort();
+  uniq("d").forEach(v=>$("f-domain").add(new Option(v.replace(/_/g," "),v)));
+  uniq("c").forEach(v=>$("f-court").add(new Option(v,v)));
+  uniq("o").forEach(v=>$("f-outcome").add(new Option(OUTLAB[v]||v,v)));
+}
+
+/* ── reference case picker ── */
+function wire(){
+  $("m-build").addEventListener("click",()=>setMode("build"));
+  $("m-like").addEventListener("click",()=>setMode("like"));
+  $("clear-chain").addEventListener("click",()=>{S.nodes=S.nodes.map(()=>null);paintChain();render()});
+  ["f-domain","f-court","f-outcome","f-sort"].forEach(id=>$(id).addEventListener("change",render));
+  ["f-from","f-to"].forEach(id=>$(id).addEventListener("input",render));
+  ["f-crossdomain","f-highconf","f-noreview","f-nonempty"].forEach(id=>
+    $(id).addEventListener("change",render));
+  $("more").addEventListener("click",()=>{S.limit+=40;render()});
+
+  const q=$("q-case"), sg=$("sugg");
+  q.addEventListener("input",()=>{
+    const v=q.value.trim().toLowerCase();
+    if(v.length<3){sg.hidden=true;return}
+    const hits=S.data.cases.filter(c=>c.n.toLowerCase().includes(v)).slice(0,25);
+    sg.innerHTML=hits.map(c=>
+      `<button type="button" data-id="${esc(c.id)}">${esc(c.n)}`+
+      `<span class="meta">${esc(c.c)} · ${c.y||"n.d."}</span></button>`).join("")
+      ||`<button type="button" disabled style="color:var(--muted)">No case by that name</button>`;
+    sg.hidden=false;
+    sg.querySelectorAll("button[data-id]").forEach(b=>b.addEventListener("click",()=>{
+      applyRef(S.data.cases.find(c=>String(c.id)===b.dataset.id));
+    }));
+  });
+  document.addEventListener("click",e=>{if(!e.target.closest(".pick"))sg.hidden=true});
+}
+/* Adopt a case as the reference chain. Shared by the picker and by ?ref= deep links
+   arriving from the query tool, so both paths land in exactly the same state. */
+function applyRef(c){
+  if(!c) return false;
+  S.ref=c;
+  S.nodes=c.k.split("").map(x=>x==="i"?"i":x);
+  S.req=new Set(); S.exc=new Set();
+  document.querySelectorAll(".chip").forEach(el=>el.dataset.s="");
+  paintChain();
+  $("q-case").value=c.n; $("sugg").hidden=true; S.limit=40;
+  renderRef(); render();
+  return true;
+}
+
+/* ?ref=<case_id> — the query tool links here from a case detail panel. Falls back to a
+   case-name match so a hand-typed link still resolves, and says so plainly when neither
+   hits: a silent empty builder would read as "no cases break this way". */
+function applyRefFromURL(){
+  const want=(new URLSearchParams(location.search).get("ref")||"").trim();
+  if(!want) return;
+  const c=S.data.cases.find(x=>String(x.id)===want)
+       || S.data.cases.find(x=>x.n.toLowerCase()===want.toLowerCase());
+  if(c){ setMode("like"); applyRef(c); return; }
+  const note=$("reflink-note");
+  note.textContent=`No case matching “${want}” is in this index — it may be one of the `
+    +`${S.data.skipped_invalid_outcome} rows dropped for an outcome outside the documented `
+    +`set, or it predates this build. Build a chain below instead.`;
+  note.hidden=false;
+}
+
+function setMode(m){
+  S.mode=m; S.limit=40;
+  document.body.dataset.mode=m;
+  $("m-build").setAttribute("aria-pressed",m==="build");
+  $("m-like").setAttribute("aria-pressed",m==="like");
+  $("s-like").hidden=(m!=="like");
+  // "Closeness of match" is only meaningful against a reference case; in builder mode
+  // the chain is a filter and every survivor would tie at 100.
+  const sort=$("f-sort");
+  sort.options[0].disabled=(m==="build");
+  sort.options[0].textContent=m==="build"?"Closeness of match (needs a reference case)":"Closeness of match";
+  if(m==="build"&&sort.value==="match")sort.value="recent";
+  if(m==="like"&&!S.ref)sort.value="match";
+  if(m==="build"){S.ref=null; $("refcard").innerHTML=""; $("q-case").value="";}
+  render();
+}
+function renderRef(){
+  const c=S.ref; if(!c){$("refcard").innerHTML="";return}
+  $("refcard").innerHTML=`<div class="refcard"><h3>${esc(c.n)}</h3>
+    <div class="cmeta"><span>${esc(c.c)}</span><span>${c.y||"n.d."}</span>
+    <span>${esc((c.d||"").replace(/_/g," "))}</span><span>${esc(OUTLAB[c.o]||c.o)}</span>
+    ${c.u?`<a href="${esc(c.u)}" target="_blank" rel="noopener">read the opinion</a>`:""}</div>
+    <div class="cmeta"><span>${chainWords(c.k)}</span></div>
+    <div class="tset" style="margin-top:7px">${c.t.length?c.t.map(t=>esc(t)).join(" · "):"no contradictions recorded"}</div>
+    </div>`;
+}
+function chainWords(k){
+  const f=[],p=[];
+  k.split("").forEach((s,i)=>{if(s==="f")f.push(i+1); if(s==="p")p.push(i+1)});
+  const bits=[];
+  if(f.length)bits.push(`fails at ${f.map(n=>"N"+n).join(", ")}`);
+  if(p.length)bits.push(`partial at ${p.map(n=>"N"+n).join(", ")}`);
+  return bits.length?bits.join("; "):"no node failure recorded";
+}
+
+/* ── matching ── */
+function jaccard(a,b){
+  if(!a.size&&!b.size)return 1;
+  let i=0; a.forEach(x=>{if(b.has(x))i++});
+  return i/(a.size+b.size-i);
+}
+function score(c){
+  const spec=S.nodes.filter(Boolean).length;
+  let nodeSim=1;
+  if(spec){
+    let hit=0;
+    S.nodes.forEach((s,i)=>{if(s&&c.k[i]===s)hit++});
+    nodeSim=hit/spec;
+  }
+  if(S.mode==="like"&&S.ref) return .6*nodeSim + .4*jaccard(S.ref.tset,c.tset);
+  return nodeSim;
+}
+function results(){
+  const dom=$("f-domain").value, crt=$("f-court").value, out=$("f-outcome").value;
+  const from=parseInt($("f-from").value,10), to=parseInt($("f-to").value,10);
+  const hi=$("f-highconf").checked, nr=$("f-noreview").checked, ne=$("f-nonempty").checked;
+  const xd=$("f-crossdomain").checked&&S.mode==="like"&&S.ref;
+  const strict=S.mode==="build";
+
+  let out2=S.data.cases.filter(c=>{
+    if(S.ref&&c.id===S.ref.id)return false;
+    if(dom&&c.d!==dom)return false;
+    if(crt&&c.c!==crt)return false;
+    if(out&&c.o!==out)return false;
+    if(!isNaN(from)&&(c.y||0)<from)return false;
+    if(!isNaN(to)&&(c.y||9999)>to)return false;
+    if(hi&&c.conf!=="h")return false;
+    if(nr&&c.rev)return false;
+    if(ne&&c.k==="iiiiiiii")return false;
+    if(xd&&c.d===S.ref.d)return false;
+    for(const t of S.req) if(!c.tset.has(t))return false;
+    for(const t of S.exc) if(c.tset.has(t))return false;
+    // In builder mode a specified node is a hard requirement; in reference mode the
+    // chain is a target to rank against, not a filter, so a near miss still surfaces.
+    if(strict) for(let i=0;i<8;i++) if(S.nodes[i]&&c.k[i]!==S.nodes[i])return false;
+    return true;
+  });
+  out2.forEach(c=>{c._s=score(c)});
+  const sort=$("f-sort").value;
+  const conf={h:2,m:1,l:0};
+  out2.sort((a,b)=>
+    sort==="recent"?(b.y||0)-(a.y||0):
+    sort==="oldest"?(a.y||9999)-(b.y||9999):
+    sort==="conf"?(conf[b.conf]??0)-(conf[a.conf]??0)||b._s-a._s:
+    b._s-a._s||(b.y||0)-(a.y||0));
+  return out2;
+}
+
+/* ── render ── */
+function render(){
+  if(!S.data)return;
+  const r=results(), n=r.length;
+  // In reference mode the chain ranks rather than filters, so the number is how many
+  // cases were ordered, not how many matched. Say which.
+  $("count").innerHTML=`<b>${n.toLocaleString()}</b> ${n===1?"case":"cases"}`+
+    (S.mode==="like"&&S.ref?` <span style="font-size:19px;color:var(--muted)">ranked</span>`:"");
+  $("query-summary").textContent=summary();
+
+  $("caveat").innerHTML = n===0 ? "" :
+    (S.mode==="like"&&S.ref
+      ? `Ranked by how closely each chain matches <i>${esc(S.ref.n)}</i>. Closeness is a shape
+         comparison between two machine annotations — it says these two opinions were read the same
+         way, not that they are legally analogous. That judgment is yours to make from the opinions.`
+      : `These are the cases whose annotation matches the signature you built. The match is to the
+         annotation, not to the opinion — read the case before relying on it.`);
+
+  renderCompose(r,n);
+
+  const rows=$("rows");
+  if(!n){
+    rows.innerHTML=`<div class="empty"><p>Nothing in the corpus carries that signature.</p>
+      <p>Signatures get specific fast — eight nodes and thirteen types describe far more shapes than
+      5,000 cases can fill. Try releasing a node to <i>any</i>, or dropping a required type.</p></div>`;
+    $("more").hidden=true; return;
+  }
+  rows.innerHTML=r.slice(0,S.limit).map(rowHTML).join("");
+  rows.querySelectorAll(".row").forEach(el=>el.addEventListener("click",ev=>{
+    if(ev.target.tagName==="A")return;
+    const c=S.data.cases.find(x=>String(x.id)===el.dataset.id);
+    const open=el.querySelector(".detail");
+    if(open){open.remove();return}
+    const d=document.createElement("div"); d.className="detail"; d.innerHTML=detailHTML(c);
+    el.appendChild(d);
+  }));
+  $("more").hidden = S.limit>=n;
+}
+function summary(){
+  const bits=[];
+  // Against a reference the full eight-node readout is noise — the shape is what matters.
+  const spec = (S.mode==="like"&&S.ref)
+    ? [chainWords(S.nodes.map(s=>s||"i").join(""))]
+    : S.nodes.map((s,i)=>s?`N${i+1} ${SNAME[s]}`:null).filter(Boolean);
+  if(spec.length)bits.push(spec.join(", "));
+  if(S.req.size)bits.push("with "+[...S.req].join(", "));
+  if(S.exc.size)bits.push("without "+[...S.exc].join(", "));
+  return bits.join("  ·  ");
+}
+function renderCompose(r,n){
+  const box=$("compose");
+  if(!n){box.innerHTML="";return}
+  const tally={}; r.forEach(c=>tally[c.o]=(tally[c.o]||0)+1);
+  const base={}; S.data.cases.forEach(c=>base[c.o]=(base[c.o]||0)+1);
+  const keys=Object.keys(tally).sort((a,b)=>tally[b]-tally[a]);
+  box.innerHTML=
+    `<p class="slabel">How these ${n.toLocaleString()} cases came out</p>
+     <div class="bar">${keys.map(k=>{
+        const pct=100*tally[k]/n;
+        return `<span style="width:${pct}%;background:${OUTCOL[k]||"#4a3f33"}"
+                 title="${esc(OUTLAB[k]||k)}: ${tally[k]}">${pct>7?Math.round(pct)+"%":""}</span>`;
+      }).join("")}</div>
+     <div class="legend">${keys.map(k=>{
+        const pct=100*tally[k]/n, bp=100*(base[k]||0)/S.data.n;
+        return `<span><i style="background:${OUTCOL[k]||"#4a3f33"}"></i>${esc(OUTLAB[k]||k)}
+                ${tally[k]} (${pct.toFixed(1)}%) · corpus ${bp.toFixed(1)}%</span>`;
+      }).join("")}</div>
+     <p style="font-size:14px;color:var(--muted);margin-top:10px;max-width:74ch">
+       Corpus percentages are shown beside each outcome so you can see how this set differs from the
+       whole. A difference is a place to look, not a result — the corpus is not a random sample and
+       these annotations have no measured error rate.</p>`;
+}
+function rowHTML(c){
+  const glyph=c.k.split("").map(s=>`<i data-s="${s}"></i>`).join("");
+  const flags=[];
+  if(c.conf!=="h")flags.push(`<span class="flag">${c.conf==="l"?"low":"medium"} confidence</span>`);
+  if(c.rev)flags.push(`<span class="flag">flagged for review</span>`);
+  return `<div class="row" data-id="${esc(c.id)}" tabindex="0">
+    <div class="glyph" aria-label="${esc(chainWords(c.k))}">${glyph}</div>
+    <div>
+      <div class="cname">${esc(c.n)}</div>
+      <div class="cmeta"><span>${esc(c.c)}</span><span>${c.y||"n.d."}</span>
+        <span>${esc((c.d||"").replace(/_/g," "))}</span>
+        <span style="color:${OUTCOL[c.o]}">${esc(OUTLAB[c.o]||c.o)}</span>
+        <span>${c.t.length} contradiction${c.t.length===1?"":"s"}</span>${flags.join("")}</div>
+      ${c.t.length?`<div class="tset">${c.t.map(esc).join(" · ")}</div>`:""}
+    </div>
+    <div class="score">${(c._s*100).toFixed(0)}<small>match</small></div>
+  </div>`;
+}
+function detailHTML(c){
+  const nodes=S.data.nodes.map((nm,i)=>
+    `<div class="dnode" data-s="${c.k[i]}"><b>N${i+1} ${esc(nm)}</b>${SNAME[c.k[i]]}</div>`).join("");
+  return `<div class="dgrid">${nodes}</div>
+    <p style="margin:14px 0 0;font-size:15px">
+      ${c.t.length?`Live contradictions: ${c.t.map(t=>esc(S.data.labels[t]||t)+
+        (S.data.forced[t]?` (${S.data.forced[t]})`:"")).join(", ")}.`:"No contradiction recorded."}
+      ${c.adv!=null?` The annotator rated the opposite reading ${Math.round(c.adv*100)}% defensible.`:""}
+    </p>
+    ${c.u?`<p style="margin:10px 0 0"><a href="${esc(c.u)}" target="_blank" rel="noopener">
+      Read the full opinion on CourtListener →</a></p>`
+     :`<p style="margin:10px 0 0;color:var(--muted);font-size:14px">
+      No verification link stored for this case${c.cite?` (${esc(c.cite)})`:""}.</p>`}`;
+}
+</script>
+</body>
+</html>

@@ -30,10 +30,19 @@ For structural clustering analysis (chi-square / correspondence analysis):
 - **Required per domain: 300–500 cases minimum**
 - **Target corpus: 500 per domain × 8 domains = 4,000 cases**
 
-Additionally, for Contradiction Debt predictive validity testing
-(does CD at decision time predict downstream litigation density?):
+**Superseded (3 October 2026).** This design originally called for Contradiction
+Debt *predictive validity* testing, asking whether debt at decision time predicts
+downstream litigation density. **That line of inquiry is withdrawn.** The v1
+predictive results rested on annotation forcing rules (RULE 1, RULE 5) that derived
+chain outcomes from node closures, and five contradiction types (RF, RCL, CC, SE,
+RPF) are definitionally entangled with the disposition. SOoL makes no predictive
+claims.
 
-- Need citation network data — CourtListener provides this
+Citation-network data is still collected, but for a different and descriptive
+purpose: tracing how a structural failure propagates through later citations, with
+no claim that debt forecasts anything.
+
+- Citation network data — CourtListener provides this
 - Need temporal spread: 1990–2024 gives 34 years of precedent propagation
 - Cases from 1990–2010 have enough downstream citation history to measure
 
@@ -94,8 +103,9 @@ Rationale:
 - 1990 post-dates the consolidation of the Pickering-Connick framework
   (giving First Amendment domain a stable baseline)
 - Pre-1990 cases available as precedent anchors but not in primary corpus
-- Cases from 1990–2010 have 14–34 years of downstream citation history
-  sufficient for CD predictive validity testing
+- Cases from 1990–2010 have 14–34 years of downstream citation history, which
+  supports descriptive citation-propagation analysis. The predictive-validity use
+  originally stated here is withdrawn; see the note above.
 - Cases from 2010–2024 represent the current doctrinal state
 
 ---
